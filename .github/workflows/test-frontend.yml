@@ -1,0 +1,35 @@
+name: Test Frontend
+
+on:
+  push:
+    branches:
+      - Tran-Dinh-Phong
+    paths:
+      - "my-app/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "my-app/**"
+
+jobs:
+  test:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
+
+      - name: Install dependencies
+        working-directory: my-app
+        run: npm install
+
+      - name: Run build
+        working-directory: my-app
+        run: npm run build
