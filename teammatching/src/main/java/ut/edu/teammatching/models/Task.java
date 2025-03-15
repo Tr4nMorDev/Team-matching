@@ -33,13 +33,17 @@ public class Task {
     @Column(name = "deadline")
     private LocalDate deadline;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "assigneeId")
-    private User assignee;
+    private boolean completed;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "teamId", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "assigned_to_student_id")
+    private Student assignedToStudent;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_to_lecturer_id")
+    private Lecturer assignedToLecturer;
+
+    @ManyToOne
+    @JoinColumn(name = "team_id")
     private Team team;
 }

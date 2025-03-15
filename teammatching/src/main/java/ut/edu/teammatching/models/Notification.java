@@ -10,6 +10,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import ut.edu.teammatching.enums.Gender;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -28,17 +29,14 @@ public class Notification {
     @Column(name = "type")
     private NotificationType type;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "recipientId", nullable = false)
-    private User recipient;
-
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "createdAt")
-    private Instant createdAt;
-
-    @ColumnDefault("0")
-    @Column(name = "isRead")
     private Boolean isRead;
+    private LocalDateTime createdAt;
 
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
+
+    @ManyToOne
+    @JoinColumn(name = "lecturer_id")
+    private Lecturer lecturer;
 }

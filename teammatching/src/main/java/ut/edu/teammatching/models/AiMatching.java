@@ -8,21 +8,21 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "AI_Matching")
+@Getter
+@Setter
 public class AiMatching {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "matchId", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
+    @OneToMany(mappedBy = "aiMatching", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AiMatchingUser> aiMatchingUsers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -35,5 +35,4 @@ public class AiMatching {
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "createdAt")
     private Instant createdAt;
-
 }

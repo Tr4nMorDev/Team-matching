@@ -1,54 +1,51 @@
 package ut.edu.teammatching.models;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import ut.edu.teammatching.enums.Gender;
 import ut.edu.teammatching.enums.Role;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Getter
-@Setter
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED) // Kế thừa với bảng riêng cho từng subclass
-@Table(name="User")
+@MappedSuperclass //Danh dau day la lop truu tuong dung chung cho cac enity con
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 public abstract class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userId", nullable = false)
-    private Long id;
 
     @Column(name = "userName", nullable = false)
-    private String userName;
+    protected String userName;
 
     @Column(name = "password", nullable = false)
-    private String password;
+    protected String password;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private Role role;
+    protected Role role;
 
     @Column(name = "fullName")
-    private String fullName;
+    protected String fullName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
-    private Gender gender;
+    protected Gender gender;
 
     @Column(name = "email")
-    private String email;
+    protected String email;
 
     @Lob
     @Column(name = "skills")
-    private String skills;
+    protected String skills;
 
     @Lob
     @Column(name = "hobby")
-    private String hobby;
+    protected String hobby;
 
     @Lob
     @Column(name = "projects")
-    private String projects;
+    protected String projects;
 
     @Column(name = "phoneNumber", length = 20)
-    private String phoneNumber;
+    protected String phoneNumber;
 }

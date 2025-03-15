@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -19,14 +21,17 @@ public class Comment {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "postId", nullable = false)
+    private LocalDateTime createAt;
+
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
+
+    @ManyToOne
+    @JoinColumn(name = "lecturer_id")
+    private Lecturer lecturer;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
     private Post post;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "authorId", nullable = false)
-    private User author;
-
 }
