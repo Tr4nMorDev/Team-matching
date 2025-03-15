@@ -1,53 +1,54 @@
 package ut.edu.teammatching.models;
-import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import ut.edu.teammatching.models.Profile;
+import ut.edu.teammatching.enums.Gender;
+import ut.edu.teammatching.enums.Role;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
-@Table (name = "user")
+@Inheritance(strategy = InheritanceType.JOINED) // Kế thừa với bảng riêng cho từng subclass
+@Table(name="User")
 public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @Column(name = "userId", nullable = false)
+    private Long id;
 
+    @Column(name = "userName", nullable = false)
     private String userName;
+
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Profile profileInfo;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role;
 
-    public User() {}
-    public User(String userName, String password) {
-        this.userName = userName;
-        this.password = password;
-    }
+    @Column(name = "fullName")
+    private String fullName;
 
-    public Long getUserId() {
-        return userId;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender")
+    private Gender gender;
 
-    public Profile getProfileInfo() {
-        return profileInfo;
-    }
+    @Column(name = "email")
+    private String email;
 
-    public String getPassword() {
-        return password;
-    }
+    @Lob
+    @Column(name = "skills")
+    private String skills;
 
-    public String getUserName() {
-        return userName;
-    }
+    @Lob
+    @Column(name = "hobby")
+    private String hobby;
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
+    @Lob
+    @Column(name = "projects")
+    private String projects;
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    
-    public void setProfileInfo(Profile profileInfo) {
-        this.profileInfo = profileInfo;
-    }
+    @Column(name = "phoneNumber", length = 20)
+    private String phoneNumber;
 }
