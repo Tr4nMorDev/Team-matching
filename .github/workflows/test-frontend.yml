@@ -18,35 +18,31 @@ jobs:
 
     steps:
       # Bước checkout code
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Change to my-app directory
+        run: cd my-app
 
-      # Thiết lập Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: "npm"
+          cache: npm
 
-      # Xóa cache npm để đảm bảo không còn cache cũ
+      # Xóa cache npm (nếu có)
       - name: Clear npm cache
         run: npm cache clean --force
-
-      # Kiểm tra cấu trúc thư mục
-      - name: Check working directory
-        run: pwd && ls -la
+        working-directory: ./my-app
 
       # Cài đặt dependencies
       - name: Install dependencies
-        working-directory: my-app
         run: npm install
+        working-directory: ./my-app
 
       # Xây dựng dự án
       - name: Run build
-        working-directory: my-app
         run: npm run build
+        working-directory: ./my-app
 
       # Kiểm tra kết quả build
       - name: Verify build
-        working-directory: my-app
         run: ls -la dist
+        working-directory: ./my-app
