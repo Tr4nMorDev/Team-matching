@@ -17,19 +17,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Bước checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Thiết lập Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: "npm"
 
+      # Kiểm tra cấu trúc thư mục
+      - name: Check working directory
+        run: pwd && ls -la
+
+      # Cài đặt dependencies
       - name: Install dependencies
         working-directory: my-app
         run: npm install
 
+      # Xây dựng dự án
       - name: Run build
         working-directory: my-app
         run: npm run build
+
+      # Kiểm tra kết quả build
+      - name: Verify build
+        working-directory: my-app
+        run: ls -la build
