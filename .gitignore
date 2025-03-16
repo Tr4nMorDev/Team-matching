@@ -31,7 +31,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-teammatching/src/main/resources/application.properties
+# teammatching/src/main/resources/application.properties
 .idea
 teammatching/target/
 
