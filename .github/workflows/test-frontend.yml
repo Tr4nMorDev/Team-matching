@@ -28,6 +28,10 @@ jobs:
           node-version: 18
           cache: "npm"
 
+      # Xóa cache npm để đảm bảo không còn cache cũ
+      - name: Clear npm cache
+        run: npm cache clean --force
+
       # Kiểm tra cấu trúc thư mục
       - name: Check working directory
         run: pwd && ls -la
@@ -45,4 +49,4 @@ jobs:
       # Kiểm tra kết quả build
       - name: Verify build
         working-directory: my-app
-        run: ls -la build
+        run: ls -la dist
