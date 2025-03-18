@@ -3,17 +3,25 @@ package ut.edu.teammatching.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import java.time.Instant;
 
 @Getter
 @Setter
 @Entity
+@Table(name="message")
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "messageId", nullable = false)
     private Long id;
+
+    @Column(name = "sentAt", nullable = false, updatable = false)
+    @CreationTimestamp
+    private Instant sentAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

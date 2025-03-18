@@ -6,9 +6,13 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
+@Table(name="comment")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,5 +32,4 @@ public class Comment {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "authorId", nullable = false)
     private User author;
-
 }

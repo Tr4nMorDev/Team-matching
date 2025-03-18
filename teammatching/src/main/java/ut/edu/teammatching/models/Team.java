@@ -6,9 +6,13 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
+@Table(name="team")
 public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,4 +31,13 @@ public class Team {
     @JoinColumn(name = "leaderId", nullable = false)
     private User leader;
 
+    @ManyToMany(mappedBy = "teams")
+    private List<Student> students = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "lecturer_id")
+    private Lecturer lecturer;
+
+    @OneToMany(mappedBy = "team")
+    private List<Task> tasks = new ArrayList<>();
 }

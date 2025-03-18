@@ -35,5 +35,4 @@ public class AiMatching {
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "createdAt")
     private Instant createdAt;
-
 }

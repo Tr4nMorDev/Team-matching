@@ -14,6 +14,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
+@Table(name="notification")
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,5 +41,4 @@ public class Notification {
     @ColumnDefault("0")
     @Column(name = "isRead")
     private Boolean isRead;
-
 }

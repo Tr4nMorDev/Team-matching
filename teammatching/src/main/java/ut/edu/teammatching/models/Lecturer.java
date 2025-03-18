@@ -6,20 +6,14 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
-public class Lecturer {
-    @Id
-    @Column(name = "userId", nullable = false)
-    private Long id;
-
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
-
+@Table(name="lecturer")
+public class Lecturer extends User {
     @Column(name = "department", nullable = false)
     private String department;
 
@@ -27,4 +21,6 @@ public class Lecturer {
     @Column(name = "ResearchAreas")
     private String researchAreas;
 
+    @OneToMany(mappedBy = "lecturer")
+    private List<Team> supervisedTeams = new ArrayList<>();
 }
