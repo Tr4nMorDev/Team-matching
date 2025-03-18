@@ -1,51 +1,72 @@
 package ut.edu.teammatching.models;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import ut.edu.teammatching.enums.Gender;
 import ut.edu.teammatching.enums.Role;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
-@MappedSuperclass //Danh dau day la lop truu tuong dung chung cho cac enity con
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED) // Kế thừa với bảng riêng cho từng subclass
+@Table(name="users")
 public abstract class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id", nullable = false)
+    private Long id;
 
-    @Column(name = "userName", nullable = false)
-    protected String userName;
+    @Column(name = "userName", nullable = false, unique = true)
+    private String userName;
 
     @Column(name = "password", nullable = false)
-    protected String password;
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    protected Role role;
+    private Role role;
 
     @Column(name = "fullName")
-    protected String fullName;
+    private String fullName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
-    protected Gender gender;
+    private Gender gender;
 
-    @Column(name = "email")
-    protected String email;
+    @Column(name = "email", unique = true)
+    private String email;
 
     @Lob
     @Column(name = "skills")
-    protected String skills;
+    private String skills;
 
     @Lob
     @Column(name = "hobby")
-    protected String hobby;
+    private String hobby;
 
     @Lob
     @Column(name = "projects")
-    protected String projects;
+    private String projects;
 
-    @Column(name = "phoneNumber", length = 20)
-    protected String phoneNumber;
+    @Column(name = "phoneNumber", length = 20, unique = true)
+    private String phoneNumber;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> sentMessages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> receivedMessages = new ArrayList<>();
 }

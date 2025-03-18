@@ -13,13 +13,14 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
+@Table(name="tasks")
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "taskId", nullable = false)
+    @Column(name = "task_id", nullable = false)
     private Long id;
 
-    @Column(name = "taskName", nullable = false)
+    @Column(name = "task_name", nullable = false)
     private String taskName;
 
     @Lob
@@ -33,17 +34,15 @@ public class Task {
     @Column(name = "deadline")
     private LocalDate deadline;
 
-    private boolean completed;
-
-    @ManyToOne
-    @JoinColumn(name = "assigned_to_student_id")
+    // Liên kết với Student (người được giao task)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "student_id", nullable = false)
     private Student assignedToStudent;
 
-    @ManyToOne
-    @JoinColumn(name = "assigned_to_lecturer_id")
-    private Lecturer assignedToLecturer;
-
-    @ManyToOne
-    @JoinColumn(name = "team_id")
+    // Liên kết với Team (nhóm chứa task)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 }

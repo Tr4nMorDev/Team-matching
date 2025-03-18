@@ -12,14 +12,13 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Table(name="posts")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "postId", nullable = false)
+    @Column(name = "post_id", nullable = false)
     private Long id;
 
-    @Column(nullable = false)
-    private String title;
     @Lob
     @Column(name = "content", nullable = false)
     private String content;
@@ -28,18 +27,13 @@ public class Post {
     @Column(name = "images")
     private String images;
 
-    @Lob
-    @Column(name = "videos")
-    private String videos;
+    // Liên kết với User (tác giả bài viết)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "user_id", nullable = false) // Thống nhất với Comment.java
+    private User author;
 
-    @ManyToOne
-    @JoinColumn(name = "student_id")
-    private Student student;
-
-    @ManyToOne
-    @JoinColumn(name = "lecturer_id")
-    private Lecturer lecturer;
-
-    @OneToMany(mappedBy = "post")
+    // Liên kết với Comment
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 }
