@@ -1,27 +1,32 @@
 package ut.edu.teammatching.models;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 
 @Entity
-@Table(name = "Students")
+@Table(name = "student")
 public class Student {
     @Id
-    @Column(name = "userId", nullable = false)
+    @Column(name = "userId")
     private Long id;
 
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "userId", nullable = false)
-    private User users;
-
-    @Column(name = "major", nullable = false)
+    @Column(nullable = false)
     private String major;
 
-    @Column(name = "term", nullable = false)
+    @Column(nullable = false)
     private Integer term;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "userId")
+    private User user;
 
     public Long getId() {
         return id;
@@ -29,14 +34,6 @@ public class Student {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUsers() {
-        return users;
-    }
-
-    public void setUsers(User users) {
-        this.users = users;
     }
 
     public String getMajor() {
@@ -55,4 +52,14 @@ public class Student {
         this.term = term;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+        if (user != null) {
+            this.id = user.getId();
+        }
+    }
 }

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import CreateGroupForm from "./AddNewGroup";
 import { useGroupContext } from "../../context/GroupContext";
 
@@ -46,6 +47,7 @@ const groups = [
 ];
 
 const GroupsComponent = () => {
+  const navigate = useNavigate(); // Khai báo useNavigate
   const [showAddGroup, setShowAddGroup] = useState(false);
   const { isGroupPending, addPendingGroup, isGroupJoined, acceptPendingGroup } =
     useGroupContext();
@@ -64,6 +66,10 @@ const GroupsComponent = () => {
 
   const handleAcceptGroup = (groupName) => {
     acceptPendingGroup(groupName);
+  };
+
+  const handleNavigateToGroup = (groupName) => {
+    navigate(`/group/${groupName}`);
   };
 
   return (
@@ -127,7 +133,7 @@ const GroupsComponent = () => {
                   if (!isJoined && !isPending) {
                     handleAddGroup(group.name);
                   } else if (isJoined) {
-                    alert(`Đang chuyển đến trang nhóm ${group.name}`);
+                    handleNavigateToGroup(group.name); // Điều hướng đến trang nhóm
                   }
                 }}
                 disabled={isPending}
@@ -135,7 +141,6 @@ const GroupsComponent = () => {
                 {isJoined ? "Enroll" : isPending ? "Chờ leader xử lý" : "Join"}
               </button>
 
-              {/* Nút leader chấp nhận (giả lập) */}
               {isPending && (
                 <button
                   className="mt-2 py-1 px-3 rounded-full bg-purple-500 text-white cursor-pointer"

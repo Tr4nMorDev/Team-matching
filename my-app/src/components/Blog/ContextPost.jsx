@@ -1,9 +1,17 @@
 import CreatePost from "./CreatePost";
 import PostItem from "./PostItem";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../context/useAuth";
+import getPosts from "../../api/userApi";
 
 const MainContent = () => {
   const { isLoggedIn } = useAuth();
+  const [posts, setPosts] = useState([]);
+  useEffect(() => {
+    getPosts()
+      .then((data) => setPosts(data))
+      .catch(console.error);
+  }, []);
 
   return (
     <main className="flex justify-center bg-gray-100 min-h-screen py-10">
@@ -12,7 +20,17 @@ const MainContent = () => {
         {isLoggedIn && <CreatePost />}
 
         {/* Danh sách bài viết luôn hiển thị */}
-        <PostItem />
+        {posts.map((post) => (
+          <PostItem
+            key={post.id}
+            name={post.author.userName}
+            avatar={post.author.profilePictureUrl}
+            time={post.createdAt}
+            image={post.images}
+            content={post.content}
+            like={post.likeCount}
+          />
+        ))}
         <PostItem />
       </div>
     </main>

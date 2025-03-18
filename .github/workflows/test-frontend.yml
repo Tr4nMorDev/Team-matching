@@ -30,6 +30,7 @@ jobs:
 
       # Xóa cache npm để đảm bảo không còn cache cũ
       - name: Clear npm cache
+        working-directory: my-app
         run: npm cache clean --force
 
       # Kiểm tra cấu trúc thư mục

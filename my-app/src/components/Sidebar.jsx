@@ -1,10 +1,11 @@
-import { Home, Users, Bell, Mail, Menu, User, CheckSquare } from "lucide-react";
+import { Home, Users, CheckSquare, Menu, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 
 const Sidebar = ({ isOpen, toggleSidebar, userRole }) => {
   const location = useLocation();
-  const { isLoggedIn, user, role } = useAuth();
+  const { isLoggedIn } = useAuth();
+
   // 🌟 Role-based routes
   const routes = {
     noLogin: [
@@ -34,14 +35,15 @@ const Sidebar = ({ isOpen, toggleSidebar, userRole }) => {
       },
     ],
   };
+
   const handleLinkClick = (e, requiresAuth) => {
     if (requiresAuth && !isLoggedIn) {
       e.preventDefault();
-      // Implement your login prompt logic here
       alert("Please log in to access this section.");
     }
   };
-  const sidebarItems = routes[userRole] || routes.noLogin; // Mặc định là student nếu không có role
+
+  const sidebarItems = routes[userRole] || routes.noLogin;
 
   return (
     <div
@@ -49,15 +51,16 @@ const Sidebar = ({ isOpen, toggleSidebar, userRole }) => {
         isOpen ? "w-64" : "w-16"
       } bg-white shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
     >
-      {/* Button Toggle Menu */}
       <button className="p-4 text-gray-500" onClick={toggleSidebar}>
         {isOpen ? "✖" : <Menu className="w-6 h-6" />}
       </button>
 
-      {/* Sidebar Items */}
-      <div className="flex flex-col items-start mt-9 space-y-2 px-2 ">
+      <div className="flex flex-col items-start mt-9 space-y-2 px-2">
         {sidebarItems.map((item) => {
-          const isActive = location.pathname === item.path;
+          const isActive =
+            item.path === "/"
+              ? location.pathname === item.path
+              : location.pathname.startsWith(item.path);
           const isDisabled = item.requiresAuth && !isLoggedIn;
           return (
             <Link

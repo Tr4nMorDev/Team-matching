@@ -1,28 +1,24 @@
 package ut.edu.teammatching.models;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "Lecturers")
+@Table(name = "lecturer")
 public class Lecturer {
     @Id
-    @Column(name = "userId", nullable = false)
+    @Column(name = "userId")
     private Long id;
 
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "userId", nullable = false)
-    private User users;
-
-    @Column(name = "department", nullable = false)
+    @Column(nullable = false)
     private String department;
 
-    @Lob
-    @Column(name = "ResearchAreas")
+    @Column(name = "ResearchAreas", columnDefinition = "TEXT")
     private String researchAreas;
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "userId")
+    private User user;
 
     public Long getId() {
         return id;
@@ -30,14 +26,6 @@ public class Lecturer {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUsers() {
-        return users;
-    }
-
-    public void setUsers(User users) {
-        this.users = users;
     }
 
     public String getDepartment() {
@@ -56,4 +44,14 @@ public class Lecturer {
         this.researchAreas = researchAreas;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+        if (user != null) {
+            this.id = user.getId();
+        }
+    }
 }

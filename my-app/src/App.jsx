@@ -9,8 +9,7 @@ import MainContent from "./components/Blog/ContextPost";
 import FriendsSidebar from "./components/FriendsSidebar"; // Import sidebar bạn bè
 import ProfileStudent from "./components/Profile/ProfileInfoStudent";
 import GroupsComponent from "./components/Group/Group";
-import StudentGroupDashboard from "./components/Group/StudentAfterJoinGroup";
-import LeaderGroupDashBoard from "./components/Group/LeaderAfterJoinGroup";
+import GroupDashBoard from "./components/Group/AfterJoinGroup";
 import UserList from "./api/UserList";
 
 function App() {
@@ -75,8 +74,7 @@ function App() {
           <Route path="/profile" element={<ProfileStudent />} />
         )}
         <Route path="/group" element={<GroupsComponent />} />
-        <Route path="/group/student/" element={<StudentGroupDashboard />} />
-        <Route path="/group/leader/" element={<LeaderGroupDashBoard />} />
+        <Route path="/group/:namegroup" element={<GroupDashBoard />} />
         <Route path="api/user" element={<UserList />} />
       </Routes>
     </>

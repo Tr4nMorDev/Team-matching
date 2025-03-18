@@ -1,14 +1,15 @@
 import { Users, Bell } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // Notification Bar Component
 const NotificationBar = ({ groupName, notificationCount }) => (
   <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-md mb-4">
     <div className="flex items-center gap-2">
       <Users className="text-blue-500" />
-      <span className="text-gray-600">
-        Đã tiến vào group {">"}{" "}
-        <span className="font-semibold">{groupName}</span>
-      </span>
+      <Link to="/group" className="text-blue-600 font-semibold hover:underline">
+        group
+      </Link>
+      <span className="font-semibold"> &gt; {groupName}</span>
     </div>
     <div className="flex items-center gap-4">
       <div className="relative">

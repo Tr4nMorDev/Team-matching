@@ -1,51 +1,68 @@
 package ut.edu.teammatching.models;
 
+import org.hibernate.annotations.Index;
 import jakarta.persistence.*;
+import java.util.List;
+import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name = "Users")
+@Table(name = "user")
+@JsonIdentityInfo(
+    generator = ObjectIdGenerators.PropertyGenerator.class,
+    property = "id"
+)
 public class User {
     @Id
-    @Column(name = "userId", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "userId")
     private Long id;
 
-    @Column(name = "userName", nullable = false)
+    @Column(name = "userName", nullable = false, unique = true)
     private String userName;
 
-    @Column(name = "password", nullable = false)
+    @Column(nullable = false)
     private String password;
 
-    @Lob
-    @Column(name = "role", nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @Column(name = "fullName")
     private String fullName;
-
-    @Lob
-    @Column(name = "gender")
-    private String gender;
-
+    
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+    
     @Column(name = "profilePictureUrl")
     private String profilePictureUrl;
-
-    @Column(name = "email")
+    
+    @Column(unique = true)
     private String email;
-
-    @Lob
-    @Column(name = "skills")
+    
+    @Column(columnDefinition = "TEXT")
     private String skills;
-
-    @Lob
-    @Column(name = "hobby")
+    
+    @Column(columnDefinition = "TEXT")
     private String hobby;
-
-    @Lob
-    @Column(name = "projects")
+    
+    @Column(columnDefinition = "TEXT")
     private String projects;
-
-    @Column(name = "phoneNumber", length = 20)
+    
+    @Column(name = "phoneNumber")
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "author")
+    @JsonIgnoreProperties({"author", "hibernateLazyInitializer", "handler"})
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Lecturer lecturer;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Student student;
 
     public Long getId() {
         return id;
@@ -71,11 +88,11 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
@@ -87,11 +104,11 @@ public class User {
         this.fullName = fullName;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
@@ -143,4 +160,27 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
+    public Lecturer getLecturer() {
+        return lecturer;
+    }
+
+    public void setLecturer(Lecturer lecturer) {
+        this.lecturer = lecturer;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
 }

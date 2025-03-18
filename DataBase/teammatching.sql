@@ -1,34 +1,48 @@
--- Bảng User
-CREATE TABLE User (
-                      userId BIGINT PRIMARY KEY AUTO_INCREMENT,
-                      userName VARCHAR(255) NOT NULL UNIQUE,
-                      password VARCHAR(255) NOT NULL,
-                      role ENUM('STUDENT', 'LECTURER') NOT NULL,
-                      fullName VARCHAR(255),
-                      gender ENUM('MALE', 'FEMALE', 'OTHER'),
-                      profilePictureUrl VARCHAR(255),
-                      email VARCHAR(255) UNIQUE,
-                      skills TEXT,
-                      hobby TEXT,
-                      projects TEXT,
-                      phoneNumber VARCHAR(20),
+
+CREATE TABLE user (
+    userId BIGINT AUTO_INCREMENT PRIMARY KEY,
+    userName VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(60) NOT NULL,
+    role ENUM('STUDENT', 'LECTURER') NOT NULL,
+    fullName VARCHAR(255),
+    gender ENUM('MALE', 'FEMALE', 'OTHER'),
+    profilePictureUrl VARCHAR(255),
+    email VARCHAR(255) UNIQUE,
+    skills TEXT,
+    hobby TEXT,
+    projects TEXT,
+    phoneNumber VARCHAR(20)
 );
 
 -- Bảng Student (Kế thừa từ User)
-CREATE TABLE Student (
+CREATE TABLE student (
                          userId BIGINT PRIMARY KEY,
                          major VARCHAR(255) NOT NULL,
                          term INT NOT NULL,
-                         FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE CASCADE
+                         FOREIGN KEY (userId) REFERENCES user(userId) ON DELETE CASCADE
 );
 
--- Bảng Lecturer (Kế thừa từ User)
-CREATE TABLE Lecturer (
+
+CREATE TABLE lecturer (
                           userId BIGINT PRIMARY KEY,
                           department VARCHAR(255) NOT NULL,
                           ResearchAreas TEXT,
-                          FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE CASCADE
+                          FOREIGN KEY (userId) REFERENCES user(userId) ON DELETE CASCADE
 );
+
+CREATE TABLE `post` (
+  `post_id` bigint NOT NULL AUTO_INCREMENT,
+  `content` text NOT NULL,
+  `images` text,
+  `author_id` bigint DEFAULT NULL,
+  `like_count` int NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`post_id`),
+  KEY `author_id` (`author_id`),
+  CONSTRAINT `post_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `user` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
 
 -- Bảng Team
 CREATE TABLE Team (
@@ -61,14 +75,7 @@ CREATE TABLE Task (
 );
 
 -- Bảng Post
-CREATE TABLE Post (
-                      postId BIGINT PRIMARY KEY AUTO_INCREMENT,
-                      content TEXT NOT NULL,
-                      images TEXT,
-                      videos TEXT,
-                      authorId BIGINT NOT NULL,
-                      FOREIGN KEY (authorId) REFERENCES User(userId) ON DELETE CASCADE
-);
+
 
 -- Bảng Comment
 CREATE TABLE Comment (
