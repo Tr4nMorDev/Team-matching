@@ -1,159 +1,153 @@
-'FPT Team Matching is a platform designed to help FPTU students connect with teams and find collaborators for academic or personal projects. It supports both academic teams (for projects in the final terms) and external teams (for personal, lecturer-led, or extracurricular projects). The system aims to simplify team formation and promote collaboration by matching students with relevant projects based on their skills and interests. 
+'FPT Team Matching is a platform designed to help FPTU students connect with teams and find collaborators for academic or personal projects. It supports both academic teams (for projects in the final terms) and external teams (for personal, lecturer-led, or extracurricular projects). The system aims to simplify team formation and promote collaboration by matching students with relevant projects based on their skills and interests.
 
-Student Profiles Management: Create detailed profiles with skills, interests, and achievements. 
+Student Profiles Management: Create detailed profiles with skills, interests, and achievements.
 
-Team Member Management: Tools to create, join, remove team members, rate members performance or manage project teams based on skills. 
+Team Member Management: Tools to create, join, remove team members, rate members performance or manage project teams based on skills.
 
-Blogs Management: Post and read blogs about finding team members or finding projects to apply to. 
+Blogs Management: Post and read blogs about finding team members or finding projects to apply to.
 
-AI Profile Scanning & Filter: Suggest compatible teammates based on skills and preferences. 
+AI Profile Scanning & Filter: Suggest compatible teammates based on skills and preferences.
 
-Messaging: Integrated chat for seamless communication. 
+Messaging: Integrated chat for seamless communication.
 
-Event Notifications: Updates on workshops, deadlines, and milestones. 
+Event Notifications: Updates on workshops, deadlines, and milestones.
 
-PROPOSED SOLUTIONS 
+PROPOSED SOLUTIONS
 
-The FPT Team Matching platform helps FPTU students connect with teams for academic and personal projects by offering tools for profile management, team creation, and collaboration. Students can create detailed profiles, tag skills, and specify project preferences to enhance matching. AI-powered suggestions help identify compatible teammates based on skills and availability, while team leaders can assign roles and rate member performance. 
+The FPT Team Matching platform helps FPTU students connect with teams for academic and personal projects by offering tools for profile management, team creation, and collaboration. Students can create detailed profiles, tag skills, and specify project preferences to enhance matching. AI-powered suggestions help identify compatible teammates based on skills and availability, while team leaders can assign roles and rate member performance.
 
- 
+The platform also features integrated messaging for seamless communication, blog management for sharing project insights, and event notifications for important deadlines and events. Students can freely create or join teams, communicate in group chats, and stay updated on workshops or project milestones, ensuring a smooth and productive team-building experience.
 
-The platform also features integrated messaging for seamless communication, blog management for sharing project insights, and event notifications for important deadlines and events. Students can freely create or join teams, communicate in group chats, and stay updated on workshops or project milestones, ensuring a smooth and productive team-building experience. 
+FUNCTIONAL REQUIREMENT
 
-FUNCTIONAL REQUIREMENT 
+Team Management
 
-Team Management 
+This section covers features related to creating and managing teams for FPTU students, with two distinct types of teams: academic teams for term projects and external teams for personal or lecturer-related projects.
 
-This section covers features related to creating and managing teams for FPTU students, with two distinct types of teams: academic teams for term projects and external teams for personal or lecturer-related projects. 
+Team Creation and Management (Students & Lecturers):
 
- 
+Students can create teams freely without needing approval from Admins or Lecturers.
 
-Team Creation and Management (Students & Lecturers): 
+Teams can be created for academic purposes (Term 7, 8, 9) or external projects (personal projects, research, lecturer projects).
 
-Students can create teams freely without needing approval from Admins or Lecturers. 
+Academic Teams must include team members who are enrolled in the same term or relevant course (Term 7, 8, 9).
 
-Teams can be created for academic purposes (Term 7, 8, 9) or external projects (personal projects, research, lecturer projects). 
+External Teams can include students from various terms or departments, suitable for personal, lecturer-led, or extracurricular projects.
 
-Academic Teams must include team members who are enrolled in the same term or relevant course (Term 7, 8, 9). 
+Team Leaders are responsible for managing the team, inviting members, assigning roles, and overseeing progress.
 
-External Teams can include students from various terms or departments, suitable for personal, lecturer-led, or extracurricular projects. 
+Team Information includes a description, required skills, and expected timeline.
 
-Team Leaders are responsible for managing the team, inviting members, assigning roles, and overseeing progress. 
+Team Search and Matching (Students):
 
-Team Information includes a description, required skills, and expected timeline. 
+Students can search for teams based on skills, interests, project goals, and team type (academic or external).
 
-Team Search and Matching (Students): 
+Academic Teams show project descriptions, required skills, and available roles.
 
-Students can search for teams based on skills, interests, project goals, and team type (academic or external). 
+External Teams can be searched based on project type (e.g., personal startup, lecturer project), skills, and availability.
 
-Academic Teams show project descriptions, required skills, and available roles. 
+An AI Filter will be provided to help connect students with teams based on their profiles.
 
-External Teams can be searched based on project type (e.g., personal startup, lecturer project), skills, and availability. 
+Team Communication and Collaboration (Students & Lecturers):
 
-An AI Filter will be provided to help connect students with teams based on their profiles. 
+Teams have chat channels for discussions, updates, and coordination.
 
-Team Communication and Collaboration (Students & Lecturers): 
+Task management tools for teams to assign tasks, set deadlines, and track progress.
 
-Teams have chat channels for discussions, updates, and coordination. 
+Lecturers can provide feedback on academic teams and ensure alignment with course objectives.
 
-Task management tools for teams to assign tasks, set deadlines, and track progress. 
+Team Roles (Students & Lecturers):
 
-Lecturers can provide feedback on academic teams and ensure alignment with course objectives. 
+Team Leaders can assign roles (e.g., team leader, developer, designer, etc.) for both Academic Teams and External Teams.
 
-Team Roles (Students & Lecturers): 
+Academic Teams may have predefined roles based on project requirements or course structure.
 
-Team Leaders can assign roles (e.g., team leader, developer, designer, etc.) for both Academic Teams and External Teams. 
+External Teams offer more flexibility, allowing team leaders to assign roles based on student expertise.
 
-Academic Teams may have predefined roles based on project requirements or course structure. 
+Lecturers can monitor the progress of academic teams and intervene as needed.
 
-External Teams offer more flexibility, allowing team leaders to assign roles based on student expertise. 
+Team Invitations (Students):
 
-Lecturers can monitor the progress of academic teams and intervene as needed. 
+Team Leaders can invite students to join teams based on skills and availability.
 
-Team Invitations (Students): 
+Students can accept or decline invitations.
 
-Team Leaders can invite students to join teams based on skills and availability. 
+Academic Teams ensure students are in the correct term and course for the project.
 
-Students can accept or decline invitations. 
+External Teams can invite students from various terms and departments.
 
-Academic Teams ensure students are in the correct term and course for the project. 
+Team Evaluation (Students & Lecturers):
 
-External Teams can invite students from various terms and departments. 
+Lecturers can evaluate Academic Teams based on reports, individual contributions, and project quality.
 
-Team Evaluation (Students & Lecturers): 
+Team Members can evaluate each other at the end of the project, giving feedback on contributions and collaboration.
 
-Lecturers can evaluate Academic Teams based on reports, individual contributions, and project quality. 
+Social Network Management
 
-Team Members can evaluate each other at the end of the project, giving feedback on contributions and collaboration. 
+This section focuses on features related to student and lecturer profiles, social interactions, and networking within the platform.
 
-Social Network Management 
+Profile Management (Students & Lecturers):
 
-This section focuses on features related to student and lecturer profiles, social interactions, and networking within the platform. 
+Students and lecturers can create detailed profiles with academic backgrounds, skills, interests, and project experience.
 
-Profile Management (Students & Lecturers): 
+Lecturers can include information on research, projects, and external collaborations.
 
-Students and lecturers can create detailed profiles with academic backgrounds, skills, interests, and project experience. 
+Students can specify their availability, skills, and interests to help match with relevant teams.
 
-Lecturers can include information on research, projects, and external collaborations. 
+Profile Search and Discovery:
 
-Students can specify their availability, skills, and interests to help match with relevant teams. 
+Students can search for other students or lecturers based on shared skills, interests, or project needs.
 
-Profile Search and Discovery: 
+Lecturers can search for students based on specific skills required for research or external projects.
 
-Students can search for other students or lecturers based on shared skills, interests, or project needs. 
+Connection Management (Students & Lecturers):
 
-Lecturers can search for students based on specific skills required for research or external projects. 
+Students and lecturers can send connection requests to one another.
 
-Connection Management (Students & Lecturers): 
+Connections can be accepted or declined, allowing users to build networks for academic or collaborative purposes.
 
-Students and lecturers can send connection requests to one another. 
+Students can connect with peers for teamwork, and lecturers can connect with students for project or research purposes.
 
-Connections can be accepted or declined, allowing users to build networks for academic or collaborative purposes. 
+Posting and Newsfeed (Students & Lecturers):
 
-Students can connect with peers for teamwork, and lecturers can connect with students for project or research purposes. 
+Students and lecturers can create posts about their projects, academic events, achievements, or other relevant topics.
 
-Posting and Newsfeed (Students & Lecturers): 
+Posts can be liked, commented on, and shared within the network.
 
-Students and lecturers can create posts about their projects, academic events, achievements, or other relevant topics. 
+The news feed shows updates from connected users, team activities, and academic announcements.
 
-Posts can be liked, commented on, and shared within the network. 
+Interaction and Engagement (Students & Lecturers):
 
-The news feed shows updates from connected users, team activities, and academic announcements. 
+Students and lecturers can interact with posts by liking, commenting, and sharing.
 
- 
+Students can endorse each other's skills and contributions.
 
-Interaction and Engagement (Students & Lecturers): 
+Lecturers can provide academic feedback on posts or projects.
 
-Students and lecturers can interact with posts by liking, commenting, and sharing. 
+Messaging System (Students & Lecturers):
 
-Students can endorse each other's skills and contributions. 
+A messaging system allows private conversations between students, lecturers, and team members.
 
-Lecturers can provide academic feedback on posts or projects. 
+Group chats for team discussions or student-lecturer interactions.
 
-Messaging System (Students & Lecturers): 
+Direct messages support text, files, and media sharing.
 
-A messaging system allows private conversations between students, lecturers, and team members. 
+Notifications and Alerts:
 
-Group chats for team discussions or student-lecturer interactions. 
+Lecturers will receive notifications when students join teams for academic projects.
 
-Direct messages support text, files, and media sharing. 
+Students will get alerts for team events, deadlines, and messages.
 
-Notifications and Alerts: 
+NON-FUNCTIONAL REQUIREMENT
 
-Lecturers will receive notifications when students join teams for academic projects. 
+Scalability & Performance
 
-Students will get alerts for team events, deadlines, and messages. 
+The platform must handle a growing number of users (students and lecturers) efficiently, with low latency and fast response times. It should scale horizontally to accommodate increased traffic during peak periods like project deadlines or events.
 
-NON-FUNCTIONAL REQUIREMENT 
+Usability & Accessibility
 
-Scalability & Performance 
+The platform should offer an intuitive, user-friendly interface that works seamlessly across both desktop and mobile devices. It must be easy for students, lecturers, and administrators to navigate, with a smooth experience for profile management, team creation, and communication.
 
-The platform must handle a growing number of users (students and lecturers) efficiently, with low latency and fast response times. It should scale horizontally to accommodate increased traffic during peak periods like project deadlines or events. 
+Security & Reliability
 
-Usability & Accessibility 
-
-The platform should offer an intuitive, user-friendly interface that works seamlessly across both desktop and mobile devices. It must be easy for students, lecturers, and administrators to navigate, with a smooth experience for profile management, team creation, and communication. 
-
-Security & Reliability 
-
-User data must be securely stored and transmitted, with multi-factor authentication and role-based access controls. The system should be highly available with minimal downtime, ensuring continuous access and a reliable user experience. 
+# User data must be securely stored and transmitted, with multi-factor authentication and role-based access controls. The system should be highly available with minimal downtime, ensuring continuous access and a reliable user experience.
