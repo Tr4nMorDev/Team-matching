@@ -26,7 +26,7 @@ const MainContent = () => {
             name={post.author.userName}
             avatar={post.author.profilePictureUrl}
             time={post.createdAt}
-            image={post.images}
+            image="http://localhost:8080/imagespost/image2.jpg"
             content={post.content}
             like={post.likeCount}
           />
@@ -38,3 +38,4 @@ const MainContent = () => {
 };
 
 export default MainContent;
+prop;

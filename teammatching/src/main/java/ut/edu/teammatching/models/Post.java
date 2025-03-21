@@ -9,10 +9,6 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "post")
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id"
-)
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +21,10 @@ public class Post {
     @Column(columnDefinition = "TEXT")
     private String images;
 
-    @Column(name = "like_count", nullable = false)
+    @Column(name = "author_id")
+    private Long authorId;
+
+    @Column(name = "like_count")
     private Integer likeCount = 0;
 
     @Column(name = "created_at", insertable = false, updatable = false)
@@ -34,8 +33,8 @@ public class Post {
     @Column(name = "updated_at", insertable = false, updatable = false)
     private Instant updatedAt;
 
-    @ManyToOne(fetch = FetchType.EAGER)  // Chuyển sang EAGER
-    @JoinColumn(name = "author_id", referencedColumnName = "userId")  // Đặt lại tham chiếu
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", insertable = false, updatable = false)
     @JsonIgnoreProperties({"posts", "hibernateLazyInitializer", "handler"})
     private User author;
 
@@ -62,6 +61,14 @@ public class Post {
 
     public void setImages(String images) {
         this.images = images;
+    }
+
+    public Long getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(Long authorId) {
+        this.authorId = authorId;
     }
 
     public Integer getLikeCount() {
@@ -94,5 +101,8 @@ public class Post {
 
     public void setAuthor(User author) {
         this.author = author;
+        if (author != null) {
+            this.authorId = author.getId();
+        }
     }
 }
