@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-const CreatePost = () => {
-  const [postText, setPostText] = useState("");
+const CreateBlog = () => {
+  const [blogText, setBlogText] = useState("");
   const [image, setImage] = useState(null);
 
   // Xử lý khi chọn ảnh
@@ -14,15 +14,15 @@ const CreatePost = () => {
 
   // Xử lý gửi bài viết
   const handleSubmit = () => {
-    console.log("Bài đăng:", postText, "Ảnh:", image);
+    console.log("Bài đăng:", blogText, "Ảnh:", image);
     // Sau này có thể gọi API upload ở đây
-    setPostText("");
+    setBlogText("");
     setImage(null);
   };
 
   return (
     <div className="p-4 border rounded-3xl mt-3 border-gray-900 bg-white shadow-md">
-      <h2 className="text-lg font-semibold text-cyan-950">Create Post</h2>
+      <h2 className="text-lg font-semibold text-cyan-950">Create Blog</h2>
 
       {/* Nhập nội dung bài viết */}
       <div className="flex items-center gap-3 mt-3">
@@ -33,8 +33,8 @@ const CreatePost = () => {
         />
         <input
           type="text"
-          value={postText}
-          onChange={(e) => setPostText(e.target.value)}
+          value={blogText}
+          onChange={(e) => setBlogText(e.target.value)}
           placeholder="Write something here..."
           className="w-full p-2 text-black border rounded-full outline-none"
         />
@@ -79,4 +79,4 @@ const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default CreateBlog;

@@ -1,4 +1,4 @@
-package ut.edu.teammatching.enums;
+package ut.edu.teammatching.models.enums;
 
 public enum NotificationType {
     DEADLINE,

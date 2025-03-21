@@ -4,7 +4,7 @@ import { useAuth } from "../../context/useAuth";
 import LoginModal from "../LoginModal";
 
 // { avatar , time , content , like ,comment }
-const PostItem = ({ name, avatar, images, time, content, like }) => {
+const BlogItem = ({ name, avatar, images, time, content, like }) => {
   const { isLoggedIn } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -47,14 +47,14 @@ const PostItem = ({ name, avatar, images, time, content, like }) => {
           )}
         </div>
 
-        {/* Nội dung bài post */}
+        {/* Nội dung bài blog */}
         <p className="mt-3 text-gray-700">{content}</p>
 
-        {/* Ảnh bài post */}
+        {/* Ảnh bài blog */}
         <div className="w-full max-h-[600px] overflow-hidden rounded-lg mt-3">
           <img
             src={images}
-            alt="Post"
+            alt="Blog"
             className="w-full h-auto max-h-[600px] object-cover"
           />
         </div>
@@ -86,4 +86,4 @@ const PostItem = ({ name, avatar, images, time, content, like }) => {
   );
 };
 
-export default PostItem;
+export default BlogItem;
