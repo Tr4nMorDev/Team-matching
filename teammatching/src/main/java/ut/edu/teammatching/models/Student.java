@@ -1,65 +1,51 @@
 package ut.edu.teammatching.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import ut.edu.teammatching.enums.Gender;
+import ut.edu.teammatching.enums.Role;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Setter
 @Entity
-@Table(name = "student")
-public class Student {
-    @Id
-    @Column(name = "userId")
-    private Long id;
-
-    @Column(nullable = false)
+@Table(name="student")
+@AllArgsConstructor
+public class Student extends User {
+    @Column(name = "major")
     private String major;
 
-    @Column(nullable = false)
+    @Column(name = "term")
     private Integer term;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "userId")
-    private User user;
+    @ManyToMany
+    @JoinTable(
+            name = "student_team",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id")
+    )
+    private List<Team> teams = new ArrayList<>();
 
-    public Long getId() {
-        return id;
-    }
+    @OneToMany(mappedBy = "assignedToStudent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Task> assignedTasks = new ArrayList<>();
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @OneToMany(mappedBy = "ratedStudent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rating> receivedRatings = new ArrayList<>();
 
-    public String getMajor() {
-        return major;
-    }
+    @OneToMany(mappedBy = "givenByStudent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rating> givenRatings = new ArrayList<>();
 
-    public void setMajor(String major) {
-        this.major = major;
-    }
+    @OneToMany(mappedBy = "leader", cascade =  CascadeType.ALL, orphanRemoval = true)
+    private List<Team> leaders = new ArrayList<>();
 
-    public Integer getTerm() {
-        return term;
-    }
-
-    public void setTerm(Integer term) {
-        this.term = term;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-        if (user != null) {
-            this.id = user.getId();
-        }
+    public Student() {
+        this.setRole(Role.STUDENT);
     }
 }

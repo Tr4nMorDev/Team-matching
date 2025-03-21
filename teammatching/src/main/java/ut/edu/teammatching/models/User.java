@@ -1,185 +1,86 @@
 package ut.edu.teammatching.models;
-import jakarta.persistence.*;
-import java.util.List;
-import java.util.ArrayList;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import ut.edu.teammatching.models.enums.Gender;
-import ut.edu.teammatching.models.enums.Role;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import ut.edu.teammatching.enums.Gender;
+import ut.edu.teammatching.enums.Role;
 
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "role")  // Phân biệt bằng role
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Student.class, name = "STUDENT"),
+        @JsonSubTypes.Type(value = Lecturer.class, name = "LECTURER")
+})
 @Entity
-@Table(name = "user")
-@JsonIdentityInfo(
-    generator = ObjectIdGenerators.PropertyGenerator.class,
-    property = "id"
-)
-public class User {
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Inheritance(strategy = InheritanceType.JOINED) // Kế thừa với bảng riêng cho từng subclass
+@Table(name="users")
+public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userId")
+    @Column(name = "user_id", nullable = false)
     private Long id;
 
-    @Column(name = "userName", nullable = false, unique = true)
-    private String userName;
+    @Column(name = "username", nullable = false, unique = true)
+    private String username;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "role", nullable = false)
     private Role role;
 
     @Column(name = "fullName")
     private String fullName;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "gender")
     private Gender gender;
 
-    @Column(name = "profilePictureUrl")
-    private String profilePictureUrl;
-
-    @Column(unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column(columnDefinition = "TEXT")
-    private String skills;
+    @ElementCollection
+    @CollectionTable(name = "user_skills", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "skill")
+    private List<String> skills = new ArrayList<>();
 
-    @Column(columnDefinition = "TEXT")
-    private String hobby;
+    @ElementCollection
+    @CollectionTable(name = "user_hobbies", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "hobby")
+    private List<String> hobbies = new ArrayList<>();
 
-    @Column(columnDefinition = "TEXT")
-    private String projects;
+    @ElementCollection
+    @CollectionTable(name = "user_projects", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "project")
+    private List<String> projects = new ArrayList<>();
 
-    @Column(name = "phoneNumber")
+    @Column(name = "phoneNumber", length = 20, unique = true)
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "author")
-    @JsonIgnoreProperties({"author", "hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Lecturer lecturer;
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> receivedNotifications;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Student student;
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> sentNotifications;
 
-    public Long getId() {
-        return id;
-    }
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> sentMessages = new ArrayList<>();
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
-
-    public void setProfilePictureUrl(String profilePictureUrl) {
-        this.profilePictureUrl = profilePictureUrl;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getSkills() {
-        return skills;
-    }
-
-    public void setSkills(String skills) {
-        this.skills = skills;
-    }
-
-    public String getHobby() {
-        return hobby;
-    }
-
-    public void setHobby(String hobby) {
-        this.hobby = hobby;
-    }
-
-    public String getProjects() {
-        return projects;
-    }
-
-    public void setProjects(String projects) {
-        this.projects = projects;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public Lecturer getLecturer() {
-        return lecturer;
-    }
-
-    public void setLecturer(Lecturer lecturer) {
-        this.lecturer = lecturer;
-    }
-
-    public List<Post> getPosts() {
-        return posts;
-    }
-
-    public void setPosts(List<Post> posts) {
-        this.posts = posts;
-    }
-
-    public Student getStudent() {
-        return student;
-    }
-
-    public void setStudent(Student student) {
-        this.student = student;
-    }
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> receivedMessages = new ArrayList<>();
 }
