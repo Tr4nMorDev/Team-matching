@@ -1,57 +1,40 @@
 package ut.edu.teammatching.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import ut.edu.teammatching.enums.Role;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Setter
 @Entity
-@Table(name = "lecturer")
-public class Lecturer {
-    @Id
-    @Column(name = "userId")
-    private Long id;
-
-    @Column(nullable = false)
+@Table(name="lecturers")
+@AllArgsConstructor
+public class Lecturer extends User {
+    @Column(name = "department")
     private String department;
 
-    @Column(name = "ResearchAreas", columnDefinition = "TEXT")
+    @Lob
+    @Column(name = "research_areas")
     private String researchAreas;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "userId")
-    private User user;
+    @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Team> supervisedTeams = new ArrayList<>();
 
-    public Long getId() {
-        return id;
-    }
+    @OneToMany(mappedBy = "ratedLecturer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rating> receivedRatings = new ArrayList<>();
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @OneToMany(mappedBy = "givenByLecturer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rating> givenRatings = new ArrayList<>();
 
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
-    }
-
-    public String getResearchAreas() {
-        return researchAreas;
-    }
-
-    public void setResearchAreas(String researchAreas) {
-        this.researchAreas = researchAreas;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-        if (user != null) {
-            this.id = user.getId();
-        }
+    public Lecturer() {
+        this.setRole(Role.LECTURER);
     }
 }
