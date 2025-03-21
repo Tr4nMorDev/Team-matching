@@ -1,4 +1,4 @@
-package ut.edu.teammatching.models;
+package ut.edu.teammatching.models.enums;
 
 public enum Role {
     STUDENT,

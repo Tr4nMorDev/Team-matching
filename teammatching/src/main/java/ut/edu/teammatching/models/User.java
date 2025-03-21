@@ -1,11 +1,12 @@
 package ut.edu.teammatching.models;
-import org.hibernate.annotations.Index;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.ArrayList;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import ut.edu.teammatching.models.enums.Gender;
+import ut.edu.teammatching.models.enums.Role;
 
 @Entity
 @Table(name = "user")
@@ -31,25 +32,25 @@ public class User {
 
     @Column(name = "fullName")
     private String fullName;
-    
+
     @Enumerated(EnumType.STRING)
     private Gender gender;
-    
+
     @Column(name = "profilePictureUrl")
     private String profilePictureUrl;
-    
+
     @Column(unique = true)
     private String email;
-    
+
     @Column(columnDefinition = "TEXT")
     private String skills;
-    
+
     @Column(columnDefinition = "TEXT")
     private String hobby;
-    
+
     @Column(columnDefinition = "TEXT")
     private String projects;
-    
+
     @Column(name = "phoneNumber")
     private String phoneNumber;
 
