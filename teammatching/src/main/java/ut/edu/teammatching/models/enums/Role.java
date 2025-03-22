@@ -1,6 +1,5 @@
-package ut.edu.teammatching.models.enums;
+package ut.edu.teammatching.enums;
 
 public enum Role {
-    STUDENT,
-    LECTURER
-} 
+    STUDENT, LECTURER, GUEST
+}
