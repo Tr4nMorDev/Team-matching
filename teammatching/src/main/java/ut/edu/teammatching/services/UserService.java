@@ -25,6 +25,12 @@ public class UserService {
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
     }
+
+    // Tìm kiếm user theo từ khóa
+    public List<User> searchUsers(String keyword) {
+        return userRepository.searchUsers(keyword);
+    }
+
     //tao moi user
     public User createUser(User user) {
         if(userRepository.findByUsername(user.getUsername()).isPresent()) {
@@ -40,9 +46,12 @@ public class UserService {
         return userRepository.findById(id).map(user -> {
             user.setUsername(newUserData.getUsername());
             user.setEmail(newUserData.getEmail());
-            user.setPassword(newUserData.getPassword());
+//            user.setPassword(newUserData.getPassword());
             user.setSkills(newUserData.getSkills());
             user.setHobbies(newUserData.getHobbies());
+            if (newUserData.getPassword() != null && !newUserData.getPassword().isEmpty()) {
+                user.setPassword(newUserData.getPassword()); // Nên mã hóa password trước khi lưu
+            }
             return userRepository.save(user);
         }).orElseThrow(() -> new RuntimeException("User not found"));
     }

@@ -4,32 +4,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import ut.edu.teammatching.repositories.PostRepository;
+import ut.edu.teammatching.models.Blog;
+import ut.edu.teammatching.repositories.BlogRepository;
 import ut.edu.teammatching.repositories.UserRepository;
-import ut.edu.teammatching.models.Post;
-import ut.edu.teammatching.models.User;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/blog")
 @CrossOrigin(origins = "*")
-public class PostController {
+public class BlogController {
 
-    private final PostRepository postRepository;
+    private final BlogRepository blogRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public PostController(PostRepository postRepository, UserRepository userRepository) {
-        this.postRepository = postRepository;
+    public BlogController(BlogRepository blogRepository, UserRepository userRepository) {
+        this.blogRepository = blogRepository;
         this.userRepository = userRepository;
     }
 
     @GetMapping
     public ResponseEntity<?> getAllPosts() {
         try {
-            List<Post> posts = postRepository.findAll();
-            return ResponseEntity.ok(posts);
+            List<Blog> blogs = blogRepository.findAll();
+            return ResponseEntity.ok(blogs);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error fetching posts: " + e.getMessage());
         }
@@ -38,48 +37,48 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getPostById(@PathVariable Long id) {
         try {
-            return postRepository.findById(id)
+            return blogRepository.findById(id)
                     .map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error fetching post: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Error fetching blog: " + e.getMessage());
         }
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> createPost(@RequestBody Post post, @RequestParam Long userId) {
+    public ResponseEntity<?> createPost(@RequestBody Blog blog, @RequestParam Long userId) {
         try {
             return userRepository.findById(userId)
                     .map(user -> {
-                        post.setAuthor(user);
-                        post.setLikeCount(0); // Ensure likeCount starts at 0
-                        Post savedPost = postRepository.save(post);
-                        return ResponseEntity.ok(savedPost);
+                        blog.setAuthor(user);
+                        blog.setLikeCount(0); // Ensure likeCount starts at 0
+                        Blog savedBlog = blogRepository.save(blog);
+                        return ResponseEntity.ok(savedBlog);
                     })
                     .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error creating post: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Error creating blog: " + e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody Post updatedPost) {
+    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody Blog updatedBlog) {
         try {
-            return postRepository.findById(id)
-                    .map(post -> {
-                        post.setContent(updatedPost.getContent());
-                        post.setImages(updatedPost.getImages());
-                        if (updatedPost.getLikeCount() != null) {
-                            post.setLikeCount(updatedPost.getLikeCount());
+            return blogRepository.findById(id)
+                    .map(blog -> {
+                        blog.setContent(updatedBlog.getContent());
+                        blog.setImages(updatedBlog.getImages());
+                        if (updatedBlog.getLikeCount() != null) {
+                            blog.setLikeCount(updatedBlog.getLikeCount());
                         }
-                        Post savedPost = postRepository.save(post);
-                        return ResponseEntity.ok(savedPost);
+                        Blog savedBlog = blogRepository.save(blog);
+                        return ResponseEntity.ok(savedBlog);
                     })
                     .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error updating post: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Error updating blog: " + e.getMessage());
         }
     }
 
@@ -87,14 +86,14 @@ public class PostController {
     @Transactional
     public ResponseEntity<?> deletePost(@PathVariable Long id) {
         try {
-            return postRepository.findById(id)
-                    .map(post -> {
-                        postRepository.delete(post);
+            return blogRepository.findById(id)
+                    .map(blog -> {
+                        blogRepository.delete(blog);
                         return ResponseEntity.ok().build();
                     })
                     .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error deleting post: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Error deleting blog: " + e.getMessage());
         }
     }
 }

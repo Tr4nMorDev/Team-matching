@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,10 +14,10 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name="posts")
-public class Post {
+public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id", nullable = false)
+    @Column(name = "blog_id", nullable = false)
     private Long id;
 
     @Lob
@@ -27,6 +28,13 @@ public class Post {
     @Column(name = "images")
     private String images;
 
+    @Column(name = "like_count", nullable = false)
+    private Integer likeCount = 0;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private Instant createdAt;
+
+
     // Liên kết với User (tác giả bài viết)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -34,6 +42,6 @@ public class Post {
     private User author;
 
     // Liên kết với Comment
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 }
