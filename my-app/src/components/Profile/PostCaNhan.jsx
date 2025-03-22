@@ -29,13 +29,13 @@ const PostCaNhan = () => {
           {/* Menu hiển thị khi bấm */}
         </div>
 
-        {/* Nội dung bài post */}
+        {/* Nội dung bài blog */}
         <p className="mt-3 text-gray-700">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi nulla
           dolor, ornare at commodo non, feugiat non nisi.
         </p>
 
-        {/* Ảnh bài post */}
+        {/* Ảnh bài blog */}
         <div className="w-full max-h-[600px] overflow-hidden rounded-lg mt-3">
           <img
             src="/Baipost.png"

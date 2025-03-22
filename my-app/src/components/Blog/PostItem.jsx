@@ -47,10 +47,10 @@ const PostItem = ({ name, avatar, images, time, content, like }) => {
           )}
         </div>
 
-        {/* Nội dung bài post */}
+        {/* Nội dung bài blog */}
         <p className="mt-3 text-gray-700">{content}</p>
 
-        {/* Ảnh bài post */}
+        {/* Ảnh bài blog */}
         <div className="w-full max-h-[600px] overflow-hidden rounded-lg mt-3">
           <img
             src={images}
