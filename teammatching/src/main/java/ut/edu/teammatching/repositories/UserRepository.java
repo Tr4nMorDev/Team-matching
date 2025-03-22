@@ -1,5 +1,6 @@
 package ut.edu.teammatching.repositories;
 
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,11 +16,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     // Kiểm tra username đã tồn tại chưa
-    boolean existsByUsername(String username);
+//    boolean existsByUsername(String username);
 
     // Tìm user và load danh sách bài blog (dùng EntityGraph để Eager Fetch)
     @EntityGraph(attributePaths = {"blogs"})
-    Optional<User> findById(Long id);
+    @NonNull
+    Optional<User> findById(@NonNull Long id);
 
     // Tìm kiếm user theo keyword (JPQL thay vì nativeQuery)
     @Query("SELECT u FROM User u WHERE " +

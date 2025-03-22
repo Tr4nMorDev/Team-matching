@@ -2,12 +2,7 @@ package ut.edu.teammatching.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import ut.edu.teammatching.enums.TeamType;
-import ut.edu.teammatching.models.User;
-import java.util.ArrayList;
-import java.util.List;
 
 import java.util.ArrayList;
 import java.util.List;
