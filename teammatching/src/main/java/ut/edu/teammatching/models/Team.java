@@ -24,6 +24,9 @@ public class Team {
     @Column(name = "team_type", nullable = false)
     private TeamType teamType;
 
+    @Column(name = "team_picture")
+    private String teamPicture; // Lưu đường dẫn ảnh đại diện
+
     @Lob
     private String  description;
 

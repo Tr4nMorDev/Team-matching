@@ -34,6 +34,9 @@ public abstract class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "profile_picture")
+    private String profilePicture; // Lưu đường dẫn ảnh đại diện
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
