@@ -1,5 +1,5 @@
 import CreateBlog from "./CreatePost";
-import BlogItem from "./PostItem";
+import BlogItem from "./BlogItem";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/useAuth";
 import getBlogs from "../../api/userApi";
@@ -32,7 +32,7 @@ const MainContent = () => {
             like={blog.likeCount}
           />
         ))}
-        <PostItem />
+        <BlogItem />
       </div>
     </main>
   );

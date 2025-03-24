@@ -24,7 +24,7 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    private Blog post;
 
     // Liên kết với User (tác giả bình luận)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

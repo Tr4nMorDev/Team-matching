@@ -70,7 +70,7 @@ public abstract class User {
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts = new ArrayList<>();
+    private List<Blog> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> receivedNotifications;

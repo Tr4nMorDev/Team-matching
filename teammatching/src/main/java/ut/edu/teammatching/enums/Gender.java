@@ -1,4 +1,4 @@
-package ut.edu.teammatching.models.enums;
+package ut.edu.teammatching.enums;
 
 public enum Gender {
     MALE, FEMALE, OTHER

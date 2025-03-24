@@ -4,31 +4,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import ut.edu.teammatching.repositories.PostRepository;
+import ut.edu.teammatching.repositories.BlogRepository;
 import ut.edu.teammatching.repositories.UserRepository;
-import ut.edu.teammatching.models.Post;
+import ut.edu.teammatching.models.Blog;
 import ut.edu.teammatching.models.User;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/blog")
 @CrossOrigin(origins = "*")
-public class PostController {
+public class BlogController {
 
-    private final PostRepository postRepository;
+    private final BlogRepository blogRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public PostController(PostRepository postRepository, UserRepository userRepository) {
-        this.postRepository = postRepository;
+    public BlogController(BlogRepository postRepository, UserRepository userRepository) {
+        this.blogRepository = postRepository;
         this.userRepository = userRepository;
     }
 
     @GetMapping
     public ResponseEntity<?> getAllPosts() {
         try {
-            List<Post> posts = postRepository.findAll();
+            List<Blog> posts = blogRepository.findAll();
             return ResponseEntity.ok(posts);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error fetching posts: " + e.getMessage());
@@ -38,7 +38,7 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getPostById(@PathVariable Long id) {
         try {
-            return postRepository.findById(id)
+            return blogRepository.findById(id)
                     .map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
@@ -48,13 +48,13 @@ public class PostController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<?> createPost(@RequestBody Post post, @RequestParam Long userId) {
+    public ResponseEntity<?> createPost(@RequestBody Blog post, @RequestParam Long userId) {
         try {
             return userRepository.findById(userId)
                     .map(user -> {
                         post.setAuthor(user);
                         post.setLikeCount(0); // Ensure likeCount starts at 0
-                        Post savedPost = postRepository.save(post);
+                        Blog savedPost = blogRepository.save(post);
                         return ResponseEntity.ok(savedPost);
                     })
                     .orElse(ResponseEntity.notFound().build());
@@ -65,16 +65,16 @@ public class PostController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody Post updatedPost) {
+    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody Blog updatedPost) {
         try {
-            return postRepository.findById(id)
+            return blogRepository.findById(id)
                     .map(post -> {
                         post.setContent(updatedPost.getContent());
                         post.setImages(updatedPost.getImages());
                         if (updatedPost.getLikeCount() != null) {
                             post.setLikeCount(updatedPost.getLikeCount());
                         }
-                        Post savedPost = postRepository.save(post);
+                        Blog savedPost = blogRepository.save(post);
                         return ResponseEntity.ok(savedPost);
                     })
                     .orElse(ResponseEntity.notFound().build());
@@ -87,9 +87,9 @@ public class PostController {
     @Transactional
     public ResponseEntity<?> deletePost(@PathVariable Long id) {
         try {
-            return postRepository.findById(id)
+            return blogRepository.findById(id)
                     .map(post -> {
-                        postRepository.delete(post);
+                        blogRepository.delete(post);
                         return ResponseEntity.ok().build();
                     })
                     .orElse(ResponseEntity.notFound().build());

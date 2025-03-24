@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { X } from "lucide-react";
+import SignUp from "./FormSignup&in/SignUp";
+import SignIn from "./FormSignup&in/SingIn";
 
 const LoginModal = ({ onClose }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -43,88 +45,9 @@ const LoginModal = ({ onClose }) => {
             </AnimatePresence>
 
             {isSignUp ? (
-              <>
-                <h2 className="text-2xl font-semibold mt-9 text-gray-900">
-                  Sign up
-                </h2>
-                <p className="text-gray-500 mb-6">
-                  Create an account to get started.
-                </p>
-
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  className="w-full p-2 mb-4 border rounded-md  text-gray-600"
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className="w-full p-2 mb-4 border rounded-md  text-gray-600"
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  className="w-full p-2 mb-4 border rounded-md  text-gray-600"
-                />
-
-                <select className="w-full p-2 mb-4 border rounded-md text-gray-600">
-                  <option value="student">Student</option>
-                  <option value="lecturer">Lecturer</option>
-                </select>
-
-                <select className="w-full p-2 mb-4 border rounded-md  text-gray-600">
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-
-                <button className="w-full bg-blue-500 text-white p-2 rounded-md font-semibold cursor-pointer mb-4">
-                  Sign Up
-                </button>
-
-                <p className="text-sm text-gray-600 text-center">
-                  Already have an account?{" "}
-                  <button
-                    onClick={handleToggle}
-                    className="text-blue-500 cursor-pointer"
-                  >
-                    Sign in
-                  </button>
-                </p>
-              </>
+              <SignUp handleToggle={handleToggle} />
             ) : (
-              <>
-                <h2 className="text-2xl font-semibold mt-20 text-gray-900">
-                  Sign in
-                </h2>
-                <p className="text-gray-500 mb-6">
-                  Enter your email and password to continue.
-                </p>
-
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className="w-full p-2 mb-4 border rounded-md text-gray-600"
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  className="w-full p-2 mb-4 border rounded-md text-gray-600"
-                />
-
-                <button className="w-full bg-blue-500 text-white p-2 rounded-md font-semibold cursor-pointer mb-4">
-                  Sign in
-                </button>
-
-                <p className="text-sm text-gray-600 text-center">
-                  Don't have an account?{" "}
-                  <button
-                    onClick={handleToggle}
-                    className="text-blue-500 cursor-pointer"
-                  >
-                    Sign up
-                  </button>
-                </p>
-              </>
+              <SignIn handleToggle={handleToggle} />
             )}
           </div>
 

@@ -13,11 +13,11 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name="posts")
-public class Post {
+@Table(name="blogs")
+public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id", nullable = false)
+    @Column(name = "blogs_id", nullable = false)
     private Long id;
 
     @Lob
@@ -41,6 +41,6 @@ public class Post {
     private User author;
 
     // Liên kết với Comment
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 }

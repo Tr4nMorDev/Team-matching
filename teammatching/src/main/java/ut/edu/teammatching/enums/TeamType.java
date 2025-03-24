@@ -1,4 +1,4 @@
-package ut.edu.teammatching.models.enums;
+package ut.edu.teammatching.enums;
 
 public enum TeamType {
     ACADEMIC,    // Nhóm học thuật, cần có giảng viên
