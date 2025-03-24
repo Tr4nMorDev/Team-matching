@@ -18,6 +18,7 @@ public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "blogs_id", nullable = false)
+
     private Long id;
 
     @Lob

@@ -34,6 +34,9 @@ public abstract class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "profile_picture")
+    private String profilePicture; // Lưu đường dẫn ảnh đại diện
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
@@ -70,7 +73,7 @@ public abstract class User {
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Blog> posts = new ArrayList<>();
+    private List<Blog> blogs = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> receivedNotifications;

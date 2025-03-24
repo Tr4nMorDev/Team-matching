@@ -20,11 +20,11 @@ public class Comment {
     @Column(name = "content", nullable = false)
     private String content;
 
-    // Liên kết với Post
+    // Liên kết với Blog
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Blog post;
+    @JoinColumn(name = "blog_id", nullable = false)
+    private Blog blog;
 
     // Liên kết với User (tác giả bình luận)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
