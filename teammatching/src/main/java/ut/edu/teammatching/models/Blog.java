@@ -13,11 +13,12 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name="posts")
+@Table(name="blogs")
 public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "blog_id", nullable = false)
+    @Column(name = "blogs_id", nullable = false)
+
     private Long id;
 
     @Lob
@@ -33,7 +34,6 @@ public class Blog {
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private Instant createdAt;
-
 
     // Liên kết với User (tác giả bài viết)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

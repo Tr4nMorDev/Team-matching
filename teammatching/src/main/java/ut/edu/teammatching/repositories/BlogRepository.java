@@ -1,5 +1,6 @@
 package ut.edu.teammatching.repositories;
 
+
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,7 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
 
     // Lấy post theo ID cùng với thông tin author
     @EntityGraph(attributePaths = {"author"})
+
     @NonNull
     Optional<Blog> findById(@NonNull Long id);
 

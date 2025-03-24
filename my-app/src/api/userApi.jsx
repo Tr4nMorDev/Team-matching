@@ -8,10 +8,10 @@ export const getUser = async (id) => {
   return response.json();
 };
 
-async function getPosts() {
+async function getBlogs() {
   try {
-    const response = await axios.get(`${API_PROJECT}/post`);
-    console.log("Posts:", response.data);
+    const response = await axios.get(`${API_PROJECT}/blog`);
+    console.log("Blogs:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching posts:", error);
@@ -19,4 +19,4 @@ async function getPosts() {
   }
 }
 
-export default getPosts;
+export default getBlogs;

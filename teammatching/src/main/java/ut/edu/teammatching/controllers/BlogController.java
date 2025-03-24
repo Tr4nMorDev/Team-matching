@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ut.edu.teammatching.models.Blog;
 import ut.edu.teammatching.repositories.BlogRepository;
 import ut.edu.teammatching.repositories.UserRepository;
-
 import java.util.List;
 
 @RestController
