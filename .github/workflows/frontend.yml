@@ -3,22 +3,17 @@ name: Test Frontend
 on:
   push:
     branches:
-      - Tran-Dinh-Phong
       - fix-lặp-data
-    paths:
-      - "my-app/**"
   pull_request:
     branches:
       - main
-    paths:
-      - "my-app/**"
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      # Bước checkout code
+      # Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -28,12 +23,6 @@ jobs:
         with:
           node-version: 18
           cache: npm
-          cache-dependency-path: my-app/package-lock.json
-
-      # Xóa cache npm (nếu có)
-      - name: Clear npm cache
-        run: npm cache clean --force
-        working-directory: my-app
 
       # Cài đặt dependencies
       - name: Install dependencies
@@ -47,5 +36,4 @@ jobs:
 
       # Kiểm tra kết quả build
       - name: Verify build
-        run: ls -la
-        working-directory: my-app/dist
+        run: ls -la my-app/dist
