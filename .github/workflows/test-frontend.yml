@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - Tran-Dinh-Phong
+      - fix-lặp-data
     paths:
       - "my-app/**"
   pull_request:
@@ -18,32 +19,33 @@ jobs:
 
     steps:
       # Bước checkout code
-      - name: Change to my-app directory
-        run: cd my-app
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
+      # Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: npm
+          cache-dependency-path: my-app/package-lock.json
 
       # Xóa cache npm (nếu có)
       - name: Clear npm cache
-        working-directory: my-app
         run: npm cache clean --force
-        working-directory: ./my-app
+        working-directory: my-app
 
       # Cài đặt dependencies
       - name: Install dependencies
         run: npm install
-        working-directory: ./my-app
+        working-directory: my-app
 
       # Xây dựng dự án
       - name: Run build
         run: npm run build
-        working-directory: ./my-app
+        working-directory: my-app
 
       # Kiểm tra kết quả build
       - name: Verify build
-        run: ls -la dist
-        working-directory: ./my-app
+        run: ls -la
+        working-directory: my-app/dist

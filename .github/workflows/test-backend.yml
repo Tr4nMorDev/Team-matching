@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - Tran-Dinh-Phong
+      - fix-lặp-data
   pull_request:
     branches:
       - main
