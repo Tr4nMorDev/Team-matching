@@ -4,21 +4,29 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 import ut.edu.teammatching.enums.Role;
+import ut.edu.teammatching.enums.Gender;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "student")
+@DiscriminatorValue("STUDENT")
 @Getter
 @Setter
-@Entity
-@Table(name="student")
+@NoArgsConstructor
 @AllArgsConstructor
 public class Student extends User {
-    @Column(name = "major")
+    @Id
+    @Column(name = "user_id")
+    private Long id;
+
+    @Column(nullable = false)
     private String major;
 
-    @Column(name = "term")
+    @Column(nullable = false)
     private Integer term;
 
     @ManyToMany
@@ -40,8 +48,4 @@ public class Student extends User {
 
     @OneToMany(mappedBy = "leader", cascade =  CascadeType.ALL, orphanRemoval = true)
     private List<Team> leaders = new ArrayList<>();
-
-    public Student() {
-        this.setRole(Role.STUDENT);
-    }
 }

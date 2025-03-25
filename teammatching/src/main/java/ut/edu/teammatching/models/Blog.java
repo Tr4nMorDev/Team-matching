@@ -1,5 +1,6 @@
 package ut.edu.teammatching.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,6 @@ public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "blogs_id", nullable = false)
-
     private Long id;
 
     @Lob
@@ -38,10 +38,11 @@ public class Blog {
     // Liên kết với User (tác giả bài viết)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id", nullable = false) // Thống nhất với Comment.java
+    @JoinColumn(name = "user_id", nullable = false)
     private User author;
 
     // Liên kết với Comment
-    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // Ngăn vòng lặp JSON
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 }
