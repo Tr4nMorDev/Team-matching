@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import ut.edu.teammatching.enums.Role;
-import ut.edu.teammatching.enums.Gender;
 
 import java.util.ArrayList;
 import java.util.List;

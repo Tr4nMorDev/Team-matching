@@ -42,6 +42,16 @@ public class Notification {
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
 
+    // Nếu thông báo liên quan đến team
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    // Nếu thông báo liên quan đến blog
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blog_id")
+    private Blog blog;
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {

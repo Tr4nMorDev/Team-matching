@@ -19,7 +19,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 //    boolean existsByUsername(String username);
 
     // Tìm user và load danh sách bài blog (dùng EntityGraph để Eager Fetch)
-    @EntityGraph(attributePaths = {"blogs"})
     @NonNull
     Optional<User> findById(@NonNull Long id);
 

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ut.edu.teammatching.models.Team;
-import ut.edu.teammatching.repositories.TeamRepository;
 import ut.edu.teammatching.services.TeamService;
 
 import java.util.List;
@@ -42,4 +41,24 @@ public class TeamController {
         teamService.deleteTeam(id);
         return ResponseEntity.ok().build();
     }
+
+    //Đặt một sinh viên làm leader của team.
+    @PutMapping("/{id}/leader/{studentId}")
+    public ResponseEntity<Team> setLeader(@PathVariable Long id, @PathVariable Long studentId) {
+        return ResponseEntity.ok(teamService.setLeader(id, studentId));
+    }
+
+    //Xóa một sinh viên khỏi team.
+    @DeleteMapping("/{id}/remove-student/{studentId}")
+    public ResponseEntity<Void> removeStudent(@PathVariable Long id, @PathVariable Long studentId) {
+        teamService.removeStudent(id, studentId);
+        return ResponseEntity.ok().build();
+    }
+
+    // Gửi thông báo đến tất cả thành viên trong team
+//    @PostMapping("/{id}/notify")
+//    public ResponseEntity<Void> notifyAllMembers(@PathVariable Long id, @RequestBody NotificationRequest request) {
+//        teamService.notifyAllMembers(id, request.getMessage());
+//        return ResponseEntity.noContent().build();
+//    }
 }
