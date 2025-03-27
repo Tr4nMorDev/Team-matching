@@ -51,9 +51,6 @@ public class UserService {
             if (student.getMajor() == null || student.getMajor().isEmpty()) {
                 throw new RuntimeException("Major is required for students");
             }
-            if (student.getTerm() == null) {
-                student.setTerm(1); // Mặc định là 1 nếu không có giá trị
-            }
 
             newUser = new Student(
                     student.getUsername(), student.getFullName(), student.getEmail(), student.getPassword(),

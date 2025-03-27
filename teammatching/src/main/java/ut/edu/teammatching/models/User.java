@@ -78,7 +78,7 @@ public abstract class User {
     @BatchSize(size = 10)
     private List<String> projects = new ArrayList<>();
 
-    @Column(name = "phoneNumber", length = 20, unique = true)
+    @Column(name = "phoneNumber", length = 20, unique = true )
     private String phoneNumber;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -105,19 +105,24 @@ public abstract class User {
     @JsonIgnore
     private List<Message> receivedMessages = new ArrayList<>();
 
-        public User(String username, String fullname ,String email, String password, Role role, Gender gender,
-                    String profilePicture,  List<String> skills,
-                    List<String> hobbies, List<String> projects, String phoneNumber) {
-            this.fullName = fullname;
-            this.username = username;
-            this.email = email;
-            this.password = password;
-            this.role = role;
-            this.gender = gender;
-            this.profilePicture = "http://localhost:8080/imagedefault.jpg";
-            this.skills = skills;
-            this.hobbies = hobbies;
-            this.projects = projects;
-            this.phoneNumber = "0000000000";
-        }
+    public User(String username, String fullName, String email, String password, Role role, Gender gender,
+                String profilePicture, List<String> skills,
+                List<String> hobbies, List<String> projects, String phoneNumber) {
+        this.username = username;
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.gender = gender;
+        this.profilePicture = profilePicture;
+
+        this.skills = skills;
+        this.hobbies = hobbies;
+        this.projects = projects;
+
+        // Nếu phoneNumber là null hoặc rỗng, có thể để null hoặc giá trị mặc định
+        this.phoneNumber = (phoneNumber == null || phoneNumber.isBlank())
+                ? null
+                : phoneNumber;
+    }
 }

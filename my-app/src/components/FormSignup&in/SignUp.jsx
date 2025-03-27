@@ -10,7 +10,7 @@ function SignUp() {
     role: "STUDENT", // 🆕 Mặc định là "student"
     type: "STUDENT", // 🆕 Tự động set type tương ứng
     gender: "MALE", // 🆕 Mặc định là "male"
-    profilePicture: "",
+    profilePicture: "http://localhost:8080/imagedefault.jpg",
     skills: [],
     hobbies: [],
     projects: [],
@@ -77,6 +77,14 @@ function SignUp() {
         name="email"
         placeholder="Email"
         value={formData.email}
+        onChange={handleChange}
+        className="w-full p-2 mb-4 border rounded-md text-gray-600"
+      />
+      <input
+        type="phoneNumber"
+        name="phoneNumber"
+        placeholder="Password"
+        value={formData.phoneNumber}
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded-md text-gray-600"
       />
