@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - fix-lặp-data
+      - dev-frontend
   pull_request:
     branches:
       - main

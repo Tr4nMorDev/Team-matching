@@ -39,6 +39,15 @@ public class UserService {
         if(userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
+        // Kiểm tra dữ liệu cần thiết
+        if (user.getFullName() == null || user.getFullName().isEmpty()) {
+            throw new RuntimeException("Full Name is required");
+        }
+        // Kiểm tra role
+        if (user.getRole() == null) {
+            throw new RuntimeException("Role cannot be null");
+        }
+
         return userRepository.save(user);
     }
     //cap nhat thong tin user

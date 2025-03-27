@@ -36,7 +36,7 @@ public class Task {
     // Liên kết với Student (người được giao task)
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "student_id", nullable = false)
+    @JoinColumn(name = "student_id", nullable = true)
     private Student assignedToStudent;
 
     // Liên kết với Team (nhóm chứa task)
