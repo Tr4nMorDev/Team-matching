@@ -8,11 +8,15 @@ import java.util.List;
 import ut.edu.teammatching.enums.Role;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Lecturer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     //lay dnah sach tat ca users
     public List<User> getAllUsers() {
@@ -36,23 +40,8 @@ public class UserService {
 
     //tao moi user
     public User createUser(User user) {
-        if(userRepository.findByUsername(user.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists");
-        }
-        if(userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
-        }
-        // Kiểm tra dữ liệu cần thiết
-        if (user.getFullName() == null || user.getFullName().isEmpty()) {
-            throw new RuntimeException("Full Name is required");
-        }
-        if (user.getRole() != Role.STUDENT && user.getRole() != Role.LECTURER) {
-            throw new RuntimeException("Role không hợp lệ: " + user.getRole());
-        }
-        // Kiểm tra role
-        if (user.getRole() == null) {
-            throw new RuntimeException("Role chưua thể lấy ");
-        }
+
+        logger.info("📌 Received request to create user: {}", user);
 
         User newUser;
         if (user.getRole() == Role.STUDENT) {

@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonTypeName("LECTURER")
 public class Lecturer extends User {
-    @Column(name = "department", nullable = false)
+    @Column(name = "department", nullable = true)
     private String department;
 
     @Lob

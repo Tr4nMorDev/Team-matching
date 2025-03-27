@@ -7,23 +7,33 @@ function SignUp() {
     username: "",
     email: "",
     password: "",
-    role: "",
-    gender: "",
+    role: "STUDENT", // 🆕 Mặc định là "student"
+    type: "STUDENT", // 🆕 Tự động set type tương ứng
+    gender: "MALE", // 🆕 Mặc định là "male"
     profilePicture: "",
-    skills: [], // 🆕 Mảng kỹ năng
-    hobbies: [], // 🆕 Mảng sở thích
-    projects: [], // 🆕 Mảng dự án
+    skills: [],
+    hobbies: [],
+    projects: [],
     phoneNumber: "",
-    major: "",
+    major: "Logistics", // 🆕 Mặc định là "Logistics"
     term: 1,
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prevData) => {
+      let updatedData = { ...prevData, [name]: value };
+
+      if (name === "role") {
+        updatedData.type = value.toUpperCase(); // Chuyển thành "STUDENT" hoặc "LECTURER"
+      }
+
+      if (name === "gender") {
+        updatedData.gender = value.toUpperCase(); // "MALE", "FEMALE"
+      }
+
+      return updatedData;
+    });
   };
 
   const handleSubmit = async () => {
@@ -85,8 +95,8 @@ function SignUp() {
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded-md text-gray-600"
       >
-        <option value="student">STUDENT</option>
-        <option value="lecturer">LECTURER</option>
+        <option value="STUDENT">STUDENT</option>
+        <option value="LECTURER">LECTURER</option>
       </select>
 
       <select
@@ -95,8 +105,8 @@ function SignUp() {
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded-md text-gray-600"
       >
-        <option value="male">MALE</option>
-        <option value="female">FEMALE</option>
+        <option value="MALE">MALE</option>
+        <option value="FEMALE">FEMALE</option>
       </select>
 
       <select
