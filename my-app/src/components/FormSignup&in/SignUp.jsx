@@ -6,8 +6,8 @@ function SignUp() {
     fullName: "",
     email: "",
     password: "",
-    role: "student",
-    gender: "male",
+    role: "STUDENT",
+    gender: "MALE",
   });
 
   const handleChange = (e) => {
@@ -19,9 +19,10 @@ function SignUp() {
   };
 
   const handleSubmit = async () => {
+    console.log("Form data before sending:", formData);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/signup",
+        "http://localhost:8080/api/users",
         formData
       );
       console.log("Sign up successful:", response.data);
@@ -68,8 +69,8 @@ function SignUp() {
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded-md text-gray-600"
       >
-        <option value="student">Student</option>
-        <option value="lecturer">Lecturer</option>
+        <option value="student">STUDENT</option>
+        <option value="lecturer">LECTURER</option>
       </select>
 
       <select
@@ -78,8 +79,8 @@ function SignUp() {
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded-md text-gray-600"
       >
-        <option value="male">Male</option>
-        <option value="female">Female</option>
+        <option value="male">MALE</option>
+        <option value="female">FEMALE</option>
       </select>
 
       <button

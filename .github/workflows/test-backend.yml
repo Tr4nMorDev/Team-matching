@@ -5,6 +5,7 @@ on:
     branches:
       - Tran-Dinh-Phong
       - fix-lặp-data
+      - dev-frontend
   pull_request:
     branches:
       - main

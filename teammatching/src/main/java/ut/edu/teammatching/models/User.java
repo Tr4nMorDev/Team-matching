@@ -99,11 +99,12 @@ public abstract class User {
     @JsonIgnore
     private List<Message> receivedMessages = new ArrayList<>();
 
-    public User(String username, String password, String fullName, Gender gender,
+    public User(String username, String password, Role role, String fullName, Gender gender,
                 String profilePicture, String email, List<String> skills,
                 List<String> hobbies, List<String> projects, String phoneNumber) {
         this.username = username;
         this.password = password;
+        this.role = role; // Đảm bảo role luôn có giá trị
         this.fullName = fullName;
         this.gender = gender;
         this.profilePicture = profilePicture;
