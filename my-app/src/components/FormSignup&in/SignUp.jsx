@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-function SignUp() {
+function SignUp({ handleToggle }) {
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
@@ -44,10 +44,8 @@ function SignUp() {
         formData
       );
       console.log("Sign up successful:", response.data);
-      alert("Sign up successful!");
     } catch (error) {
       console.error("Error signing up:", error.response?.data || error.message);
-      alert("Sign up failed!");
     }
   };
 
@@ -138,10 +136,7 @@ function SignUp() {
 
       <p className="text-sm text-gray-600 text-center">
         Already have an account?{" "}
-        <button
-          onClick={() => alert("Toggle to Sign In")}
-          className="text-blue-500 cursor-pointer"
-        >
+        <button onClick={handleToggle} className="text-blue-500 cursor-pointer">
           Sign in
         </button>
       </p>

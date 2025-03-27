@@ -1,5 +1,6 @@
 package ut.edu.teammatching.services;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ut.edu.teammatching.repositories.UserRepository;
@@ -11,12 +12,13 @@ import ut.edu.teammatching.models.Lecturer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     //lay dnah sach tat ca users
     public List<User> getAllUsers() {
@@ -44,6 +46,10 @@ public class UserService {
         logger.info("📌 Received request to create user: {}", user);
 
         User newUser;
+
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+
         if (user.getRole() == Role.STUDENT) {
             if (!(user instanceof Student student)) {
                 throw new RuntimeException("Invalid user data for student");
