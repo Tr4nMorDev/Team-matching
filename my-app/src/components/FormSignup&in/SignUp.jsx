@@ -4,10 +4,18 @@ import axios from "axios";
 function SignUp() {
   const [formData, setFormData] = useState({
     fullName: "",
+    username: "",
     email: "",
     password: "",
-    role: "STUDENT",
-    gender: "MALE",
+    role: "",
+    gender: "",
+    profilePicture: "",
+    skills: [], // 🆕 Mảng kỹ năng
+    hobbies: [], // 🆕 Mảng sở thích
+    projects: [], // 🆕 Mảng dự án
+    phoneNumber: "",
+    major: "",
+    term: 1,
   });
 
   const handleChange = (e) => {
@@ -19,7 +27,7 @@ function SignUp() {
   };
 
   const handleSubmit = async () => {
-    console.log("Form data before sending:", formData);
+    console.log("Form data before sending:", JSON.stringify(formData, null, 2));
     try {
       const response = await axios.post(
         "http://localhost:8080/api/users",
@@ -41,8 +49,16 @@ function SignUp() {
       <input
         type="text"
         name="fullName"
-        placeholder="Full Name"
+        placeholder="Full name"
         value={formData.fullName}
+        onChange={handleChange}
+        className="w-full p-2 mb-4 border rounded-md text-gray-600"
+      />
+      <input
+        type="text"
+        name="username"
+        placeholder="username"
+        value={formData.username}
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded-md text-gray-600"
       />
@@ -81,6 +97,18 @@ function SignUp() {
       >
         <option value="male">MALE</option>
         <option value="female">FEMALE</option>
+      </select>
+
+      <select
+        name="major"
+        value={formData.major}
+        onChange={handleChange}
+        className="w-full p-2 mb-4 border rounded-md text-gray-600"
+      >
+        <option value="Logistics">Logistics</option>
+        <option value="Information Technology">Information Technology</option>
+        <option value="Marketing">Marketing</option>
+        <option value="media">Media</option>
       </select>
 
       <button

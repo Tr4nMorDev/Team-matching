@@ -6,6 +6,7 @@ on:
       - Tran-Dinh-Phong
       - fix-lặp-data
       - dev-frontend
+      - Add-jwt
   pull_request:
     branches:
       - main
