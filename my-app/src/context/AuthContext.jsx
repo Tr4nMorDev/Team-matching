@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import axios from "axios";
 
 // Tạo context
 export const AuthContext = createContext();
@@ -6,39 +7,60 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null); // Thêm role
+  const [role, setRole] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token") || null); // Lưu token vào state
 
-  const login = () => setIsLoggedIn(true);
+  const login = (token, userData) => {
+    console.log("Token received:", token); // Kiểm tra token có đúng không
+    setIsLoggedIn(true);
+    setToken(token);
+    setUser(userData);
+    localStorage.setItem("token", token);
+  };
+
   const logout = () => {
     setIsLoggedIn(false);
     setUser(null);
     setRole(null);
+    setToken(null);
+    localStorage.removeItem("token"); // Xóa token khỏi localStorage
   };
 
-  // Giả sử bạn có một hàm để lấy thông tin người dùng từ API
-  const fetchUserData = async () => {
+  // Lấy thông tin người dùng sau khi đăng nhập
+  const getProtectedData = async () => {
     try {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/users/1"
+      const token = localStorage.getItem("token");
+      console.log("Using token:", token); // Kiểm tra token có thực sự được lấy không
+
+      const response = await axios.get(
+        "http://localhost:8080/api/protected-resource",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Kiểm tra token có thực sự được gửi không
+          },
+        }
       );
-      const userData = await response.json();
-      setUser(userData);
-      setRole(userData.username);
-      console.log(userData.username);
+
+      console.log("Protected data:", response.data);
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu người dùng:", error);
+      console.error(
+        "Error fetching protected data:",
+        error.response?.data || error.message
+      );
     }
   };
 
   // Lấy thông tin người dùng khi đăng nhập
   useEffect(() => {
-    if (isLoggedIn) {
-      fetchUserData();
+    if (isLoggedIn && token) {
+      getProtectedData();
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, token]);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, role, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, role, user, token, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

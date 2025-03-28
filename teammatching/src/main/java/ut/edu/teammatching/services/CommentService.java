@@ -12,13 +12,8 @@ public class CommentService {
 
     @Autowired
     private CommentRepository commentRepository;
-    
-    //Tạo bình luận mới
-    public Comment createComment(Comment comment) {
-        return commentRepository.save(comment);
-    }
-    
-    public List<Comment> getCommentsByPostId(Long postId) {
-        return commentRepository.findByPostId(postId);
+
+    public List<Comment> getCommentsByBlogId(Long blog) {
+        return commentRepository.findByBlogId(blog);
     }
 }

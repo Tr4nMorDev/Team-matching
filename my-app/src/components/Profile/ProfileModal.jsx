@@ -5,10 +5,14 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import EditProfileModal from "./EditProfileModal";
 
 const ProfileModal = ({ onClose }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate(); // Khởi tạo useNavigate
   const modalRef = useRef(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const handleLogout = () => {
+    logout(); // Gọi hàm logout từ AuthContext
+    navigate("/"); // Điều hướng về trang đăng nhập
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -71,7 +75,7 @@ const ProfileModal = ({ onClose }) => {
         </div>
 
         <button
-          onClick={onClose}
+          onClick={handleLogout}
           className="w-full p-2 bg-gray-500 text-white rounded-b-lg hover:bg-red-600"
         >
           Sign out

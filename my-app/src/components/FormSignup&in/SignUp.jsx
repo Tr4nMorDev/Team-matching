@@ -1,35 +1,51 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-function SignUp() {
+function SignUp({ handleToggle }) {
   const [formData, setFormData] = useState({
     fullName: "",
+    username: "",
     email: "",
     password: "",
-    role: "STUDENT",
-    gender: "MALE",
+    role: "STUDENT", // 🆕 Mặc định là "student"
+    type: "STUDENT", // 🆕 Tự động set type tương ứng
+    gender: "MALE", // 🆕 Mặc định là "male"
+    profilePicture: "http://localhost:8080/imagedefault.jpg",
+    skills: [],
+    hobbies: [],
+    projects: [],
+    phoneNumber: "",
+    major: "Logistics", // 🆕 Mặc định là "Logistics"
+    term: 1,
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prevData) => {
+      let updatedData = { ...prevData, [name]: value };
+
+      if (name === "role") {
+        updatedData.type = value.toUpperCase(); // Chuyển thành "STUDENT" hoặc "LECTURER"
+      }
+
+      if (name === "gender") {
+        updatedData.gender = value.toUpperCase(); // "MALE", "FEMALE"
+      }
+
+      return updatedData;
+    });
   };
 
   const handleSubmit = async () => {
-    console.log("Form data before sending:", formData);
+    console.log("Form data before sending:", JSON.stringify(formData, null, 2));
     try {
       const response = await axios.post(
         "http://localhost:8080/api/users",
         formData
       );
       console.log("Sign up successful:", response.data);
-      alert("Sign up successful!");
     } catch (error) {
       console.error("Error signing up:", error.response?.data || error.message);
-      alert("Sign up failed!");
     }
   };
 
@@ -41,8 +57,16 @@ function SignUp() {
       <input
         type="text"
         name="fullName"
-        placeholder="Full Name"
+        placeholder="Full name"
         value={formData.fullName}
+        onChange={handleChange}
+        className="w-full p-2 mb-4 border rounded-md text-gray-600"
+      />
+      <input
+        type="text"
+        name="username"
+        placeholder="username"
+        value={formData.username}
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded-md text-gray-600"
       />
@@ -51,6 +75,14 @@ function SignUp() {
         name="email"
         placeholder="Email"
         value={formData.email}
+        onChange={handleChange}
+        className="w-full p-2 mb-4 border rounded-md text-gray-600"
+      />
+      <input
+        type="phoneNumber"
+        name="phoneNumber"
+        placeholder="Password"
+        value={formData.phoneNumber}
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded-md text-gray-600"
       />
@@ -69,8 +101,8 @@ function SignUp() {
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded-md text-gray-600"
       >
-        <option value="student">STUDENT</option>
-        <option value="lecturer">LECTURER</option>
+        <option value="STUDENT">STUDENT</option>
+        <option value="LECTURER">LECTURER</option>
       </select>
 
       <select
@@ -79,8 +111,20 @@ function SignUp() {
         onChange={handleChange}
         className="w-full p-2 mb-4 border rounded-md text-gray-600"
       >
-        <option value="male">MALE</option>
-        <option value="female">FEMALE</option>
+        <option value="MALE">MALE</option>
+        <option value="FEMALE">FEMALE</option>
+      </select>
+
+      <select
+        name="major"
+        value={formData.major}
+        onChange={handleChange}
+        className="w-full p-2 mb-4 border rounded-md text-gray-600"
+      >
+        <option value="Logistics">Logistics</option>
+        <option value="Information Technology">Information Technology</option>
+        <option value="Marketing">Marketing</option>
+        <option value="media">Media</option>
       </select>
 
       <button
@@ -92,10 +136,7 @@ function SignUp() {
 
       <p className="text-sm text-gray-600 text-center">
         Already have an account?{" "}
-        <button
-          onClick={() => alert("Toggle to Sign In")}
-          className="text-blue-500 cursor-pointer"
-        >
+        <button onClick={handleToggle} className="text-blue-500 cursor-pointer">
           Sign in
         </button>
       </p>

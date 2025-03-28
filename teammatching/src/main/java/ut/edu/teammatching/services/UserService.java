@@ -1,15 +1,24 @@
 package ut.edu.teammatching.services;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ut.edu.teammatching.repositories.UserRepository;
 import ut.edu.teammatching.models.User;
 import java.util.List;
+import ut.edu.teammatching.enums.Role;
+import ut.edu.teammatching.models.Student;
+import ut.edu.teammatching.models.Lecturer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     //lay dnah sach tat ca users
     public List<User> getAllUsers() {
@@ -33,19 +42,36 @@ public class UserService {
 
     //tao moi user
     public User createUser(User user) {
-        if(userRepository.findByUsername(user.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists");
-        }
-        if(userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
-        }
-        // Kiểm tra dữ liệu cần thiết
-        if (user.getFullName() == null || user.getFullName().isEmpty()) {
-            throw new RuntimeException("Full Name is required");
-        }
-        // Kiểm tra role
-        if (user.getRole() == null) {
-            throw new RuntimeException("Role cannot be null");
+
+        logger.info("📌 Received request to create user: {}", user);
+
+        User newUser;
+
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+
+        if (user.getRole() == Role.STUDENT) {
+            if (!(user instanceof Student student)) {
+                throw new RuntimeException("Invalid user data for student");
+            }
+            if (student.getMajor() == null || student.getMajor().isEmpty()) {
+                throw new RuntimeException("Major is required for students");
+            }
+
+            newUser = new Student(
+                    student.getUsername(), student.getFullName(), student.getEmail(), student.getPassword(),
+                    student.getRole(), student.getGender(), student.getProfilePicture(),
+                    student.getSkills(), student.getHobbies(), student.getProjects(), student.getPhoneNumber(),
+                    student.getMajor(), student.getTerm()
+            );
+        } else if (user.getRole() == Role.LECTURER) {
+            Lecturer lecturer = (Lecturer) user; // Ép kiểu User thành Lecturer
+            newUser = new Lecturer(lecturer.getUsername(), lecturer.getFullName(), lecturer.getEmail(), lecturer.getPassword(),
+                    lecturer.getRole(), lecturer.getGender(), lecturer.getProfilePicture(),
+                    lecturer.getSkills(), lecturer.getHobbies(), lecturer.getProjects(), lecturer.getPhoneNumber(),
+                    lecturer.getDepartment(), lecturer.getResearchAreas());
+        } else {
+            throw new IllegalArgumentException("Invalid role: " + user.getRole());
         }
 
         return userRepository.save(user);
