@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import axios from "axios";
 
 // Tạo context
 export const AuthContext = createContext();
@@ -10,10 +11,11 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null); // Lưu token vào state
 
   const login = (token, userData) => {
+    console.log("Token received:", token); // Kiểm tra token có đúng không
     setIsLoggedIn(true);
-    setToken(token); // Lưu token vào state
-    setUser(userData); // Lưu thông tin người dùng vào state
-    localStorage.setItem("token", token); // Lưu token vào localStorage
+    setToken(token);
+    setUser(userData);
+    localStorage.setItem("token", token);
   };
 
   const logout = () => {
@@ -25,24 +27,33 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Lấy thông tin người dùng sau khi đăng nhập
-  const fetchUserData = async () => {
+  const getProtectedData = async () => {
     try {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/users/1"
+      const token = localStorage.getItem("token");
+      console.log("Using token:", token); // Kiểm tra token có thực sự được lấy không
+
+      const response = await axios.get(
+        "http://localhost:8080/api/protected-resource",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Kiểm tra token có thực sự được gửi không
+          },
+        }
       );
-      const userData = await response.json();
-      setUser(userData);
-      setRole(userData.username);
-      console.log(userData.username);
+
+      console.log("Protected data:", response.data);
     } catch (error) {
-      console.error("Lỗi khi lấy dữ liệu người dùng:", error);
+      console.error(
+        "Error fetching protected data:",
+        error.response?.data || error.message
+      );
     }
   };
 
   // Lấy thông tin người dùng khi đăng nhập
   useEffect(() => {
     if (isLoggedIn && token) {
-      fetchUserData();
+      getProtectedData();
     }
   }, [isLoggedIn, token]);
 

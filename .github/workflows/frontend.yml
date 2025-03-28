@@ -5,6 +5,7 @@ on:
     branches:
       - fix-lặp-data
       - dev-frontend
+      - Add-jwt
   pull_request:
     branches:
       - main

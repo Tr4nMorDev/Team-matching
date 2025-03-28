@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 
-function SignIn({ handleToggle }) {
+function SignIn({ handleToggle, onClose }) {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -28,37 +28,14 @@ function SignIn({ handleToggle }) {
 
       const { token, userData } = response.data;
       console.log("Sign in successful:", userData);
-      console.log("This is token:", token);
-
       localStorage.setItem("token", token);
       login(token, userData);
+      onClose();
     } catch (error) {
       console.error("Error signing in:", error.response?.data || error.message);
     }
   };
 
-  const getProtectedData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      // Gửi token trong header Authorization
-      const response = await axios.get(
-        "http://localhost:8080/api/protected-resource", // URL của API cần xác thực
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Thêm token vào header
-          },
-        }
-      );
-
-      console.log("Protected data:", response.data);
-    } catch (error) {
-      console.error(
-        "Error fetching protected data:",
-        error.response?.data || error.message
-      );
-    }
-  };
   return (
     <>
       <h2 className="text-2xl font-semibold mt-20 text-gray-900">Sign in</h2>
