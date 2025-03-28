@@ -6,16 +6,25 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null); // Thêm role
+  const [role, setRole] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token") || null); // Lưu token vào state
 
-  const login = () => setIsLoggedIn(true);
+  const login = (token, userData) => {
+    setIsLoggedIn(true);
+    setToken(token); // Lưu token vào state
+    setUser(userData); // Lưu thông tin người dùng vào state
+    localStorage.setItem("token", token); // Lưu token vào localStorage
+  };
+
   const logout = () => {
     setIsLoggedIn(false);
     setUser(null);
     setRole(null);
+    setToken(null);
+    localStorage.removeItem("token"); // Xóa token khỏi localStorage
   };
 
-  // Giả sử bạn có một hàm để lấy thông tin người dùng từ API
+  // Lấy thông tin người dùng sau khi đăng nhập
   const fetchUserData = async () => {
     try {
       const response = await fetch(
@@ -32,13 +41,15 @@ export const AuthProvider = ({ children }) => {
 
   // Lấy thông tin người dùng khi đăng nhập
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && token) {
       fetchUserData();
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, token]);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, role, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, role, user, token, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -8,6 +8,9 @@ import ut.edu.teammatching.auth.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import java.util.Map;
 
 import java.util.Optional;
 
@@ -24,10 +27,11 @@ public class AuthController {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/signin")
-    public String signin(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> signin(@RequestBody LoginRequest request) {
         Optional<User> userOpt = userRepository.findByUsername(request.getUsername());
         if (userOpt.isEmpty()) {
-            return "User not found!";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User not found!"));
         }
 
         User user = userOpt.get();
@@ -35,10 +39,22 @@ public class AuthController {
         System.out.println("Stored password: " + user.getPassword());
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return "Invalid password!";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid password!"));
         }
 
         // ✅ Tạo JWT token
-        return jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateToken(user.getUsername());
+
+        // ✅ Trả về JSON chứa token + user info
+        return ResponseEntity.ok(Map.of(
+                "token", token,
+                "userData", Map.of(
+                        "id", user.getId(),
+                        "username", user.getUsername(),
+                        "email", user.getEmail()
+                )
+        ));
     }
+
 }
