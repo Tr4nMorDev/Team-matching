@@ -15,17 +15,10 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
-    // Tạo bình luận mới
-    @PostMapping
-    public ResponseEntity<Comment> createComment(@RequestBody Comment comment) {
-        Comment savedComment = commentService.createComment(comment);
-        return ResponseEntity.ok(savedComment);
-    }
-
-    // Lấy danh sách bình luận theo postId
-    @GetMapping("/post/{postId}")
-    public ResponseEntity<List<Comment>> getCommentsByPostId(@PathVariable Long postId) {
-        List<Comment> comments = commentService.findByPostId(postId); // ❌ Fix lỗi truyền tham số
+    // API lấy danh sách bình luận theo Blog ID
+    @GetMapping("/blog/{blogId}")
+    public ResponseEntity<List<Comment>> getCommentsByBlogId(@PathVariable Long blogId) {
+        List<Comment> comments = commentService.getCommentsByBlogId(blogId);
         return ResponseEntity.ok(comments);
     }
 }
