@@ -33,7 +33,7 @@ public class JwtUtil {
     // ✅ Lấy tất cả claims từ token
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser()  // Dùng parser() cho phiên bản cũ
-                .setSigningKey(key.getEncoded())  // Đặt khóa ký (HMAC key)
+                .setSigningKey(key)  // Đặt khóa ký (HMAC key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -55,11 +55,19 @@ public class JwtUtil {
 
     // ✅ Kiểm tra token hợp lệ và chưa hết hạn
     public boolean validateToken(String token) {
-        return !isTokenExpired(token);
+        try {
+            boolean expired = isTokenExpired(token);
+            System.out.println("🔍 Token expired: " + expired);
+            return !expired;
+        } catch (Exception e) {
+            System.err.println("❌ Token validation error: " + e.getMessage());
+            return false;
+        }
     }
 
     // ✅ Lấy username từ token
     public String getUsernameFromToken(String token) {
         return getAllClaimsFromToken(token).getSubject();
     }
+
 }

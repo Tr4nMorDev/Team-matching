@@ -24,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
+        System.out.println("🔍 Checking Authorization Header: " + authHeader);
 
         // Kiểm tra xem có header Authorization hay không
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -32,14 +33,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);  // Cắt bỏ "Bearer "
+        System.out.println("🔑 Extracted Token: " + token);
 
         try {
             if (jwtUtil.validateToken(token)) {
                 Authentication authentication = jwtUtil.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                System.out.println("✅ Token is valid. User authenticated: " + authentication.getName());
+                System.out.println("✅ User roles: " + authentication.getAuthorities());
             }
         } catch (Exception e) {
-            System.err.println("Lỗi xác thực token: " + e.getMessage());
+            System.err.println("❌ Lỗi xác thực token: " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);

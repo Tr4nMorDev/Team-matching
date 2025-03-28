@@ -29,24 +29,27 @@ export const AuthProvider = ({ children }) => {
   // Lấy thông tin người dùng sau khi đăng nhập
   const getProtectedData = async () => {
     try {
-      const token = localStorage.getItem("token");
-      console.log("Using token:", token); // Kiểm tra token có thực sự được lấy không
-
-      const response = await axios.get(
+      const token = localStorage.getItem("token"); // hoặc cách lưu token của bạn
+      const response = await fetch(
         "http://localhost:8080/api/protected-resource",
         {
+          method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`, // Kiểm tra token có thực sự được gửi không
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
-      console.log("Protected data:", response.data);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
     } catch (error) {
-      console.error(
-        "Error fetching protected data:",
-        error.response?.data || error.message
-      );
+      console.error("Error fetching protected data:", error);
+      throw error;
     }
   };
 
