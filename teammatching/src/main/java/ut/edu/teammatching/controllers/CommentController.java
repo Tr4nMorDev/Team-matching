@@ -22,10 +22,10 @@ public class CommentController {
         return ResponseEntity.ok(savedComment);
     }
 
-    //Lấy ds bình luận theo postId
+    // Lấy danh sách bình luận theo postId
     @GetMapping("/post/{postId}")
     public ResponseEntity<List<Comment>> getCommentsByPostId(@PathVariable Long postId) {
-        List<Comment> comments = commentService.getCommentsByPostID(postId);
+        List<Comment> comments = commentService.findByPostId(postId); // ❌ Fix lỗi truyền tham số
         return ResponseEntity.ok(comments);
     }
 }
