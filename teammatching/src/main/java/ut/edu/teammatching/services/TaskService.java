@@ -1,64 +1,76 @@
 package ut.edu.teammatching.services;
 
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ut.edu.teammatching.enums.TaskStatus;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Task;
 import ut.edu.teammatching.models.Team;
+import ut.edu.teammatching.repositories.StudentRepository;
 import ut.edu.teammatching.repositories.TaskRepository;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import ut.edu.teammatching.repositories.TeamRepository;
 
 @Service
-@RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final TeamRepository teamRepository;
+    private final StudentRepository studentRepository;
 
-    // Lấy danh sách tất cả các Task
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    public TaskService(TaskRepository taskRepository, TeamRepository teamRepository, StudentRepository studentRepository) {
+        this.taskRepository = taskRepository;
+        this.teamRepository = teamRepository;
+        this.studentRepository = studentRepository;
     }
 
-    // Lấy Task theo ID
-    public Optional<Task> getTaskById(Long id) {
-        return taskRepository.findById(id);
+    /**
+     * Lấy thông tin một task dựa trên ID.
+     */
+    public Task getTaskById(Long taskId) {
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy task!"));
     }
 
-    // Lấy danh sách Task theo một Team cụ thể
-    public List<Task> getTasksByTeam(Team team) {
-        return taskRepository.findByTeam(team);
-    }
-
-    // Tạo một Task mới
-    public Task createTask(Task task) {
-        return taskRepository.save(task);
-    }
-
-    // Xóa Task theo ID
+    /**
+     * Xóa một task khỏi hệ thống.
+     */
     @Transactional
-    public void deleteTask(Long id) {
-        taskRepository.deleteById(id);
+    public void deleteTask(Long taskId) {
+        if (!taskRepository.existsById(taskId)) {
+            throw new RuntimeException("Không tìm thấy task để xóa!");
+        }
+        taskRepository.deleteById(taskId);
     }
 
-    // Cập nhật trạng thái của Task (To Do, In Progress, Done)
+    /**
+     * Chỉ leader của team mới có thể giao task cho thành viên.
+     */
     @Transactional
-    public void updateStatus(Long taskId, TaskStatus newStatus) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
-        task.setStatus(newStatus);
-        taskRepository.save(task);
-    }
+    public Task assignTask(Long leaderId, Long teamId, String taskName, String description, Long studentId) {
+        // Kiểm tra team có tồn tại không
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
 
-    // Gán một Task cho một sinh viên cụ thể
-    @Transactional
-    public void assignTo(Long taskId, Student student) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+        // Kiểm tra leader có hợp lệ không
+        if (!team.getLeader().getId().equals(leaderId)) {
+            throw new IllegalStateException("Chỉ leader của team mới có thể giao task!");
+        }
+
+        // Kiểm tra sinh viên có trong team không
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên!"));
+
+        if (!team.getStudents().contains(student)) {
+            throw new IllegalStateException("Sinh viên không thuộc team này!");
+        }
+
+        // Tạo mới task
+        Task task = new Task();
+        task.setTaskName(taskName);
+        task.setDescription(description);
+        task.setTeam(team);
         task.setAssignedToStudent(student);
-        taskRepository.save(task);
+        task.setStatus(TaskStatus.IN_PROGRESS);
+
+        return taskRepository.save(task);
     }
 }
