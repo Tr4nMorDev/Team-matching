@@ -27,14 +27,6 @@ public class Student extends User {
     @Column(nullable = false)
     private Integer term;
 
-    @ManyToMany
-    @JoinTable(
-            name = "student_team",
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "team_id")
-    )
-    private List<Team> teams = new ArrayList<>();
-
     @OneToMany(mappedBy = "assignedToStudent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> assignedTasks = new ArrayList<>();
 
