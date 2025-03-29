@@ -60,20 +60,11 @@ public class Team {
         this.leader = newLeader;
     }
 
-    // Kiểm tra nếu leader rời khỏi team
-    public void removeStudent(Student student) {
-        if (student.equals(this.leader)) {
-            throw new IllegalStateException("Leader không thể rời team! Hãy chỉ định leader mới trước.");
-        }
-        students.remove(student);
-        roles.remove(student);
-    }
-
     @ElementCollection
     @CollectionTable(name = "team_roles", joinColumns = @JoinColumn(name = "team_id"))
-    @MapKeyJoinColumn(name = "user_id")
+    @MapKeyColumn(name = "user_id") // Lưu ID của User
     @Column(name = "role")
-    private Map<User, String> roles = new HashMap<>();
+    private Map<Long, String> roles = new HashMap<>();
 
     /** 🔥 Kiểm tra ràng buộc: Nếu team là Academic thì phải có giảng viên */
     @PrePersist

@@ -20,9 +20,9 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
     @NonNull
     Optional<Blog> findById(@NonNull Long id);
 
-    // Lấy tất cả posts của một user
-//    List<Blog> findByAuthor_Id(Long userId);
-
-    // Đếm số lượng post của một user
-//    long countByAuthor_Id(Long userId);
+//     Lấy tất cả posts của một user
+    List<Blog> findByAuthor_Id(Long userId);
+//
+//     Đếm số lượng post của một user
+    long countByAuthor_Id(Long userId);
 }

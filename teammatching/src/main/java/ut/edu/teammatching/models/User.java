@@ -98,19 +98,4 @@ public abstract class User {
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Message> receivedMessages = new ArrayList<>();
-
-    public User(String username, String password, String fullName, Gender gender,
-                String profilePicture, String email, List<String> skills,
-                List<String> hobbies, List<String> projects, String phoneNumber) {
-        this.username = username;
-        this.password = password;
-        this.fullName = fullName;
-        this.gender = gender;
-        this.profilePicture = profilePicture;
-        this.email = email;
-        this.skills = skills;
-        this.hobbies = hobbies;
-        this.projects = projects;
-        this.phoneNumber = phoneNumber;
-    }
 }

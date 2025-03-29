@@ -3,6 +3,7 @@ package ut.edu.teammatching.models;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ut.edu.teammatching.enums.Role;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name="lecturers")
+@NoArgsConstructor
 @AllArgsConstructor
 public class Lecturer extends User {
     @Column(name = "department")
@@ -30,8 +32,4 @@ public class Lecturer extends User {
 
     @OneToMany(mappedBy = "givenByLecturer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Rating> givenRatings = new ArrayList<>();
-
-    public Lecturer() {
-        this.setRole(Role.LECTURER);
-    }
 }

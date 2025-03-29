@@ -38,7 +38,7 @@ public class Notification {
     @Column(name = "is_read", nullable = false)
     private Boolean isRead = false;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
 
@@ -47,10 +47,15 @@ public class Notification {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    // Nếu thông báo liên quan đến blog
+    // Nếu thông báo liên quan đến tin nhắn
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blog_id")
-    private Blog blog;
+    @JoinColumn(name = "message_id")
+    private Message message;
+
+    // Thông báo nếu tới hạn Deadline
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", nullable = false)
+    private Task task;
 
     @PrePersist
     protected void onCreate() {
