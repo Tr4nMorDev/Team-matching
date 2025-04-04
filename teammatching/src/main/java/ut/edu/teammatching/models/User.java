@@ -3,6 +3,7 @@ package ut.edu.teammatching.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ut.edu.teammatching.enums.Gender;
 import ut.edu.teammatching.enums.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -40,6 +41,7 @@ public abstract class User {
     private String username;
 
     @Column(name = "password", nullable = false)
+    @JsonIgnore // Luôn ignore password
     private String password;
 
     @Column(name = "profile_picture")
@@ -82,27 +84,27 @@ public abstract class User {
     private String phoneNumber;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore // Tránh lặp dữ liệu
+    @JsonIgnoreProperties("author")
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonIgnoreProperties("author")
     private List<Blog> blogs = new ArrayList<>();
 
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonIgnoreProperties({"recipient", "sender"})
     private List<Notification> receivedNotifications;
 
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonIgnoreProperties({"recipient", "sender"})
     private List<Notification> sentNotifications;
 
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonIgnoreProperties({"sender", "receiver"})
     private List<Message> sentMessages = new ArrayList<>();
 
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonIgnoreProperties({"sender", "receiver"})
     private List<Message> receivedMessages = new ArrayList<>();
 
     public User(String username, String fullName, String email, String password, Role role, Gender gender,
