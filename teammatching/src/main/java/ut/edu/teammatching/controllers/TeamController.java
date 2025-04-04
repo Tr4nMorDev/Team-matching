@@ -3,6 +3,7 @@ package ut.edu.teammatching.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ut.edu.teammatching.dto.AssignRoleRequest;
 import ut.edu.teammatching.models.Team;
 import ut.edu.teammatching.services.TeamService;
 
@@ -36,10 +37,11 @@ public class TeamController {
         return ResponseEntity.ok(teamService.updateTeam(id, team));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Team> deleteTeam(@PathVariable Long id) {
-        teamService.deleteTeam(id);
-        return ResponseEntity.ok().build();
+    @DeleteMapping("/{teamId}")
+    public ResponseEntity<String> deleteTeam(@RequestParam Long leaderId,
+                                             @PathVariable Long teamId) {
+        teamService.deleteTeam(leaderId, teamId);
+        return ResponseEntity.ok("Team deleted successfully");
     }
 
     //Đặt một sinh viên làm leader của team.
@@ -55,10 +57,28 @@ public class TeamController {
         return ResponseEntity.ok().build();
     }
 
-    // Gửi thông báo đến tất cả thành viên trong team
-//    @PostMapping("/{id}/notify")
-//    public ResponseEntity<Void> notifyAllMembers(@PathVariable Long id, @RequestBody NotificationRequest request) {
-//        teamService.notifyAllMembers(id, request.getMessage());
-//        return ResponseEntity.noContent().build();
-//    }
+    //Thêm thành viên
+    @PostMapping("/{teamId}/add-member")
+    public ResponseEntity<Team> addMember(@RequestParam Long leaderId,
+                                          @PathVariable Long teamId,
+                                          @RequestParam Long studentId) {
+        Team team = teamService.addMember(leaderId, teamId, studentId);
+        return ResponseEntity.ok(team);
+    }
+
+    //Thêm giảng viên hướng dẫn
+    @PostMapping("/{teamId}/assign-lecturer")
+    public ResponseEntity<Team> assignLecturer(@RequestParam Long leaderId,
+                                               @PathVariable Long teamId,
+                                               @RequestParam Long lecturerId) {
+        Team team = teamService.assignLecturer(leaderId, teamId, lecturerId);
+        return ResponseEntity.ok(team);
+    }
+
+    //Phân công vai trò
+    @PostMapping("/{teamId}/assign-role")
+    public ResponseEntity<?> assignRole(@RequestBody AssignRoleRequest request) {
+        Team updatedTeam = teamService.assignRole(request.getLeaderId(), request.getTeamId(), request.getMemberId(), request.getRole());
+        return ResponseEntity.ok(updatedTeam);
+    }
 }

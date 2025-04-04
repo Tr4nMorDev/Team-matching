@@ -112,9 +112,6 @@ public abstract class User {
     @JsonIgnore
     private List<Message> receivedMessages = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "members")
-    private Set<Team> teams = new HashSet<>();
-
     public void setPassword(String password) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         this.password = encoder.encode(password);

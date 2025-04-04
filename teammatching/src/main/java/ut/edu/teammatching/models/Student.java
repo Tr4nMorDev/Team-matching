@@ -27,6 +27,9 @@ public class Student extends User {
     @Column(nullable = false)
     private Integer term;
 
+    @ManyToMany(mappedBy = "students")
+    private List<Team> teams = new ArrayList<>();
+
     @OneToMany(mappedBy = "assignedToStudent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> assignedTasks = new ArrayList<>();
 

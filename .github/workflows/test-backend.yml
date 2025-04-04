@@ -3,8 +3,7 @@ name: Test Backend
 on:
   push:
     branches:
-      - Tran-Dinh-Phong
-      - fix-lặp-data
+      - TestTeamAndTask
   pull_request:
     branches:
       - main

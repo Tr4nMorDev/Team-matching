@@ -20,5 +20,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Tìm user và load danh sách bài blog (dùng EntityGraph để Eager Fetch)
     @NonNull
     Optional<User> findById(@NonNull Long id);
+
+    @Query("SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<User> searchUsers(@NonNull String keyword);
 }
 

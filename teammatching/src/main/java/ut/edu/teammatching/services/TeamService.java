@@ -1,26 +1,28 @@
 package ut.edu.teammatching.services;
 
 import jakarta.transaction.Transactional;
-//import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ut.edu.teammatching.models.Lecturer;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Team;
 import ut.edu.teammatching.repositories.TeamRepository;
 import ut.edu.teammatching.repositories.StudentRepository;
+import ut.edu.teammatching.repositories.LecturerRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-//@RequiredArgsConstructor
 public class TeamService {
     private final TeamRepository teamRepository;
     private final StudentRepository studentRepository;
+    private final LecturerRepository lecturerRepository;
 
     // Inject các repository vào TeamService
-    public TeamService(TeamRepository teamRepository, StudentRepository studentRepository) {
+    public TeamService(TeamRepository teamRepository, StudentRepository studentRepository, LecturerRepository lecturerRepository) {
         this.teamRepository = teamRepository;
         this.studentRepository = studentRepository;
+        this.lecturerRepository = lecturerRepository;
     }
 
     public List<Team> getAllTeams() {
@@ -48,12 +50,16 @@ public class TeamService {
             return teamRepository.save(team);
         }).orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
     }
+
+    // Xóa team (chỉ Leader có thể xóa)
     @Transactional
-    public void deleteTeam(Long id) {
-        if (!teamRepository.existsById(id)) {
-            throw new RuntimeException("Không tìm thấy team để xóa!");
+    public void deleteTeam(Long leaderId, Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Team not found"));
+        if (!team.getLeader().getId().equals(leaderId)) {
+            throw new RuntimeException("Only the team leader can delete the team");
         }
-        teamRepository.deleteById(id);
+        teamRepository.delete(team);
     }
 
     /**
@@ -79,6 +85,23 @@ public class TeamService {
         return teamRepository.save(team);
     }
 
+    //Rời team
+    @Transactional
+    public void leaveTeam(Long studentId, Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên!"));
+
+        if (team.getLeader().getId().equals(studentId)) {
+            throw new IllegalStateException("Leader không thể rời khỏi nhóm. Hãy chuyển Leader trước!");
+        }
+
+        team.getStudents().remove(student);
+        teamRepository.save(team);
+    }
+
     /**
      * Xóa một sinh viên khỏi team.
      */
@@ -102,17 +125,60 @@ public class TeamService {
         teamRepository.save(team);
     }
 
-//    /**
-//     * Gửi thông báo đến tất cả thành viên trong team.
-//     */
-//    private void notifyAllMembers(Long teamId, String message) {
-//        Team team = getTeamById(teamId);
-//        team.getStudents().forEach(member ->
-//                notificationService.sendNotification(member, message)
-//        );
-//
-//        if (team.getLecturer() != null) {
-//            notificationService.sendNotification(team.getLecturer(), message);
-//        }
-//    }
+    // Thêm thành viên vào team (chỉ Leader có thể thêm)
+    @Transactional
+    public Team addMember(Long leaderId, Long teamId, Long studentId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
+        if (!team.getLeader().getId().equals(leaderId)) {
+            throw new RuntimeException("Chỉ có Leader mới được thêm thành viên");
+        }
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên!"));
+
+        team.getStudents().add(student);
+        return teamRepository.save(team);
+    }
+
+    // Bổ nhiệm giảng viên hướng dẫn
+    @Transactional
+    public Team assignLecturer(Long leaderId, Long teamId, Long lecturerId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
+
+        if (!team.getLeader().getId().equals(leaderId)) {
+            throw new RuntimeException("Chỉ có Leader mới được bổ nhiệm giảng viên");
+        }
+
+        Lecturer lecturer = lecturerRepository.findById(lecturerId) // Đúng cách
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy giảng viên"));
+
+        team.setLecturer(lecturer);
+        return teamRepository.save(team);
+    }
+
+    //Phân công vai trò trong team
+    @Transactional
+    public Team assignRole(Long leaderId, Long teamId, Long memberId, String role) {
+        // Tìm team
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
+
+        // Kiểm tra người gọi có phải là leader không
+        if (!team.getLeader().getId().equals(leaderId)) {
+            throw new RuntimeException("Chỉ có Leader mới được phân công vai trò");
+        }
+
+        // Kiểm tra xem member có trong team không
+        Student member = studentRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên!"));
+        if (!team.getStudents().contains(member)) {
+            throw new RuntimeException("Thành viên không có trong team");
+        }
+
+        // Gán vai trò
+        team.getRoles().put(memberId, role);
+        return teamRepository.save(team);
+    }
 }
