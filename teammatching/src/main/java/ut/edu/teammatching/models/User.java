@@ -3,23 +3,22 @@ package ut.edu.teammatching.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.*;
-import org.hibernate.annotations.BatchSize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ut.edu.teammatching.enums.Gender;
 import ut.edu.teammatching.enums.Role;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "role")  // Phân biệt bằng role
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type"
+)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = Student.class, name = "STUDENT"),
         @JsonSubTypes.Type(value = Lecturer.class, name = "LECTURER")
@@ -37,13 +36,9 @@ public abstract class User {
     @Column(name = "user_id", nullable = false)
     private Long id;
 
-    @NotBlank //rang buoc du lieu dau vao
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Setter(AccessLevel.NONE) //Khong tu dong tao setter
-    @NotBlank
-    @Size(min = 8, message = "Mật khẩu phải có ít nhất 8 ký tự")
     @Column(name = "password", nullable = false)
     private String password;
 
@@ -52,6 +47,7 @@ public abstract class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
+    @JsonProperty("role") // 🔥 Đảm bảo Spring Boot hiểu đúng key JSON
     private Role role;
 
     @Column(name = "fullName")
@@ -61,9 +57,7 @@ public abstract class User {
     @Column(name = "gender")
     private Gender gender;
 
-    @Email
-    @NotBlank
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email", unique = true)
     private String email;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -84,8 +78,7 @@ public abstract class User {
     @BatchSize(size = 10)
     private List<String> projects = new ArrayList<>();
 
-    @Pattern(regexp = "^(\\+?\\d{1,3})?\\d{10,12}$", message = "Số điện thoại không hợp lệ")
-    @Column(name = "phoneNumber", length = 20, unique = true)
+    @Column(name = "phoneNumber", length = 20, unique = true )
     private String phoneNumber;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -112,17 +105,24 @@ public abstract class User {
     @JsonIgnore
     private List<Message> receivedMessages = new ArrayList<>();
 
-    public void setPassword(String password) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        this.password = encoder.encode(password);
-    }
+    public User(String username, String fullName, String email, String password, Role role, Gender gender,
+                String profilePicture, List<String> skills,
+                List<String> hobbies, List<String> projects, String phoneNumber) {
+        this.username = username;
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.gender = gender;
+        this.profilePicture = profilePicture;
 
-    @PrePersist
-    @PreUpdate
-    private void encryptPassword() {
-        if (this.password != null && !this.password.startsWith("$2a$")) { // Kiểm tra nếu chưa mã hóa
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            this.password = encoder.encode(this.password);
-        }
+        this.skills = skills;
+        this.hobbies = hobbies;
+        this.projects = projects;
+
+        // Nếu phoneNumber là null hoặc rỗng, có thể để null hoặc giá trị mặc định
+        this.phoneNumber = (phoneNumber == null || phoneNumber.isBlank())
+                ? null
+                : phoneNumber;
     }
 }

@@ -1,85 +1,100 @@
 package ut.edu.teammatching.services;
-
-//import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ut.edu.teammatching.repositories.UserRepository;
 import ut.edu.teammatching.models.User;
 import java.util.List;
+import ut.edu.teammatching.enums.Role;
+import ut.edu.teammatching.models.Student;
+import ut.edu.teammatching.models.Lecturer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    // Lấy danh sách tất cả users
+    //lay dnah sach tat ca users
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    // Lấy thông tin user theo ID
+    //lay thong tin user theo id
     public User getUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    // Lấy thông tin user theo username
+    //lay thong tin user theo username
     public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+        return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    // Lấy thông tin user theo email
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+    // Tìm kiếm user theo từ khóa
+    public List<User> searchUsers(String keyword) {
+        return userRepository.searchUsers(keyword);
     }
 
-    // Kiểm tra xem username có tồn tại không
-    public boolean existsByUsername(String username) {
-        return userRepository.findByUsername(username).isPresent();
-    }
-
-    // Kiểm tra xem email có tồn tại không
-    public boolean existsByEmail(String email) {
-        return userRepository.findByEmail(email).isPresent();
-    }
-
-    // Tạo mới user
+    //tao moi user
     public User createUser(User user) {
-        if (existsByUsername(user.getUsername())) {
-            throw new RuntimeException("Username đã tồn tại");
+
+        logger.info("📌 Received request to create user: {}", user);
+
+        User newUser;
+
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+
+        if (user.getRole() == Role.STUDENT) {
+            if (!(user instanceof Student student)) {
+                throw new RuntimeException("Invalid user data for student");
+            }
+            if (student.getMajor() == null || student.getMajor().isEmpty()) {
+                throw new RuntimeException("Major is required for students");
+            }
+
+            newUser = new Student(
+                    student.getUsername(), student.getFullName(), student.getEmail(), student.getPassword(),
+                    student.getRole(), student.getGender(), student.getProfilePicture(),
+                    student.getSkills(), student.getHobbies(), student.getProjects(), student.getPhoneNumber(),
+                    student.getMajor(), student.getTerm()
+            );
+        } else if (user.getRole() == Role.LECTURER) {
+            Lecturer lecturer = (Lecturer) user; // Ép kiểu User thành Lecturer
+            newUser = new Lecturer(lecturer.getUsername(), lecturer.getFullName(), lecturer.getEmail(), lecturer.getPassword(),
+                    lecturer.getRole(), lecturer.getGender(), lecturer.getProfilePicture(),
+                    lecturer.getSkills(), lecturer.getHobbies(), lecturer.getProjects(), lecturer.getPhoneNumber(),
+                    lecturer.getDepartment(), lecturer.getResearchAreas());
+        } else {
+            throw new IllegalArgumentException("Invalid role: " + user.getRole());
         }
-        if (existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email đã tồn tại");
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         return userRepository.save(user);
     }
-
-    // Cập nhật thông tin user
+    //cap nhat thong tin user
     public User updateUser(Long id, User newUserData) {
         return userRepository.findById(id).map(user -> {
             user.setUsername(newUserData.getUsername());
             user.setEmail(newUserData.getEmail());
+//            user.setPassword(newUserData.getPassword());
             user.setSkills(newUserData.getSkills());
             user.setHobbies(newUserData.getHobbies());
-
-            // Mã hóa password nếu có thay đổi
             if (newUserData.getPassword() != null && !newUserData.getPassword().isEmpty()) {
-                user.setPassword(passwordEncoder.encode(newUserData.getPassword()));
+                user.setPassword(newUserData.getPassword()); // Nên mã hóa password trước khi lưu
             }
-
             return userRepository.save(user);
-        }).orElseThrow(() -> new RuntimeException("User không tồn tại"));
+        }).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    // Xóa user theo ID
+    //xoa user theo id
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User không tồn tại");
+        if(!userRepository.existsById(id)){
+            throw new RuntimeException("User not found");
         }
         userRepository.deleteById(id);
     }
