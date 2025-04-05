@@ -3,7 +3,11 @@ name: Test Backend
 on:
   push:
     branches:
-      - Testteamtask
+      - Tran-Dinh-Phong
+      - fix-lặp-data
+      - dev-frontend
+      - Add-jwt
+      - fix-e
   pull_request:
     branches:
       - main

@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - fix-lặp-data
+      - dev-frontend
+      - Add-jwt
+      - fix-e
   pull_request:
     branches:
       - main

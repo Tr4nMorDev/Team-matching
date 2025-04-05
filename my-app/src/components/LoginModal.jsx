@@ -3,6 +3,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import SignUp from "./FormSignup&in/SignUp";
 import SignIn from "./FormSignup&in/SingIn";
+import { useAuth } from "../context/useAuth";
 
 const LoginModal = ({ onClose }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -47,7 +48,7 @@ const LoginModal = ({ onClose }) => {
             {isSignUp ? (
               <SignUp handleToggle={handleToggle} />
             ) : (
-              <SignIn handleToggle={handleToggle} />
+              <SignIn handleToggle={handleToggle} onClose={onClose} />
             )}
           </div>
 
