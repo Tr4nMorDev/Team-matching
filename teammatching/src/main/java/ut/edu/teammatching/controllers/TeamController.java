@@ -1,6 +1,7 @@
 package ut.edu.teammatching.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ut.edu.teammatching.dto.AssignRoleRequest;
@@ -42,6 +43,18 @@ public class TeamController {
                                              @PathVariable Long teamId) {
         teamService.deleteTeam(leaderId, teamId);
         return ResponseEntity.ok("Team deleted successfully");
+    }
+
+    @PostMapping("/{teamId}/leave")
+    public ResponseEntity<String> leaveTeam(@PathVariable Long teamId, @RequestParam Long userId) {
+        try {
+            teamService.leaveTeam(teamId, userId);
+            return ResponseEntity.ok("User has left the team successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to leave team.");
+        }
     }
 
     //Đặt một sinh viên làm leader của team.
