@@ -1,7 +1,9 @@
 package ut.edu.teammatching.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
@@ -13,6 +15,8 @@ import java.time.Instant;
 @Setter
 @Entity
 @Table(name="message")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,4 +49,7 @@ public class Message {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Transient
+    private String type; // "PRIVATE" hoặc "TEAM"
 }
