@@ -11,6 +11,8 @@ import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Lecturer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ut.edu.teammatching.exceptions.ResourceNotFoundException;
+import ut.edu.teammatching.dto.UserDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -21,13 +23,16 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     //lay dnah sach tat ca users
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(UserDTO::new)
+                .toList(); // or .collect(Collectors.toList()) if you use older Java
     }
 
     //lay thong tin user theo id
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findById(id)
+                .orElseThrow(()     -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
     //lay thong tin user theo username
@@ -78,17 +83,15 @@ public class UserService {
     }
     //cap nhat thong tin user
     public User updateUser(Long id, User newUserData) {
-        return userRepository.findById(id).map(user -> {
-            user.setUsername(newUserData.getUsername());
-            user.setEmail(newUserData.getEmail());
-//            user.setPassword(newUserData.getPassword());
-            user.setSkills(newUserData.getSkills());
-            user.setHobbies(newUserData.getHobbies());
-            if (newUserData.getPassword() != null && !newUserData.getPassword().isEmpty()) {
-                user.setPassword(newUserData.getPassword()); // Nên mã hóa password trước khi lưu
-            }
-            return userRepository.save(user);
-        }).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = getUserById(id);
+        user.setUsername(newUserData.getUsername());
+        user.setEmail(newUserData.getEmail());
+        user.setSkills(newUserData.getSkills());
+        user.setHobbies(newUserData.getHobbies());
+        if (newUserData.getPassword() != null && !newUserData.getPassword().isEmpty()) {
+            user.setPassword(newUserData.getPassword());
+        }
+        return userRepository.save(user);
     }
 
     //xoa user theo id
@@ -97,5 +100,10 @@ public class UserService {
             throw new RuntimeException("User not found");
         }
         userRepository.deleteById(id);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
     }
 }

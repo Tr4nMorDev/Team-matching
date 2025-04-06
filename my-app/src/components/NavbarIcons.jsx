@@ -94,8 +94,8 @@ const NavbarIcons = () => {
               className="mt-0 w-12 h-12 rounded-full border border-gray-300"
             />
             <div className="flex flex-col sm:block">
-              <h1 className="text-blue-300">{user?.name}</h1>
-              <h2 className="text-blue-300">{user?.username}</h2>
+              <h1 className="text-gray-900 ">{user?.email}</h1>
+              <h2 className="text-gray-900">{user?.username}</h2>
             </div>
           </button>
         ) : (
