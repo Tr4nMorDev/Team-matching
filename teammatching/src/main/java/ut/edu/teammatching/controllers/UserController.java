@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ut.edu.teammatching.models.User;
 import ut.edu.teammatching.services.UserService;
-
+import ut.edu.teammatching.dto.UserDTO;
 import java.util.List;
 
 @RestController
@@ -16,7 +16,7 @@ public class UserController {
 
     // Lấy danh sách tất cả users
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 

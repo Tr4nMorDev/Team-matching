@@ -8,10 +8,13 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || null); // Lưu token vào state
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [hasFetched, setHasFetched] = useState(false);
+
+  // Kiểm tra và khôi phục trạng thái đăng nhập khi component mount
 
   const login = (token, userData) => {
-    console.log("Token received:", token); // Kiểm tra token có đúng không
+    console.log("Token received:", token);
     setIsLoggedIn(true);
     setToken(token);
     setUser(userData);
@@ -23,13 +26,13 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setRole(null);
     setToken(null);
-    localStorage.removeItem("token"); // Xóa token khỏi localStorage
+    localStorage.removeItem("token");
   };
 
   // Lấy thông tin người dùng sau khi đăng nhập
   const getProtectedData = async () => {
     try {
-      const token = localStorage.getItem("token"); // hoặc cách lưu token của bạn
+      const token = localStorage.getItem("token");
       const response = await fetch(
         "http://localhost:8080/api/protected-resource",
         {
@@ -55,10 +58,21 @@ export const AuthProvider = ({ children }) => {
 
   // Lấy thông tin người dùng khi đăng nhập
   useEffect(() => {
-    if (isLoggedIn && token) {
-      getProtectedData();
+    const storedToken = localStorage.getItem("token");
+    if (storedToken && !user) {
+      // Chỉ gọi 1 lần nếu chưa có user
+      getProtectedData()
+        .then((data) => {
+          setIsLoggedIn(true);
+          setUser(data.user);
+          setRole(data.role);
+          setToken(storedToken);
+        })
+        .catch(() => {
+          logout(); // Xử lý token lỗi
+        });
     }
-  }, [isLoggedIn, token]);
+  }, []);
 
   return (
     <AuthContext.Provider

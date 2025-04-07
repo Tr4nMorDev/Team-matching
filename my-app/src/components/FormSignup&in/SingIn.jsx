@@ -19,20 +19,52 @@ function SignIn({ handleToggle, onClose }) {
 
   const handleSubmit = async () => {
     try {
+      console.log("Attempting to sign in with:", formData);
       const response = await axios.post(
         "http://localhost:8080/api/auth/signin",
         formData
       );
 
-      console.log("Full response data:", response.data); // 🔍 Debug
-
+      // Chỉ lấy thông tin cần thiết từ response
       const { token, userData } = response.data;
-      console.log("Sign in successful:", userData);
+      const { id, username, email } = userData;
+
+      console.log("Sign in successful with basic info:", {
+        id,
+        username,
+        email,
+      });
+
+      // Lưu token và thông tin cơ bản
       localStorage.setItem("token", token);
-      login(token, userData);
+      login(token, { id, username, email });
+
+      // Nếu cần thông tin chi tiết của user, gọi API riêng
+      try {
+        const userDetailsResponse = await axios.get(
+          `http://localhost:8080/api/users/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("Full user details:", userDetailsResponse.data);
+        // Có thể lưu thông tin chi tiết vào state nếu cần
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+
       onClose();
     } catch (error) {
       console.error("Error signing in:", error.response?.data || error.message);
+      if (error.response) {
+        console.error("Error response:", {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers,
+        });
+      }
     }
   };
 

@@ -70,9 +70,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<MainContent />} />
-        {role === "Bret" && (
-          <Route path="/profile" element={<ProfileStudent />} />
-        )}
+        <Route path="/profile" element={<ProfileStudent />} />
         <Route path="/group" element={<GroupsComponent />} />
         <Route path="/group/:namegroup" element={<GroupDashBoard />} />
         <Route path="api/user" element={<UserList />} />
