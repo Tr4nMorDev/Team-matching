@@ -1,112 +1,102 @@
-import React, { useState, useContext } from "react";
-import axios from "axios";
-import { AuthContext } from "../../context/AuthContext";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/useAuth';
 
-function SignIn({ handleToggle, onClose }) {
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
-  const { login } = useContext(AuthContext);
+const SignIn = ({ handleToggle, onClose }) => {
+    const navigate = useNavigate();
+    const { login } = useAuth();
+    const [error, setError] = useState('');
+    const [formData, setFormData] = useState({
+        username: '',
+        password: '',
+    });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
 
-  const handleSubmit = async () => {
-    try {
-      console.log("Attempting to sign in with:", formData);
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/signin",
-        formData
-      );
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
 
-      // Chỉ lấy thông tin cần thiết từ response
-      const { token, userData } = response.data;
-      const { id, username, email } = userData;
+            const data = await response.json();
 
-      console.log("Sign in successful with basic info:", {
-        id,
-        username,
-        email,
-      });
+            if (!response.ok) {
+                throw new Error(data.error || 'Login failed');
+            }
 
-      // Lưu token và thông tin cơ bản
-      localStorage.setItem("token", token);
-      login(token, { id, username, email });
+            // Đăng nhập thành công
+            login(data.token, data.userData);
+            onClose(); // Đóng modal
+            navigate('/'); // Chuyển đến trang chủ
+        } catch (err) {
+            setError(err.message);
+        }
+    };
 
-      // Nếu cần thông tin chi tiết của user, gọi API riêng
-      try {
-        const userDetailsResponse = await axios.get(
-          `http://localhost:8080/api/users/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("Full user details:", userDetailsResponse.data);
-        // Có thể lưu thông tin chi tiết vào state nếu cần
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-      }
+    return (
+        <div className="w-full">
+            <h2 className="text-3xl font-bold mb-6 text-center">Welcome Back!</h2>
+            {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        required
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        value={formData.username}
+                        onChange={handleChange}
+                    />
+                </div>
 
-      onClose();
-    } catch (error) {
-      console.error("Error signing in:", error.response?.data || error.message);
-      if (error.response) {
-        console.error("Error response:", {
-          status: error.response.status,
-          data: error.response.data,
-          headers: error.response.headers,
-        });
-      }
-    }
-  };
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        required
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        value={formData.password}
+                        onChange={handleChange}
+                    />
+                </div>
 
-  return (
-    <>
-      <h2 className="text-2xl font-semibold mt-20 text-gray-900">Sign in</h2>
-      <p className="text-gray-500 mb-6">
-        Enter your username and password to continue.
-      </p>
+                <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                    Sign In
+                </button>
 
-      <input
-        type="text"
-        name="username"
-        placeholder="Username"
-        value={formData.username}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border rounded-md text-gray-600"
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border rounded-md text-gray-600"
-      />
-
-      <button
-        onClick={handleSubmit}
-        className="w-full bg-blue-500 text-white p-2 rounded-md font-semibold cursor-pointer mb-4"
-      >
-        Sign in
-      </button>
-
-      <p className="text-sm text-gray-600 text-center">
-        Don't have an account?{" "}
-        <button onClick={handleToggle} className="text-blue-500 cursor-pointer">
-          Sign up
-        </button>
-      </p>
-    </>
-  );
-}
+                <div className="text-center mt-4">
+                    <p className="text-sm text-gray-600">
+                        Don't have an account?{' '}
+                        <button
+                            type="button"
+                            onClick={handleToggle}
+                            className="text-blue-600 hover:text-blue-700 font-medium"
+                        >
+                            Sign Up
+                        </button>
+                    </p>
+                </div>
+            </form>
+        </div>
+    );
+};
 
 export default SignIn;
