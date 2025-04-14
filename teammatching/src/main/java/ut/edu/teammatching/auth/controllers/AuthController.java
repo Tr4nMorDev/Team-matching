@@ -1,6 +1,7 @@
 package ut.edu.teammatching.auth.controllers;
 
 
+import ut.edu.teammatching.dto.UserDTO;
 import ut.edu.teammatching.dto.auth.LoginRequest;
 import ut.edu.teammatching.models.User;
 import ut.edu.teammatching.repositories.UserRepository;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import java.util.Map;
+import ut.edu.teammatching.services.UserService;
 
 import java.util.Optional;
 
@@ -45,15 +47,11 @@ public class AuthController {
 
         // ✅ Tạo JWT token
         String token = jwtUtil.generateToken(user.getUsername());
-
+        UserDTO userDTO = UserService.convertToDTO(user);
         // ✅ Trả về JSON chứa token + user info
         return ResponseEntity.ok(Map.of(
                 "token", token,
-                "userData", Map.of(
-                        "id", user.getId(),
-                        "username", user.getUsername(),
-                        "email", user.getEmail()
-                )
+                "userData", userDTO
         ));
     }
 

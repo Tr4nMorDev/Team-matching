@@ -1,13 +1,15 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import SignUp from "./FormSignup&in/SignUp";
 import SignIn from "./FormSignup&in/SingIn";
 import { useAuth } from "../context/useAuth";
 
 const LoginModal = ({ onClose }) => {
+  const { user } = useAuth(); // Lấy user từ context
   const [isSignUp, setIsSignUp] = useState(false);
   const [key, setKey] = useState(0);
+
   const handleToggle = () => {
     setIsSignUp((prev) => !prev);
     setKey((prev) => prev + 1);
@@ -18,8 +20,8 @@ const LoginModal = ({ onClose }) => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0, scale: 1.2 }} // Hiệu ứng fade-out + phóng to nhẹ
-        transition={{ duration: 0.5, ease: "easeOut" }} // Kéo dài animation
+        exit={{ opacity: 0, scale: 1.2 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-md transition-opacity duration-300 z-20"
       >
         <motion.div
@@ -55,8 +57,8 @@ const LoginModal = ({ onClose }) => {
           {/* Hình ảnh bên phải */}
           <div className="w-1/2 relative">
             <img
-              src="/imagecopy.png" // Đường dẫn trực tiếp đến ảnh
-              alt="Background"
+              src="/imagecopy.png"
+              alt="Default"
               className="w-full h-full object-cover"
             />
           </div>

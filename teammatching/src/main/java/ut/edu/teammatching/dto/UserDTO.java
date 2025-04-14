@@ -45,4 +45,7 @@ public class UserDTO {
             this.userID = new LecturerDetailDTO(lecturer);
         }
     }
+    public static UserDTO fromUser(User user) {
+        return new UserDTO(user);
+    }
 } 

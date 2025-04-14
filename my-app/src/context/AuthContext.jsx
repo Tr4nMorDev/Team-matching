@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
           logout(); // Xử lý token lỗi
         });
     }
-  }, []);
+  }, [user, hasFetched]);
 
   return (
     <AuthContext.Provider

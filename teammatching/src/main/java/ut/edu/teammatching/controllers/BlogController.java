@@ -10,7 +10,7 @@ import ut.edu.teammatching.repositories.UserRepository;
 import java.util.List;
 
 @RestController
-@RequestMapping("/blog")
+@RequestMapping("/api/blogs")
 @CrossOrigin(origins = "*")
 public class BlogController {
 

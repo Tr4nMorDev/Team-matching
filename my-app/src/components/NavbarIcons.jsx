@@ -83,19 +83,19 @@ const NavbarIcons = () => {
           }}
         />
 
-        {isLoggedIn ? (
+        {isLoggedIn && user ? (
           <button
             className="flex gap-4 cursor-pointer"
             onClick={() => setShowProfile(true)}
           >
             <img
-              src="/avata.jpg"
+              src={user.profilePicture}
               alt="User"
               className="mt-0 w-12 h-12 rounded-full border border-gray-300"
             />
             <div className="flex flex-col sm:block">
-              <h1 className="text-gray-900 ">{user?.email}</h1>
-              <h2 className="text-gray-900">{user?.username}</h2>
+              <h1 className="text-gray-900 ">{user.fullName}</h1>
+              <h2 className="text-gray-900">{user.role}</h2>
             </div>
           </button>
         ) : (

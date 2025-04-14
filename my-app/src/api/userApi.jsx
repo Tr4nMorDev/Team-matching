@@ -10,7 +10,7 @@ export const getUser = async (id) => {
 
 async function getBlogs() {
   try {
-    const response = await axios.get(`${API_PROJECT}/blog`);
+    const response = await axios.get(`${API_PROJECT}/api/blogs`);
     console.log("Blogs:", response.data);
     return response.data;
   } catch (error) {
