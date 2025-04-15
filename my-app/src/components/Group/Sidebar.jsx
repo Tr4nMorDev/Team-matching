@@ -2,7 +2,7 @@ import ProjectSection from "./SidebarItem/ProjectSection";
 import OtherSection from "./SidebarItem/OtherSection";
 import GroupChatBox from "./DashBoard/GroupChatBox";
 
-const Sidebar = ({ onMemberClick, onRequestClick }) => (
+const Sidebar = ({ onMemberClick, onRequestClick, onRatingClick }) => (
   <aside className="w-1/4 bg-white p-4 rounded-xl shadow-md">
     <input
       type="text"
@@ -20,6 +20,7 @@ const Sidebar = ({ onMemberClick, onRequestClick }) => (
       <OtherSection
         onMemberClick={onMemberClick}
         onRequestClick={onRequestClick}
+        onRatingClick={onRatingClick} // ✅ Truyền xuống đây
       />
     </div>
   </aside>
