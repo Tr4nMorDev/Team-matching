@@ -6,7 +6,7 @@ import AboutStudent from "./AboutStudent";
 import FriendsList from "../FriendList";
 
 const ProfileStudent = () => {
-  const { role } = useAuth();
+  const { role, user } = useAuth();
   const [activeTab, setActiveTab] = useState("Timeline");
 
   return (

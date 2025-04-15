@@ -3,10 +3,12 @@ import BlogItem from "./BlogItem";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/useAuth";
 import getBlogs from "../../api/userApi";
+import { data } from "react-router-dom";
 
 const MainContent = () => {
   const { isLoggedIn } = useAuth();
   const [blogs, setBlogs] = useState([]);
+  console.log(blogs);
   useEffect(() => {
     getBlogs()
       .then((data) => setBlogs(data))
@@ -24,15 +26,14 @@ const MainContent = () => {
         {blogs.map((blog) => (
           <BlogItem
             key={blog.id}
-            name={blog.author.userName}
-            avatar={blog.author.profilePictureUrl}
+            name={blog.author.fullName}
+            avatar={blog.author.profilePicture}
             time={blog.createdAt}
-            image={blog.images}
+            images={blog.images}
             content={blog.content}
             like={blog.likeCount}
           />
         ))}
-        <BlogItem />
       </div>
     </main>
   );

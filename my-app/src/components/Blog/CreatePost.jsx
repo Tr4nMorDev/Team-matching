@@ -1,8 +1,10 @@
 import { useState } from "react";
-
+import { useAuth } from "../../context/useAuth";
 const CreateBlog = () => {
   const [blogText, setBlogText] = useState("");
   const [image, setImage] = useState(null);
+  const { isLoggedIn, user } = useAuth();
+  if (!user) return null;
 
   // Xử lý khi chọn ảnh
   const handleImageChange = (event) => {
@@ -27,7 +29,7 @@ const CreateBlog = () => {
       {/* Nhập nội dung bài viết */}
       <div className="flex items-center gap-3 mt-3">
         <img
-          src="/avata.jpg"
+          src={user.profilePicture}
           alt="Profile"
           className="h-10 w-10 rounded-full"
         />

@@ -28,7 +28,9 @@ public class UserService {
                 .map(UserDTO::new)
                 .toList(); // or .collect(Collectors.toList()) if you use older Java
     }
-
+    public static UserDTO convertToDTO(User user) {
+        return new UserDTO(user);
+    }
     //lay thong tin user theo id
     public User getUserById(Long id) {
         return userRepository.findById(id)
