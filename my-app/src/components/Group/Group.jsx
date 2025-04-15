@@ -1,75 +1,17 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
 import CreateGroupForm from "./AddNewGroup";
-import { useGroupContext } from "../../context/GroupContext";
+import CommunityGroups from "./CommunityGroups";
+import MyGroups from "./MyGroups";
 
-const groups = [
-  {
-    photo: "/avata.jpg",
-    name: "Designer",
-    description: "Nhóm học thuật",
-    posts: 600,
-    members: 320,
-    ki: 1,
-    visits: "1.2k",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    photo: "/avata.jpg",
-    name: "R & D",
-    description: "Nhóm bên ngoài",
-    posts: 300,
-    members: 210,
-    ki: "Không bắt buộc",
-    visits: "1.1k",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    photo: "/avata.jpg",
-    name: "Graphics",
-    description: "Nhóm học thuật",
-    posts: 320,
-    members: 100,
-    ki: 2,
-    visits: "1.0k",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    photo: "/avata.jpg",
-    name: "Marketing",
-    description: "Nhóm học thuật",
-    posts: 150,
-    members: 200,
-    ki: 1,
-    visits: "900",
-    image: "https://via.placeholder.com/150",
-  },
-];
-
-const GroupsComponent = () => {
-  const navigate = useNavigate(); // Khai báo useNavigate
+const Group = () => {
   const [showAddGroup, setShowAddGroup] = useState(false);
-  const { isGroupPending, addPendingGroup, isGroupJoined, acceptPendingGroup } =
-    useGroupContext();
+  const [activeTab, setActiveTab] = useState("my");
 
-  const handleShowAddGroup = () => {
-    setShowAddGroup(true);
-  };
+  const handleShowAddGroup = () => setShowAddGroup(true);
+  const handleCloseAddGroup = () => setShowAddGroup(false);
 
-  const handleCloseAddGroup = () => {
-    setShowAddGroup(false);
-  };
-
-  const handleAddGroup = (groupName) => {
-    addPendingGroup(groupName);
-  };
-
-  const handleAcceptGroup = (groupName) => {
-    acceptPendingGroup(groupName);
-  };
-
-  const handleNavigateToGroup = (groupName) => {
-    navigate(`/group/${groupName}`);
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
   };
 
   return (
@@ -93,69 +35,31 @@ const GroupsComponent = () => {
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        {groups.map((group, index) => {
-          const isPending = isGroupPending(group.name);
-          const isJoined = isGroupJoined(group.name);
 
-          return (
-            <div
-              key={index}
-              className="bg-white p-6 rounded-2xl shadow-lg text-center"
-            >
-              <img
-                src={group.photo}
-                alt={group.name}
-                className="w-24 h-24 mx-auto rounded-full object-cover mb-4"
-              />
-              <h2 className="text-lg font-semibold text-blue-600">
-                {group.name}
-              </h2>
-              <div className="text-lg font-semibold text-cyan-950">
-                <h2>Kì : {group.ki}</h2>
-              </div>
-              <p className="text-gray-500 text-sm">{group.description}</p>
-              <div className="flex justify-around text-sm text-gray-700 mt-4">
-                <span>Member: {group.members}</span>
-              </div>
-              {isPending && (
-                <p className="text-yellow-500 text-sm">Chờ leader xử lý</p>
-              )}
-              <button
-                className={`mt-4 py-2 px-4 rounded-full cursor-pointer ${
-                  isJoined
-                    ? "bg-green-500 text-white"
-                    : isPending
-                    ? "bg-gray-400"
-                    : "bg-blue-500 text-white"
-                }`}
-                onClick={() => {
-                  if (!isJoined && !isPending) {
-                    handleAddGroup(group.name);
-                  } else if (isJoined) {
-                    handleNavigateToGroup(group.name); // Điều hướng đến trang nhóm
-                  }
-                }}
-                disabled={isPending}
-              >
-                {isJoined ? "Enroll" : isPending ? "Chờ leader xử lý" : "Join"}
-              </button>
-
-              {isPending && (
-                <button
-                  className="mt-2 py-1 px-3 rounded-full bg-purple-500 text-white cursor-pointer"
-                  onClick={() => handleAcceptGroup(group.name)}
-                >
-                  Chấp nhận
-                </button>
-              )}
-            </div>
-          );
-        })}
+      <div className="flex justify-center mb-8">
+        <button
+          className={`px-6 py-2 mr-4 cursor-pointer ${
+            activeTab === "my" ? "bg-blue-500 text-white" : "bg-gray-300"
+          }`}
+          onClick={() => handleTabChange("my")}
+        >
+          Nhóm của tôi
+        </button>
+        <button
+          className={`px-6 py-2 cursor-pointer ${
+            activeTab === "community" ? "bg-blue-500 text-white" : "bg-gray-300"
+          }`}
+          onClick={() => handleTabChange("community")}
+        >
+          Nhóm cộng đồng
+        </button>
       </div>
+
+      {activeTab === "my" ? <MyGroups /> : <CommunityGroups />}
+
       {showAddGroup && <CreateGroupForm onClose={handleCloseAddGroup} />}
     </div>
   );
 };
 
-export default GroupsComponent;
+export default Group;
