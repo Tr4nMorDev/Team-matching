@@ -9,6 +9,7 @@ on:
       - Add-jwt
       - fix-e
       - Testteamtask
+      - karus
   pull_request:
     branches:
       - main
