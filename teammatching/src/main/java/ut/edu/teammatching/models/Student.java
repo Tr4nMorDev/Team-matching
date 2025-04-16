@@ -20,12 +20,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonTypeName("STUDENT")
+@PrimaryKeyJoinColumn(name = "user_id")
 public class Student extends User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Nếu id tự tăng
-    @Column(name = "user_id")
-    private Long id;
-
     @Column(nullable = false)
     private String major;
 
