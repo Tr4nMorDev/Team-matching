@@ -16,6 +16,7 @@ import java.util.List;
 @Table(name = "lecturers")
 @AllArgsConstructor
 @JsonTypeName("LECTURER")
+@PrimaryKeyJoinColumn(name = "user_id")
 public class Lecturer extends User {
     @Column(name = "department", nullable = true)
     private String department;

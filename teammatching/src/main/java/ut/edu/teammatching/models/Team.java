@@ -1,5 +1,6 @@
 package ut.edu.teammatching.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import ut.edu.teammatching.enums.TeamType;
@@ -45,10 +46,12 @@ public class Team {
     private Lecturer lecturer;
 
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Task> tasks = new ArrayList<>();
 
     // Team Leader - Người tạo nhóm
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "leader_id", nullable = false)
     private Student leader;
 

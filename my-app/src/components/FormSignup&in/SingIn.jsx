@@ -1,81 +1,98 @@
-import React, { useState, useContext } from "react";
-import axios from "axios";
-import { AuthContext } from "../../context/AuthContext";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/useAuth';
 
-function SignIn({ handleToggle, onClose }) {
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
-  const { login } = useContext(AuthContext);
+const SignIn = ({ handleToggle, onClose }) => {
+    const navigate = useNavigate();
+    const { login } = useAuth();
+    const [error, setError] = useState('');
+    const [formData, setFormData] = useState({
+        username: '',
+        password: '',
+    });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
 
-  const handleSubmit = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/signin",
-        formData
-      );
+    const handleSubmit = async (e) => {
+        e.preventDefault(); // Ngăn submit reload trang
+        try {
+            const response = await axios.post(
+                'http://localhost:8080/api/auth/signin',
+                formData
+            );
 
-      const { token, userData } = response.data;
+            const { token, userData } = response.data;
 
-      // Lưu token và toàn bộ userData
-      localStorage.setItem("token", token);
-      login(token, userData); // truyền toàn bộ object luôn
+            localStorage.setItem('token', token);
+            login(token, userData);
 
-      console.log("Signed in with full userData:", userData);
-      onClose();
-    } catch (error) {
-      console.error("Error signing in:", error.response?.data || error.message);
-    }
-  };
+            console.log('Signed in with full userData:', userData);
+            onClose(); // Đóng modal hoặc form
+            navigate('/dashboard'); // hoặc bất cứ route nào bạn muốn
+        } catch (error) {
+            const errorMessage =
+                error.response?.data?.message || 'Login failed. Please try again.';
+            setError(errorMessage);
+            console.error('Error signing in:', errorMessage);
+        }
+    };
 
-  return (
-    <>
-      <h2 className="text-2xl font-semibold mt-20 text-gray-900">Sign in</h2>
-      <p className="text-gray-500 mb-6">
-        Enter your username and password to continue.
-      </p>
+    return (
+        <div className="max-w-md mx-auto bg-white p-8 rounded shadow">
+            <h2 className="text-2xl font-bold text-center mb-6">Sign In</h2>
+            <form onSubmit={handleSubmit}>
+                {error && <p className="text-red-500 mb-4">{error}</p>}
+                <div className="mb-4">
+                    <label className="block text-gray-700">Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        className="w-full border px-3 py-2 rounded"
+                        required
+                    />
+                </div>
+                <div className="mb-6">
+                    <label className="block text-gray-700">Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="w-full border px-3 py-2 rounded"
+                        required
+                    />
+                </div>
+                <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                    Sign In
+                </button>
 
-      <input
-        type="text"
-        name="username"
-        placeholder="Username"
-        value={formData.username}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border rounded-md text-gray-600"
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={handleChange}
-        className="w-full p-2 mb-4 border rounded-md text-gray-600"
-      />
-
-      <button
-        onClick={handleSubmit}
-        className="w-full bg-blue-500 text-white p-2 rounded-md font-semibold cursor-pointer mb-4"
-      >
-        Sign in
-      </button>
-
-      <p className="text-sm text-gray-600 text-center">
-        Don't have an account?{" "}
-        <button onClick={handleToggle} className="text-blue-500 cursor-pointer">
-          Sign up
-        </button>
-      </p>
-    </>
-  );
-}
+                <div className="text-center mt-4">
+                    <p className="text-sm text-gray-600">
+                        Don't have an account?{' '}
+                        <button
+                            type="button"
+                            onClick={handleToggle}
+                            className="text-blue-600 hover:text-blue-700 font-medium"
+                        >
+                            Sign Up
+                        </button>
+                    </p>
+                </div>
+            </form>
+        </div>
+    );
+};
 
 export default SignIn;
