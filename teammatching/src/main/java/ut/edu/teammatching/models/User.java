@@ -1,12 +1,8 @@
 package ut.edu.teammatching.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.*;
 import ut.edu.teammatching.enums.Gender;
 import ut.edu.teammatching.enums.Role;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -106,6 +102,14 @@ public abstract class User {
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"sender", "receiver"})
     private List<Message> receivedMessages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "requester")
+    @JsonManagedReference
+    private List<Friend> sentFriendRequests;
+
+    @OneToMany(mappedBy = "receiver")
+    @JsonManagedReference
+    private List<Friend> receivedFriendRequests;
 
     public User(String username, String fullName, String email, String password, Role role, Gender gender,
                 String profilePicture, List<String> skills,

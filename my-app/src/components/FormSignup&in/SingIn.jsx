@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 
@@ -13,32 +14,63 @@ const SignIn = ({ handleToggle, onClose }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prevState => ({
+        setFormData((prevState) => ({
             ...prevState,
-            [name]: value
+            [name]: value,
         }));
     };
 
-  const handleSubmit = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/api/auth/signin",
-        formData
-      );
+    const handleSubmit = async (e) => {
+        e.preventDefault(); // Ngăn submit reload trang
+        try {
+            const response = await axios.post(
+                'http://localhost:8080/api/auth/signin',
+                formData
+            );
 
-      const { token, userData } = response.data;
+            const { token, userData } = response.data;
 
-      // Lưu token và toàn bộ userData
-      localStorage.setItem("token", token);
-      login(token, userData); // truyền toàn bộ object luôn
+            localStorage.setItem('token', token);
+            login(token, userData);
 
-      console.log("Signed in with full userData:", userData);
-      onClose();
-    } catch (error) {
-      console.error("Error signing in:", error.response?.data || error.message);
-    }
-  };
+            console.log('Signed in with full userData:', userData);
+            onClose(); // Đóng modal hoặc form
+            navigate('/dashboard'); // hoặc bất cứ route nào bạn muốn
+        } catch (error) {
+            const errorMessage =
+                error.response?.data?.message || 'Login failed. Please try again.';
+            setError(errorMessage);
+            console.error('Error signing in:', errorMessage);
+        }
+    };
 
+    return (
+        <div className="max-w-md mx-auto bg-white p-8 rounded shadow">
+            <h2 className="text-2xl font-bold text-center mb-6">Sign In</h2>
+            <form onSubmit={handleSubmit}>
+                {error && <p className="text-red-500 mb-4">{error}</p>}
+                <div className="mb-4">
+                    <label className="block text-gray-700">Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        className="w-full border px-3 py-2 rounded"
+                        required
+                    />
+                </div>
+                <div className="mb-6">
+                    <label className="block text-gray-700">Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="w-full border px-3 py-2 rounded"
+                        required
+                    />
+                </div>
                 <button
                     type="submit"
                     className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
