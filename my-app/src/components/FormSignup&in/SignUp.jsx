@@ -10,6 +10,7 @@ function SignUp({ handleToggle }) {
     gender: "MALE",
     phoneNumber: "",
     major: "Logistics",
+    role: "STUDENT",
     term: 1,
     skills: ["None"],
     hobbies: ["None"],
@@ -58,7 +59,7 @@ function SignUp({ handleToggle }) {
     setMessage({ type: '', text: '' });
 
     // Remove role from the request data as it's not in the DTO
-    const { role, ...signupData } = formData;
+    const signupData = formData;
 
     console.log("Sending registration data:", JSON.stringify(signupData, null, 2));
 
@@ -197,6 +198,16 @@ function SignUp({ handleToggle }) {
       >
         <option value="MALE">MALE</option>
         <option value="FEMALE">FEMALE</option>
+      </select>
+
+      <select
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          className="w-full p-2 mb-4 border rounded-md text-gray-600"
+      >
+        <option value="STUDENT">STUDENT</option>
+        <option value="LECTURER">LECTURER</option>
       </select>
 
       <select
