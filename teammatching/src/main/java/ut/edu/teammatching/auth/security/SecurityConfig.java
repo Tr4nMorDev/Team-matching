@@ -47,7 +47,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
+            .authorizeHttpRequests(auth -> auth.requestMatchers("/imagespost/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
@@ -59,6 +59,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/messages/**").permitAll()
                 .requestMatchers("/api/blogs/**").permitAll()
                 .requestMatchers("/api/comments/**").permitAll()
+                    .requestMatchers("/imagedefault.jpg").permitAll()
                 .requestMatchers("/api/protected-resource").authenticated()
                 .anyRequest().authenticated()
             )

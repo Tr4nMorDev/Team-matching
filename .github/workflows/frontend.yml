@@ -7,6 +7,7 @@ on:
       - dev-frontend
       - Add-jwt
       - fix-e
+      - karus
   pull_request:
     branches:
       - main

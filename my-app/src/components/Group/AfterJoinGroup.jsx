@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import MemberList from "./DashBoard/MemberList";
 import MemberRequestList from "./DashBoard/MemberRequestList";
 import GroupChatBox from "./DashBoard/GroupChatBox"; // Import thêm Chat Box
+import RatingForm from "./DashBoard/RatingForm";
 
 const GroupDashBoard = () => {
   const [activeTab, setActiveTab] = useState(""); // Lưu trạng thái tab đang được chọn
@@ -44,6 +45,9 @@ const GroupDashBoard = () => {
               onRequestClick={() =>
                 setActiveTab(activeTab === "requests" ? "" : "requests")
               }
+              onRatingClick={() =>
+                setActiveTab(activeTab === "rating" ? "" : "rating")
+              }
             />
             <div className="w-3/4 bg-gray-50 p-6 rounded-lg shadow-inner">
               <h1 className="text-2xl font-semibold mb-4">Dashboard Content</h1>
@@ -51,6 +55,7 @@ const GroupDashBoard = () => {
               {activeTab === "requests" && (
                 <MemberRequestList requests={memberRequests} />
               )}
+              {activeTab === "rating" && <RatingForm />}
               {/* Hiển thị Box Chat ở đây */}
               {activeTab === "" && <GroupChatBox groupName="Team Awesome" />}
             </div>

@@ -5,7 +5,7 @@ import axios from "axios";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token") || null);
@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
           logout(); // Xử lý token lỗi
         });
     }
-  }, []);
+  }, [user, hasFetched]);
 
   return (
     <AuthContext.Provider
