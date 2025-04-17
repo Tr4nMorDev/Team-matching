@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from 'axios';  // Thêm axios để gửi yêu cầu HTTP
 
 const CreateGroupForm = ({ onCreate, onClose }) => {
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
-  const [groupKi, setGroupKi] = useState(1);
   const [groupType, setGroupType] = useState("Nhóm học thuật");
   const [groupPhoto, setGroupPhoto] = useState("/avata.jpg");
 
@@ -16,22 +16,34 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+// Hàm gửi yêu cầu POST đến backend
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (groupName && groupDescription) {
       const newGroup = {
-        photo: groupPhoto,
-        name: groupName,
-        description: groupType,
-        members: 0,
-        ki: groupKi,
+        teamName: groupName,
+        description: groupDescription,
+        teamType: groupType === "Nhóm học thuật" ? "ACADEMIC" : "EXTERNAL",
+        teamPicture: groupPhoto,
+        creatorId: 101,        // 👈 Thay bằng giá trị thực tế từ context hoặc props
+        isLecturer: false,     // 👈 Nếu là sinh viên thì false
       };
-      onCreate(newGroup);
-      setGroupName("");
-      setGroupDescription("");
-      setGroupKi(1);
-      setGroupType("Nhóm học thuật");
-      onClose();
+
+      try {
+        const response = await axios.post("http://localhost:8080/api/teams", newGroup);
+
+        if (response.status === 201) {
+          onCreate(newGroup);
+          setGroupName("");
+          setGroupDescription("");
+          setGroupType("Nhóm học thuật");
+          onClose();
+        }
+      } catch (error) {
+        console.error("Lỗi khi tạo nhóm:", error);
+        alert("Đã có lỗi xảy ra khi tạo nhóm. Vui lòng thử lại.");
+      }
     }
   };
 
@@ -94,14 +106,6 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
               onChange={(e) => setGroupDescription(e.target.value)}
             />
             <div className="flex gap-4">
-              <input
-                type="number"
-                placeholder="Group Ki"
-                className="border p-2 rounded w-full"
-                value={groupKi}
-                onChange={(e) => setGroupKi(Number(e.target.value))}
-                min={1}
-              />
               <select
                 className="border p-2 rounded w-full"
                 value={groupType}
