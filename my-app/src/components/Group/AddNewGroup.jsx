@@ -5,13 +5,20 @@ import { useAuth } from "../../context/useAuth"; // Import useAuth hook
 
 const CreateGroupForm = ({ onCreate, onClose }) => {
   const { user, token } = useAuth();
-  
+
   useEffect(() => {
-    // Log để kiểm tra thông tin user
     console.log("Current user:", user);
     console.log("User role:", user?.role);
     console.log("User ID:", user?.id);
     console.log("Auth token:", token);
+
+    // Nếu là giảng viên thì chỉ được tạo nhóm NON_ACADEMIC
+    if (user?.role === "LECTURER") {
+      setFormData(prev => ({
+        ...prev,
+        teamType: "NON_ACADEMIC"
+      }));
+    }
   }, [user, token]);
   
   // State cho form
@@ -46,7 +53,6 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
       
       const requestData = {
         ...formData,
-        creatorId: user.id  // Thêm ID của người tạo
       };
       
       console.log("Request data:", requestData);
@@ -149,15 +155,24 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
             {/* Team Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Team Type</label>
-              <select
-                value={formData.teamType}
-                onChange={e => setFormData(prev => ({ ...prev, teamType: e.target.value }))}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                required
-              >
-                <option value="ACADEMIC">Academic Team</option>
-                <option value="EXTERNAL">External Team</option>
-              </select>
+              {user?.role === "LECTURER" ? (
+                  <input
+                      type="text"
+                      value="External Team"
+                      disabled
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 bg-gray-100 text-gray-600"
+                  />
+              ) : (
+                  <select
+                      value={formData.teamType}
+                      onChange={e => setFormData(prev => ({ ...prev, teamType: e.target.value }))}
+                      className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                      required
+                  >
+                    <option value="ACADEMIC">Academic Team</option>
+                    <option value="NON_ACADEMIC">External Team</option>
+                  </select>
+              )}
             </div>
 
             {/* Buttons */}
