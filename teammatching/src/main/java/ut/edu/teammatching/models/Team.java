@@ -33,6 +33,11 @@ public class Team {
     @Lob
     private String  description;
 
+    //Lưu người tạo team
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_id")
+    private User createdBy;
+
     @ManyToMany
     @JoinTable(
             name = "student_team",
@@ -52,7 +57,7 @@ public class Team {
     // Team Leader - Người tạo nhóm
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    @JoinColumn(name = "leader_id", nullable = false)
+    @JoinColumn(name = "leader_id")
     private Student leader;
 
     // Đảm bảo chỉ có một leader duy nhất
@@ -71,13 +76,40 @@ public class Team {
 
     /** 🔥 Kiểm tra ràng buộc: Nếu team là Academic thì phải có giảng viên */
     @PrePersist
+    private void prePersist() {
+        // Nếu không có leader → kiểm tra xem creator có phải là giảng viên không
+        if (this.leader == null && !(this.createdBy instanceof Lecturer)) {
+            throw new IllegalStateException("Team phải có leader hoặc được tạo bởi giảng viên!");
+        }
+
+        if (this.leader != null && !students.contains(this.leader)) {
+            throw new IllegalStateException("Leader phải là thành viên của team!");
+        }
+    }
+
     @PreUpdate
-    private void validateTeam() {
+    private void preUpdate() {
         if (this.teamType == TeamType.ACADEMIC && this.lecturer == null) {
             throw new IllegalStateException("Academic Team phải có giảng viên!");
         }
+
         if (this.leader == null || !students.contains(this.leader)) {
             throw new IllegalStateException("Mỗi team phải có một leader và leader phải là thành viên trong team!");
+        }
+    }
+
+    public void addStudent(Student student) {
+        if (student == null) {
+            throw new IllegalArgumentException("Student không được null!");
+        }
+
+        if (!students.contains(student)) {
+            students.add(student);
+        }
+
+        // Chỉ gán leader nếu team là Academic hoặc Non-Academic, và leader đang null
+        if (this.leader == null && !students.isEmpty()) {
+            this.leader = students.get(0); // Gán leader là sinh viên đầu tiên trong team
         }
     }
 }

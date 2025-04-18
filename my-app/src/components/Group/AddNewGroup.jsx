@@ -1,55 +1,76 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from 'axios';  // Thêm axios để gửi yêu cầu HTTP
+import axios from 'axios';
+import { useAuth } from "../../context/useAuth"; // Import useAuth hook
 
 const CreateGroupForm = ({ onCreate, onClose }) => {
-  const [groupName, setGroupName] = useState("");
-  const [groupDescription, setGroupDescription] = useState("");
-  const [groupType, setGroupType] = useState("Nhóm học thuật");
-  const [groupPhoto, setGroupPhoto] = useState("/avata.jpg");
+  const { user, token } = useAuth();
+  
+  useEffect(() => {
+    // Log để kiểm tra thông tin user
+    console.log("Current user:", user);
+    console.log("User role:", user?.role);
+    console.log("User ID:", user?.id);
+    console.log("Auth token:", token);
+  }, [user, token]);
+  
+  // State cho form
+  const [formData, setFormData] = useState({
+    teamName: "",
+    description: "",
+    teamType: "ACADEMIC",
+    teamPicture: "/avata.jpg"
+  });
+  
+  // State cho loading và error
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-      setGroupPhoto(imageUrl);
+      setFormData(prev => ({
+        ...prev,
+        teamPicture: imageUrl
+      }));
     }
   };
 
-// Hàm gửi yêu cầu POST đến backend
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (groupName && groupDescription) {
-      const newGroup = {
-        teamName: groupName,
-        description: groupDescription,
-        teamType: groupType === "Nhóm học thuật" ? "ACADEMIC" : "EXTERNAL",
-        teamPicture: groupPhoto,
-        creatorId: 101,        // 👈 Thay bằng giá trị thực tế từ context hoặc props
-        isLecturer: false,     // 👈 Nếu là sinh viên thì false
+    
+    try {
+      console.log("Sending request with user:", user);
+      console.log("Token:", token);
+      
+      const requestData = {
+        ...formData,
+        creatorId: user.id  // Thêm ID của người tạo
       };
-
-      try {
-        const response = await axios.post("http://localhost:8080/api/teams", newGroup);
-
-        if (response.status === 201) {
-          onCreate(newGroup);
-          setGroupName("");
-          setGroupDescription("");
-          setGroupType("Nhóm học thuật");
-          onClose();
+      
+      console.log("Request data:", requestData);
+      
+      const response = await axios.post(
+        "http://localhost:8080/api/teams",
+        requestData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
         }
-      } catch (error) {
-        console.error("Lỗi khi tạo nhóm:", error);
-        alert("Đã có lỗi xảy ra khi tạo nhóm. Vui lòng thử lại.");
-      }
-    }
-  };
+      );
 
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
+      console.log("Response:", response.data);
+      
+      if (response.data) {
+        onCreate && onCreate(response.data);
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error details:", error.response?.data);
+      setError(error.response?.data || error.message);
     }
   };
 
@@ -59,68 +80,103 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
         className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-md z-20"
-        onClick={handleBackdropClick}
+        onClick={onClose}
       >
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="relative bg-white bg-opacity-90 rounded-[30px] shadow-lg w-[500px] p-6"
-          onClick={(e) => e.stopPropagation()}
+          className="bg-white rounded-lg shadow-xl p-6 w-[500px]"
+          onClick={e => e.stopPropagation()}
         >
-          <h2 className="text-2xl font-bold mb-4 text-center">
-            Create New Group
-          </h2>
-          <div className="flex justify-center mb-4">
-            <label className="relative cursor-pointer">
-              <img
-                src={groupPhoto}
-                alt="Group"
-                className="w-32 h-32 rounded-full object-cover border-2 border-gray-300"
-              />
-              <input
-                type="file"
-                className="absolute inset-0 opacity-0 cursor-pointer"
-                onChange={handlePhotoChange}
-              />
-              <div className="absolute bottom-0 right-0 bg-gray-200 p-1 rounded-full">
-                ✏️
-              </div>
-            </label>
-          </div>
+          <h2 className="text-2xl font-bold mb-4">Create New Team</h2>
+          
+          {/* Hiển thị lỗi nếu có */}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Group Name"
-              className="border p-2 rounded w-full"
-              value={groupName}
-              onChange={(e) => setGroupName(e.target.value)}
-            />
-            <textarea
-              placeholder="Group Description"
-              className="border p-2 rounded w-full"
-              value={groupDescription}
-              onChange={(e) => setGroupDescription(e.target.value)}
-            />
-            <div className="flex gap-4">
+            {/* Team Picture */}
+            <div className="flex justify-center mb-4">
+              <label className="relative cursor-pointer">
+                <img
+                  src={formData.teamPicture}
+                  alt="Team"
+                  className="w-32 h-32 rounded-full object-cover border-2"
+                />
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handlePhotoChange}
+                />
+                <div className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4v16m8-8H4" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </div>
+              </label>
+            </div>
+
+            {/* Team Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Team Name</label>
+              <input
+                type="text"
+                value={formData.teamName}
+                onChange={e => setFormData(prev => ({ ...prev, teamName: e.target.value }))}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                required
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Description</label>
+              <textarea
+                value={formData.description}
+                onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                rows="3"
+                required
+              />
+            </div>
+
+            {/* Team Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Team Type</label>
               <select
-                className="border p-2 rounded w-full"
-                value={groupType}
-                onChange={(e) => setGroupType(e.target.value)}
+                value={formData.teamType}
+                onChange={e => setFormData(prev => ({ ...prev, teamType: e.target.value }))}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                required
               >
-                <option value="Nhóm học thuật">Nhóm học thuật</option>
-                <option value="Nhóm bên ngoài">Nhóm bên ngoài</option>
+                <option value="ACADEMIC">Academic Team</option>
+                <option value="EXTERNAL">External Team</option>
               </select>
             </div>
-            <div className="flex justify-end">
+
+            {/* Buttons */}
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
               <button
                 type="submit"
-                className="bg-blue-500 text-white py-2 px-4 rounded"
+                disabled={loading}
+                className={`px-4 py-2 rounded-md text-white ${
+                  loading ? 'bg-blue-300' : 'bg-blue-500 hover:bg-blue-600'
+                }`}
               >
-                Submit
+                {loading ? 'Creating...' : 'Create Team'}
               </button>
             </div>
           </form>
