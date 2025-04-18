@@ -1,6 +1,7 @@
 package ut.edu.teammatching.dto;
 
 import lombok.Data;
+import ut.edu.teammatching.enums.FriendStatus;
 import ut.edu.teammatching.models.Friend;
 
 import java.time.LocalDateTime;
@@ -8,20 +9,16 @@ import java.time.LocalDateTime;
 @Data
 public class FriendDTO {
     private Long id;
-    private String status;
+    private FriendStatus status;
     private LocalDateTime createdAt;
-    private Long requesterId;
-    private String requesterName;
-    private Long receiverId;
-    private String receiverName;
+    private UserDTO requester;
+    private UserDTO receiver;
 
     public FriendDTO(Friend friend) {
         this.id = friend.getId();
-        this.status = friend.getStatus().name();
+        this.status = friend.getStatus();
         this.createdAt = friend.getCreatedAt();
-        this.requesterId = friend.getRequester().getId();
-        this.requesterName = friend.getRequester().getFullName();
-        this.receiverId = friend.getReceiver().getId();
-        this.receiverName = friend.getReceiver().getFullName();
+        this.requester = new UserDTO(friend.getRequester());
+        this.receiver = new UserDTO(friend.getReceiver());
     }
 }

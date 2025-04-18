@@ -23,7 +23,8 @@ public class FriendService {
     private final FriendRepository friendRepository;
     private final UserRepository userRepository;
 
-    public Friend sendFriendRequest(Long senderId, Long receiverId) {
+    // Gửi yêu cầu kết bạn
+    public FriendDTO sendFriendRequest(Long senderId, Long receiverId) {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new UserNotFoundException("Sender not found"));
         User receiver = userRepository.findById(receiverId)
@@ -42,29 +43,54 @@ public class FriendService {
         friend.setRequester(sender);
         friend.setReceiver(receiver);
         friend.setStatus(FriendStatus.PENDING);
-        return friendRepository.save(friend);
+
+        Friend savedFriend = friendRepository.save(friend);
+
+        // Trả về FriendDTO thay vì Friend
+        return new FriendDTO(savedFriend);
     }
 
-    public Friend respondToFriendRequest(Long requestId, boolean accept) {
+    // Phản hồi yêu cầu kết bạn
+    public FriendDTO respondToFriendRequest(Long requestId, boolean accept) {
         Friend friend = friendRepository.findById(requestId)
                 .orElseThrow(() -> new FriendRequestNotFoundException("Friend request not found"));
         friend.setStatus(accept ? FriendStatus.ACCEPTED : FriendStatus.REJECTED);
-        return friendRepository.save(friend);
+        Friend updatedFriend = friendRepository.save(friend);
+
+        // Trả về FriendDTO thay vì Friend
+        return new FriendDTO(updatedFriend);
     }
 
+    // Lấy danh sách bạn bè
     public List<FriendDTO> getFriendList(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         List<Friend> friends = friendRepository.findByRequesterOrReceiverAndStatus(user, user, FriendStatus.ACCEPTED);
-        return friends.stream().map(FriendDTO::new).toList();
+        return friends.stream()
+                .map(FriendDTO::new)  // Ánh xạ Friend thành FriendDTO
+                .collect(Collectors.toList());
     }
 
-    public List<Friend> getPendingRequests(Long userId) {
+    // Lấy danh sách bạn bè đã xác nhận
+    public List<FriendDTO> getAcceptedFriends(Long userId) {
+        List<Friend> friends = friendRepository.findAcceptedFriends(userId);
+        return friends.stream()
+                .map(FriendDTO::new)  // Ánh xạ Friend thành FriendDTO
+                .collect(Collectors.toList());
+    }
+
+    // Lấy danh sách yêu cầu kết bạn đang chờ xử lý
+    public List<FriendDTO> getPendingRequests(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-        return friendRepository.findByReceiverAndStatus(user, FriendStatus.PENDING);
+        List<Friend> pendingFriends = friendRepository.findByReceiverAndStatus(user, FriendStatus.PENDING);
+
+        return pendingFriends.stream()
+                .map(FriendDTO::new)  // Ánh xạ Friend thành FriendDTO
+                .collect(Collectors.toList());
     }
 
+    // Hủy kết bạn
     public void unfriend(Long friendId) {
         Friend friend = friendRepository.findById(friendId)
                 .orElseThrow(() -> new FriendRequestNotFoundException("Friend relationship not found"));
@@ -75,11 +101,13 @@ public class FriendService {
         }
     }
 
+    // Lấy số lượng bạn bè
     public Long getFriendsCount(Long userId) {
         return friendRepository.countByRequesterIdAndStatus(userId, FriendStatus.ACCEPTED) +
                 friendRepository.countByReceiverIdAndStatus(userId, FriendStatus.ACCEPTED);
     }
 
+    // Kiểm tra xem 2 người có phải là bạn hay không
     public boolean isFriend(Long userId1, Long userId2) {
         User user1 = userRepository.findById(userId1)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -92,11 +120,5 @@ public class FriendService {
                 || friendRepository.findByRequesterAndReceiver(user2, user1)
                 .filter(f -> f.getStatus() == FriendStatus.ACCEPTED)
                 .isPresent();
-    }
-    public List<FriendDTO> getAcceptedFriends(Long userId) {
-        List<Friend> friends = friendRepository.findAcceptedFriends(userId);
-        return friends.stream()
-                .map(FriendDTO::new)
-                .collect(Collectors.toList());
     }
 }

@@ -21,7 +21,7 @@ const SignIn = ({ handleToggle, onClose }) => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Ngăn submit reload trang
+        e.preventDefault();
         try {
             const response = await axios.post(
                 'http://localhost:8080/api/auth/signin',
@@ -30,12 +30,15 @@ const SignIn = ({ handleToggle, onClose }) => {
 
             const { token, userData } = response.data;
 
+            // ✅ Lưu token và user ID vào localStorage
             localStorage.setItem('token', token);
+            localStorage.setItem('userId', userData.id);
+
             login(token, userData);
 
             console.log('Signed in with full userData:', userData);
-            onClose(); // Đóng modal hoặc form
-            navigate('/dashboard'); // hoặc bất cứ route nào bạn muốn
+            onClose(); // Đóng modal
+            navigate('/'); // Redirect sau đăng nhập
         } catch (error) {
             const errorMessage =
                 error.response?.data?.message || 'Login failed. Please try again.';

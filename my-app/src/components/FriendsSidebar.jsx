@@ -15,16 +15,27 @@ export default function FriendsSidebar({ isOpen, toggleSidebar }) {
     const fetchFriends = async () => {
       if (!user?.id) return;
       try {
-        const res = await axios.get(`/api/friends/list/${user.id}`);
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`/api/friends/list/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("res.data", res.data);
+
         const mapped = res.data.map((f) => {
           const friendUser = f.requester.id === user.id ? f.receiver : f.requester;
+          const avatar = friendUser.profilePicture || "/imagedefault.jpg";
+
           return {
             id: friendUser.id,
             name: friendUser.fullName,
             user: friendUser.role || "user",
-            avatar: friendUser.avatarUrl || "/avata.jpg",
+            avatar,
           };
         });
+
         setFriendsList(mapped);
       } catch (err) {
         console.error("Error loading friends:", err);
@@ -44,7 +55,6 @@ export default function FriendsSidebar({ isOpen, toggleSidebar }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, toggleSidebar]);
 
-  // Lọc bạn bè theo searchTerm
   const filteredFriends = friendsList.filter((friend) =>
       friend.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -74,7 +84,6 @@ export default function FriendsSidebar({ isOpen, toggleSidebar }) {
           <div className="p-4">
             <h2 className="text-lg font-semibold mb-4">Friends</h2>
 
-            {/* Search box */}
             <div className="relative mb-4">
               <input
                   type="text"
