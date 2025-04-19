@@ -1,34 +1,16 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 
-const FriendsList = ({ userId = 1 }) => {
-    const [friends, setFriends] = useState([]);
+const friendsData = [
+    { name: "Petey Cruiser", friends: 15, image: "/avata.jpg" },
+    { name: "Anna Sthesia", friends: 50, image: "/avata.jpg" },
+    { name: "Paul Molive", friends: 10, image: "/avata.jpg" },
+    { name: "Gail Forcewind", friends: 20, image: "/avata.jpg" },
+    { name: "Paige Turner", friends: 12, image: "/avata.jpg" },
+    { name: "b Frapples", friends: 6, image: "/avata.jpg" },
+];
 
-    useEffect(() => {
-        const fetchFriends = async () => {
-            try {
-                const response = await axios.get(`/api/friends/list/${userId}`);
-                const mapped = response.data.map((f) => {
-                    const isRequester = f.requesterId === userId;
-                    const friendName = isRequester ? f.receiverName : f.requesterName;
-                    const friendId = isRequester ? f.receiverId : f.requesterId;
-
-                    return {
-                        id: f.id,
-                        name: friendName,
-                        friendId: friendId,
-                        friends: 0,
-                        image: "/avata.jpg",
-                    };
-                });
-                setFriends(mapped);
-            } catch (error) {
-                console.error("Failed to fetch friends:", error);
-            }
-        };
-
-        fetchFriends();
-    }, [userId]);
+const FriendsList = () => {
+    const [friends, setFriends] = useState(friendsData);
 
     return (
         <div className="p-6 bg-white shadow-md rounded-lg w-full max-w-4xl mx-auto">
@@ -37,9 +19,9 @@ const FriendsList = ({ userId = 1 }) => {
                 <span className="text-blue-500 cursor-pointer">All Friends</span>
             </div>
             <div className="grid grid-cols-2 gap-4 mt-4">
-                {friends.map((friend) => (
+                {friends.map((friend, index) => (
                     <div
-                        key={friend.id}
+                        key={index}
                         className="flex items-center p-4 border rounded-lg shadow-sm bg-white"
                     >
                         <img

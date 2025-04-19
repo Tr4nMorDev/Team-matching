@@ -1,11 +1,16 @@
 package ut.edu.teammatching.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;  // Add this
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ut.edu.teammatching.dto.AssignRoleRequest;
+import ut.edu.teammatching.dto.CreateTeamDTO;
+import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Team;
+import ut.edu.teammatching.models.User;
+import ut.edu.teammatching.repositories.UserRepository;
 import ut.edu.teammatching.services.TeamService;
 
 import java.util.List;
@@ -16,6 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TeamController {
     private final TeamService teamService;
+    private final UserRepository userRepository;
 
     @GetMapping
     public List<Team> getAllTeams() {
@@ -29,8 +35,19 @@ public class TeamController {
     }
 
     @PostMapping
-    public ResponseEntity<Team> createTeam(@RequestBody Team team) {
-        return ResponseEntity.ok(teamService.createTeam(team));
+    public ResponseEntity<?> createTeam(@RequestBody CreateTeamDTO request, Authentication authentication) {
+        try {
+            Team created = teamService.createTeam(
+                    request.getTeamName(),
+                    request.getDescription(),
+                    request.getTeamType(),
+                    request.getTeamPicture(),
+                    authentication // Truyền thêm authentication vào đây
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
@@ -70,13 +87,29 @@ public class TeamController {
         return ResponseEntity.ok().build();
     }
 
-    //Thêm thành viên
-    @PostMapping("/{teamId}/add-member")
-    public ResponseEntity<Team> addMember(@RequestParam Long leaderId,
-                                          @PathVariable Long teamId,
-                                          @RequestParam Long studentId) {
-        Team team = teamService.addMember(leaderId, teamId, studentId);
-        return ResponseEntity.ok(team);
+    @PostMapping("/{teamId}/add-student")
+    public ResponseEntity<?> addStudentToTeam(
+            @PathVariable Long teamId,
+            @RequestParam Long studentIdToAdd,
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Người dùng không hợp lệ");
+        }
+
+        User currentUser = userOpt.get();
+        if (!(currentUser instanceof Student currentStudent)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Chỉ sinh viên mới có thể thêm thành viên vào team");
+        }
+
+        try {
+            teamService.addStudent(teamId, studentIdToAdd, currentStudent.getId());
+            return ResponseEntity.ok("Đã thêm sinh viên vào team");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     //Thêm giảng viên hướng dẫn

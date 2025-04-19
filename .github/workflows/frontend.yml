@@ -8,6 +8,7 @@ on:
       - Add-jwt
       - fix-e
       - karus
+      - testAPI
   pull_request:
     branches:
       - main

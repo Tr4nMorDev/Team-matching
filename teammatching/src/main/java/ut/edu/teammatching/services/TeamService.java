@@ -2,12 +2,16 @@ package ut.edu.teammatching.services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import ut.edu.teammatching.enums.TeamType;
 import ut.edu.teammatching.models.Lecturer;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Team;
+import ut.edu.teammatching.models.User;
 import ut.edu.teammatching.repositories.TeamRepository;
 import ut.edu.teammatching.repositories.StudentRepository;
 import ut.edu.teammatching.repositories.LecturerRepository;
+import org.springframework.security.core.Authentication;
+import ut.edu.teammatching.repositories.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,12 +21,15 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final StudentRepository studentRepository;
     private final LecturerRepository lecturerRepository;
+    private final UserRepository userRepository;
 
-    // Inject các repository vào TeamService
-    public TeamService(TeamRepository teamRepository, StudentRepository studentRepository, LecturerRepository lecturerRepository) {
+    // Constructor sẽ được Spring tự động gọi khi tạo instance của TeamService
+    public TeamService(TeamRepository teamRepository, StudentRepository studentRepository,
+                       LecturerRepository lecturerRepository, UserRepository userRepository) {
         this.teamRepository = teamRepository;
         this.studentRepository = studentRepository;
         this.lecturerRepository = lecturerRepository;
+        this.userRepository = userRepository; // Inject UserRepository vào constructor
     }
 
     public List<Team> getAllTeams() {
@@ -34,10 +41,35 @@ public class TeamService {
     }
 
     @Transactional
-    public Team createTeam(Team team) {
-        if (team.getLeader() == null || !team.getStudents().contains(team.getLeader())) {
-            throw new IllegalStateException("Mỗi team phải có một leader hợp lệ!");
+    public Team createTeam(String teamName, String description, TeamType teamType, String teamPicture, Authentication authentication) {
+        // Lấy thông tin người dùng từ JWT token
+        String username = authentication.getName();  // Lấy username từ JWT token
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            throw new RuntimeException("Không tìm thấy người dùng!");
         }
+
+        User creator = userOpt.get();
+
+        // Tạo team mới
+        Team team = new Team();
+        team.setTeamName(teamName);
+        team.setDescription(description);
+        team.setTeamType(teamType);
+        team.setTeamPicture(teamPicture);
+        team.setCreatedBy(creator);  // luôn nên gán createdBy
+
+        // Kiểm tra xem creator là giảng viên hay sinh viên và xử lý tương ứng
+        if (creator instanceof Lecturer) {
+            Lecturer lecturer = (Lecturer) creator;
+            team.setLecturer(lecturer);
+        } else if (creator instanceof Student) {
+            Student student = (Student) creator;
+            team.getStudents().add(student);   // Thêm vào team trước
+            team.setLeader(student);           // Rồi mới set leader
+        }
+
+        // Lưu team vào cơ sở dữ liệu
         return teamRepository.save(team);
     }
 
@@ -125,20 +157,36 @@ public class TeamService {
         teamRepository.save(team);
     }
 
-    // Thêm thành viên vào team (chỉ Leader có thể thêm)
     @Transactional
-    public Team addMember(Long leaderId, Long teamId, Long studentId) {
+    public void addStudent(Long teamId, Long studentIdToAdd, Long currentStudentId) {
+        // Lấy team theo ID
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
-        if (!team.getLeader().getId().equals(leaderId)) {
-            throw new RuntimeException("Chỉ có Leader mới được thêm thành viên");
-        }
 
-        Student student = studentRepository.findById(studentId)
+        // Lấy sinh viên hiện tại
+        Student currentStudent = studentRepository.findById(currentStudentId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên!"));
 
-        team.getStudents().add(student);
-        return teamRepository.save(team);
+        // Kiểm tra xem sinh viên hiện tại có phải là thành viên của team không
+        if (!team.getStudents().contains(currentStudent)) {
+            throw new IllegalStateException("Chỉ thành viên trong team mới có quyền thêm người!");
+        }
+
+        // Lấy sinh viên cần thêm vào team
+        Student studentToAdd = studentRepository.findById(studentIdToAdd)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên cần thêm!"));
+
+        // Nếu sinh viên này chưa có trong team, thêm vào
+        if (!team.getStudents().contains(studentToAdd)) {
+            team.getStudents().add(studentToAdd);
+            // Nếu leader chưa được chỉ định, gán leader là sinh viên đầu tiên trong team
+            if (team.getLeader() == null && !team.getStudents().isEmpty()) {
+                team.setLeader(team.getStudents().get(0)); // Gán leader là sinh viên đầu tiên
+            }
+            teamRepository.save(team);
+        } else {
+            throw new IllegalStateException("Sinh viên này đã là thành viên của team!");
+        }
     }
 
     // Bổ nhiệm giảng viên hướng dẫn

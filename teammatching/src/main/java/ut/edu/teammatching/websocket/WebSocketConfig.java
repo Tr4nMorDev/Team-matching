@@ -18,20 +18,22 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // Đảm bảo chỉ cho phép các origin từ ứng dụng frontend của bạn
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
-                .withSockJS(); // hoặc dùng .setAllowedOrigins("http://localhost:3000") nếu cần
+                .setAllowedOrigins("http://localhost:3000", "http://localhost:5173") // Hợp nhất các URL origin
+                .withSockJS(); // SockJS fallback
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/queue");
-        config.setApplicationDestinationPrefixes("/app");
-        config.setUserDestinationPrefix("/user");
+        config.enableSimpleBroker("/topic", "/queue");  // Enable broker destinations
+        config.setApplicationDestinationPrefixes("/app");  // Prefix cho các yêu cầu ứng dụng
+        config.setUserDestinationPrefix("/user");  // Địa chỉ đến người dùng
     }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(jwtChannelInterceptor); // interceptor ở đây nè!
+        // Đăng ký interceptor để kiểm tra JWT trước khi nhận thông điệp
+        registration.interceptors(jwtChannelInterceptor);
     }
 }

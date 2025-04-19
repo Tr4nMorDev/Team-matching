@@ -14,7 +14,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name="message")
+@Table(name = "message")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Message {
@@ -35,12 +35,12 @@ public class Message {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "receiverId")
-    private User receiver;
+    private User receiver;  // nullable để không bắt buộc khi gửi cho team
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "teamId")
-    private Team team;
+    private Team team;  // nullable để không bắt buộc khi gửi cho người dùng
 
     @Lob
     @Column(name = "content", nullable = false)
@@ -50,6 +50,14 @@ public class Message {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // Constructor helper method để xác định loại tin nhắn (Private hay Team)
     @Transient
-    private String type; // "PRIVATE" hoặc "TEAM"
+    public String getType() {
+        if (receiver != null && team == null) {
+            return "PRIVATE";
+        } else if (receiver == null && team != null) {
+            return "TEAM";
+        }
+        return "UNKNOWN";  // Trường hợp không xác định
+    }
 }
