@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from 'axios';
-import { useAuth } from "../../context/useAuth"; // Import useAuth hook
+import { useAuth } from "../../context/useAuth";
+import EditUser from "../EditUser";
 
 const CreateGroupForm = ({ onCreate, onClose }) => {
   const { user, token } = useAuth();
+  const [showEditUser, setShowEditUser] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null); // Lưu file ảnh được chọn
 
   useEffect(() => {
     console.log("Current user:", user);
@@ -12,7 +15,6 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
     console.log("User ID:", user?.id);
     console.log("Auth token:", token);
 
-    // Nếu là giảng viên thì chỉ được tạo nhóm NON_ACADEMIC
     if (user?.role === "LECTURER") {
       setFormData(prev => ({
         ...prev,
@@ -20,43 +22,62 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
       }));
     }
   }, [user, token]);
-  
-  // State cho form
+
   const [formData, setFormData] = useState({
     teamName: "",
     description: "",
     teamType: "ACADEMIC",
     teamPicture: "/avata.jpg"
   });
-  
-  // State cho loading và error
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setSelectedFile(file);
       const imageUrl = URL.createObjectURL(file);
       setFormData(prev => ({
         ...prev,
-        teamPicture: imageUrl
+        teamPicture: imageUrl // Hiển thị ảnh tạm thời
       }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setLoading(true);
     try {
       console.log("Sending request with user:", user);
       console.log("Token:", token);
-      
+
+      let teamPictureUrl = formData.teamPicture;
+
+      // Nếu có file ảnh được chọn, upload ảnh lên server trước
+      if (selectedFile) {
+        const uploadData = new FormData();
+        uploadData.append("file", selectedFile);
+        const uploadResponse = await axios.post(
+          "http://localhost:8080/api/teams/upload",
+          uploadData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+        teamPictureUrl = uploadResponse.data; // Lấy URL từ server
+      }
+
       const requestData = {
-        ...formData,
+        teamName: formData.teamName,
+        description: formData.description,
+        teamType: formData.teamType,
+        teamPicture: teamPictureUrl // Sử dụng URL trả về từ server
       };
-      
-      console.log("Request data:", requestData);
-      
+
       const response = await axios.post(
         "http://localhost:8080/api/teams",
         requestData,
@@ -69,7 +90,7 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
       );
 
       console.log("Response:", response.data);
-      
+
       if (response.data) {
         onCreate && onCreate(response.data);
         onClose();
@@ -77,6 +98,8 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
     } catch (error) {
       console.error("Error details:", error.response?.data);
       setError(error.response?.data || error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,8 +120,18 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
           onClick={e => e.stopPropagation()}
         >
           <h2 className="text-2xl font-bold mb-4">Create New Team</h2>
-          
-          {/* Hiển thị lỗi nếu có */}
+
+          {user && (
+            <div className="mb-4">
+              <button
+                onClick={() => setShowEditUser(true)}
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+              >
+                Chỉnh sửa thông tin cá nhân
+              </button>
+            </div>
+          )}
+
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
               {error}
@@ -106,7 +139,6 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Team Picture */}
             <div className="flex justify-center mb-4">
               <label className="relative cursor-pointer">
                 <img
@@ -128,7 +160,6 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
               </label>
             </div>
 
-            {/* Team Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Team Name</label>
               <input
@@ -140,7 +171,6 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
               />
             </div>
 
-            {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Description</label>
               <textarea
@@ -152,7 +182,6 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
               />
             </div>
 
-            {/* Team Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Team Type</label>
               {user?.role === "LECTURER" ? (
@@ -175,7 +204,6 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
               )}
             </div>
 
-            {/* Buttons */}
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
@@ -188,13 +216,20 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
                 type="submit"
                 disabled={loading}
                 className={`px-4 py-2 rounded-md text-white ${
-                  loading ? 'bg-blue-300' : 'bg-blue-500 hover:bg-blue-600'
+                  loading ? 'bg-blue-300' : 'bg-blue-600 hover:bg-blue-700'
                 }`}
               >
                 {loading ? 'Creating...' : 'Create Team'}
               </button>
             </div>
           </form>
+
+          {showEditUser && (
+            <EditUser
+              userId={user.id}
+              onClose={() => setShowEditUser(false)}
+            />
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
