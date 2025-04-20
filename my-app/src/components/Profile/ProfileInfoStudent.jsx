@@ -32,8 +32,8 @@ const ProfileStudent = () => {
           {/* Stats */}
           <div className="flex justify-center gap-6 mt-4">
             <div className="text-center">
-              <p className="text-lg font-semibold text-gray-600">email</p>
-              <p className="text-gray-500 text-sm">{user?.email}</p>
+              <p className="text-lg font-semibold text-gray-600">Biệt danh</p>
+              <p className="text-gray-500 text-sm">Không có</p>
             </div>
           </div>
         </div>
