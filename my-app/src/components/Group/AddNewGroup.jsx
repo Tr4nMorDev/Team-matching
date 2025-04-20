@@ -7,7 +7,10 @@ import EditUser from "../EditUser";
 const CreateGroupForm = ({ onCreate, onClose }) => {
   const { user, token } = useAuth();
   const [showEditUser, setShowEditUser] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null); // Lưu file ảnh được chọn
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [comments, setComments] = useState([]); // Thêm state cho comments
+  const [commentsLoading, setCommentsLoading] = useState(false); // Thêm state loading cho comments
+  const [commentsError, setCommentsError] = useState(null); // Thêm state error cho comments
 
   useEffect(() => {
     console.log("Current user:", user);
@@ -21,6 +24,22 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
         teamType: "NON_ACADEMIC"
       }));
     }
+
+    // Gọi API để lấy danh sách comment của blog (giả sử blogId = 1)
+    const fetchComments = async () => {
+      setCommentsLoading(true);
+      try {
+        const response = await axios.get("http://localhost:8080/api/comments/blog/1");
+        setComments(response.data);
+      } catch (err) {
+        setCommentsError("Không thể tải danh sách comment");
+        console.error(err);
+      } finally {
+        setCommentsLoading(false);
+      }
+    };
+
+    fetchComments();
   }, [user, token]);
 
   const [formData, setFormData] = useState({
@@ -40,7 +59,7 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
       const imageUrl = URL.createObjectURL(file);
       setFormData(prev => ({
         ...prev,
-        teamPicture: imageUrl // Hiển thị ảnh tạm thời
+        teamPicture: imageUrl
       }));
     }
   };
@@ -54,7 +73,6 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
 
       let teamPictureUrl = formData.teamPicture;
 
-      // Nếu có file ảnh được chọn, upload ảnh lên server trước
       if (selectedFile) {
         const uploadData = new FormData();
         uploadData.append("file", selectedFile);
@@ -68,14 +86,14 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
             }
           }
         );
-        teamPictureUrl = uploadResponse.data; // Lấy URL từ server
+        teamPictureUrl = uploadResponse.data;
       }
 
       const requestData = {
         teamName: formData.teamName,
         description: formData.description,
         teamType: formData.teamType,
-        teamPicture: teamPictureUrl // Sử dụng URL trả về từ server
+        teamPicture: teamPictureUrl
       };
 
       const response = await axios.post(
@@ -223,6 +241,26 @@ const CreateGroupForm = ({ onCreate, onClose }) => {
               </button>
             </div>
           </form>
+
+          {/* Hiển thị danh sách comment của blog */}
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-4">Bình luận của Blog (Ví dụ)</h3>
+            {commentsLoading && <p>Đang tải comment...</p>}
+            {commentsError && <p className="text-red-500">{commentsError}</p>}
+            {!commentsLoading && !commentsError && comments.length === 0 && <p>Chưa có comment nào.</p>}
+            {!commentsLoading && !commentsError && comments.length > 0 && (
+              <ul className="space-y-4">
+                {comments.map(comment => (
+                  <li key={comment.id} className="border-b pb-2">
+                    <div className="flex justify-between items-center">
+                      <p className="font-medium">{comment.author.username}</p> {/* Hiển thị username của author */}
+                    </div>
+                    <p className="text-gray-700">{comment.content}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
 
           {showEditUser && (
             <EditUser
