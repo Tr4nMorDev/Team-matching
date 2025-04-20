@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MoreVertical } from "lucide-react"; // Import icon 3 chấm
 import { useAuth } from "../../context/useAuth";
 import LoginModal from "../LoginModal";
+import { ThumbsUp, MessageCircle } from "lucide-react";
 
 // { avatar , time , content , like ,comment }
 const BlogItem = ({ name, avatar, images, time, content, like }) => {
@@ -21,13 +22,15 @@ const BlogItem = ({ name, avatar, images, time, content, like }) => {
               className="h-10 w-10 rounded-full"
             />
             <div>
-              <h3 className="font-semibold text-gray-900">{name}</h3>
-              <p className="text-sm text-gray-500">{time}</p>
+              <h3 className="font-semibold text-gray-900 ">{name}</h3>
+              <p className="text-sm text-gray-500">
+                -----------------------------------------------------------------------------------------
+              </p>
             </div>
           </div>
 
           {/* Nút ba chấm */}
-          <button
+          {/* <button
             onClick={() => {
               if (!isLoggedIn) return setShowLogin(true);
               () => setShowMenu(!showMenu);
@@ -35,7 +38,7 @@ const BlogItem = ({ name, avatar, images, time, content, like }) => {
             className="p-2 rounded-full cursor-pointer bg-blue-300 "
           >
             <MoreVertical size={20} />
-          </button>
+          </button> */}
 
           {/* Menu hiển thị khi bấm */}
           {showMenu && (
@@ -68,7 +71,8 @@ const BlogItem = ({ name, avatar, images, time, content, like }) => {
                 if (!isLoggedIn) return setShowLogin(true);
               }}
             >
-              👍 <span>{like}</span>
+              <ThumbsUp size={18} className="mr-2" />
+              {like} Thích
             </button>
             <button
               className="flex items-center gap-2 text-gray-700 hover:text-blue-500 cursor-pointer"
@@ -76,7 +80,8 @@ const BlogItem = ({ name, avatar, images, time, content, like }) => {
                 if (!isLoggedIn) return setShowLogin(true);
               }}
             >
-              💬 <span>comment</span>
+              <MessageCircle size={18} className="mr-2" />
+              Bình luận
             </button>
           </div>
         </div>

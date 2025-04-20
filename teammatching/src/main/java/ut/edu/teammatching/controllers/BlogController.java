@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import ut.edu.teammatching.dto.BlogCreateRequest;
+import ut.edu.teammatching.dto.BlogDTO;
 import ut.edu.teammatching.models.Blog;
 import ut.edu.teammatching.models.User;
 import ut.edu.teammatching.repositories.BlogRepository;
@@ -25,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/blogs")
@@ -63,7 +65,18 @@ public class BlogController {
             return ResponseEntity.internalServerError().body("Error fetching blog: " + e.getMessage());
         }
     }
-
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getBlogsByUserId(@PathVariable Long userId) {
+        try {
+            List<Blog> blogs = blogRepository.findByAuthor_Id(userId);
+            List<BlogDTO> blogDTOs = blogs.stream()
+                    .map(blog -> new BlogDTO(blog)) // Chuyển đối tượng Blog thành BlogDTO
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(blogDTOs);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error fetching blogs: " + e.getMessage());
+        }
+    }
     @PostMapping
     public ResponseEntity<?> createBlog(@RequestBody BlogCreateRequest request) {
         // Validate request
