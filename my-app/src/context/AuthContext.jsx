@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
     setToken(token);
     setUser(userData);
     localStorage.setItem("token", token);
+    localStorage.setItem("username", userData.username);
   };
 
   const logout = () => {
@@ -58,21 +59,23 @@ export const AuthProvider = ({ children }) => {
 
   // Lấy thông tin người dùng khi đăng nhập
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken && !user) {
-      // Chỉ gọi 1 lần nếu chưa có user
-      getProtectedData()
-        .then((data) => {
+    const fetchUser = async () => {
+      const storedToken = localStorage.getItem("token");
+      if (storedToken && !user) {
+        try {
+          const data = await getProtectedData();
           setIsLoggedIn(true);
           setUser(data.user);
           setRole(data.role);
           setToken(storedToken);
-        })
-        .catch(() => {
-          logout(); // Xử lý token lỗi
-        });
-    }
-  }, [user, hasFetched]);
+        } catch {
+          logout();
+        }
+      }
+      setHasFetched(true);
+    };
+    fetchUser();
+  }, [user]);
 
   return (
     <AuthContext.Provider
