@@ -71,6 +71,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/ratings/**").permitAll()
                 .requestMatchers("/api/notifications/**").permitAll()
                 .requestMatchers("/api/messages/**").permitAll()
+                    .requestMatchers("/api/blogs/like").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/blogs/**").permitAll()  // Cho phép xem bài viết công khai
                     .requestMatchers(HttpMethod.POST, "/api/blogs/**").permitAll()  // Chỉ cho phép người dùng đăng nhập tạo bài viết
                     .requestMatchers(HttpMethod.PUT, "/api/blogs/**").authenticated()

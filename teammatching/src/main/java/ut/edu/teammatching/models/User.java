@@ -27,6 +27,7 @@ import java.util.List;
 @Setter
 @Inheritance(strategy = InheritanceType.JOINED) // Kế thừa với bảng riêng cho từng subclass
 @Table(name="users")
+
 public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

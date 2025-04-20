@@ -10,9 +10,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import ut.edu.teammatching.dto.BlogCreateRequest;
+import ut.edu.teammatching.dto.BlogDTO;
+import ut.edu.teammatching.dto.LikeRequest;
 import ut.edu.teammatching.models.Blog;
+import ut.edu.teammatching.models.Like;
 import ut.edu.teammatching.models.User;
 import ut.edu.teammatching.repositories.BlogRepository;
+import ut.edu.teammatching.repositories.LikeRepository;
 import ut.edu.teammatching.repositories.UserRepository;
 
 import javax.imageio.ImageIO;
@@ -22,9 +26,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/blogs")
@@ -63,7 +66,18 @@ public class BlogController {
             return ResponseEntity.internalServerError().body("Error fetching blog: " + e.getMessage());
         }
     }
-
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getBlogsByUserId(@PathVariable Long userId) {
+        try {
+            List<Blog> blogs = blogRepository.findByAuthor_Id(userId);
+            List<BlogDTO> blogDTOs = blogs.stream()
+                    .map(blog -> new BlogDTO(blog)) // Chuyển đối tượng Blog thành BlogDTO
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(blogDTOs);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error fetching blogs: " + e.getMessage());
+        }
+    }
     @PostMapping
     public ResponseEntity<?> createBlog(@RequestBody BlogCreateRequest request) {
         // Validate request
@@ -117,6 +131,38 @@ public class BlogController {
 
         Blog savedBlog = blogRepository.save(blog);
         return ResponseEntity.ok(savedBlog);
+    }
+    @Autowired
+    private LikeRepository likeRepository;
+
+    @PostMapping("/like")
+    public ResponseEntity<?> toggleLike(@RequestBody LikeRequest likeRequest) {
+        Long postId = likeRequest.getPostId();
+        Long userId = likeRequest.getUserId();
+
+        if (postId == null || userId == null) {
+            return ResponseEntity.badRequest().body("Post ID and User ID are required.");
+        }
+
+        Blog blog = blogRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Blog not found"));
+
+        Optional<Like> existingLike = likeRepository.findByPostIdAndUserId(postId, userId);
+        if (existingLike.isPresent()) {
+            // Đã like → unlike
+            likeRepository.delete(existingLike.get());
+            blog.setLikeCount(blog.getLikeCount() - 1);
+        } else {
+            // Chưa like → like
+            Like newLike = new Like();
+            newLike.setPostId(postId);
+            newLike.setUserId(userId);
+            likeRepository.save(newLike);
+            blog.setLikeCount(blog.getLikeCount() + 1);
+        }
+
+        blogRepository.save(blog);
+        return ResponseEntity.ok(blog);
     }
 
 
