@@ -65,18 +65,7 @@ public class BlogController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createBlog(@RequestBody BlogCreateRequest request,
-                                        @AuthenticationPrincipal UserDetails userDetails) {
-//         Check if user is authenticated
-        System.out.println("UserDetails: " + userDetails);
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
-
-        // Find user by email/username from token
-        User author = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
+    public ResponseEntity<?> createBlog(@RequestBody BlogCreateRequest request) {
         // Validate request
         if (request.getContent() == null || request.getContent().trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Content cannot be empty");
@@ -85,41 +74,40 @@ public class BlogController {
         // Create new Blog entity
         Blog blog = new Blog();
         blog.setContent(request.getContent());
-        blog.setAuthor(author);
+
+        // Tùy chọn: nếu bạn vẫn muốn gán userId từ request (không lấy từ token nữa)
+        if (request.getUserId() != null) {
+            User author = userRepository.findById(request.getUserId())
+                    .orElse(null);
+            blog.setAuthor(author);
+        }
 
         // Handle image if provided
         if (request.getImages() != null && !request.getImages().isEmpty()) {
             try {
                 String base64 = String.valueOf(request.getImages());
-                // Remove data URI prefix if present (e.g., "data:image/png;base64,")
                 if (base64.contains(",")) {
                     base64 = base64.split(",")[1];
                 }
 
-                // Decode base64 to bytes
                 byte[] imageBytes = Base64.getDecoder().decode(base64);
-
-                // Validate image format
                 BufferedImage image = ImageIO.read(new ByteArrayInputStream(imageBytes));
                 if (image == null) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid image format");
                 }
 
-                // Generate unique filename
                 String fileName = UUID.randomUUID() + ".png";
                 Path uploadPath = Paths.get(uploadDir);
                 Path filePath = uploadPath.resolve(fileName);
 
-                // Create upload directory if it doesn't exist
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
                 }
 
-                // Save image to file system
                 Files.write(filePath, imageBytes);
 
-                // Set image path in blog (relative path for frontend access)
-                blog.setImages("/imagespost/" + fileName);
+                String fullUrl = "http://localhost:8080/imagespost/" + fileName;
+                blog.setImages(fullUrl);
             } catch (IllegalArgumentException e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid base64 string");
             } catch (IOException e) {
@@ -127,10 +115,10 @@ public class BlogController {
             }
         }
 
-        // Save blog to database
         Blog savedBlog = blogRepository.save(blog);
         return ResponseEntity.ok(savedBlog);
     }
+
 
     @PutMapping("/{id}")
     @Transactional

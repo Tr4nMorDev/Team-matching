@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import ut.edu.teammatching.repositories.UserRepository;
 import ut.edu.teammatching.services.UserService;
 
@@ -71,7 +72,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/notifications/**").permitAll()
                 .requestMatchers("/api/messages/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/blogs/**").permitAll()  // Cho phép xem bài viết công khai
-                    .requestMatchers(HttpMethod.POST, "/api/blogs/**").authenticated()  // Chỉ cho phép người dùng đăng nhập tạo bài viết
+                    .requestMatchers(HttpMethod.POST, "/api/blogs/**").permitAll()  // Chỉ cho phép người dùng đăng nhập tạo bài viết
                     .requestMatchers(HttpMethod.PUT, "/api/blogs/**").authenticated()
                 .requestMatchers("/api/comments/**").permitAll()
                 .requestMatchers("/api/friends/**").authenticated()

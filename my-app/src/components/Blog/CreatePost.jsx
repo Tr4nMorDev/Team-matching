@@ -29,7 +29,6 @@ const CreateBlog = () => {
       images: image || null, // Send single base64 string or null
       userId: user.id,
     };
-
     try {
       if (!token) {
         throw new Error("No authentication token found");
@@ -41,7 +40,7 @@ const CreateBlog = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            // Không cần Authorization nữa
           },
         }
       );

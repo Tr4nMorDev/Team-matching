@@ -11,14 +11,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
+//    private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, CustomUserDetailsService userDetailsService) {
-        this.jwtUtil = jwtUtil;
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, CustomUserDetailsService userDetailsService) {
+        this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
     }
 
@@ -39,15 +41,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("🔑 Extracted Token: " + token);
 
         try {
-            if (jwtUtil.validateToken(token)) {
-                String username = jwtUtil.getUsernameFromToken(token);
+            if (jwtTokenProvider.validateToken(token)) {
+                String username = jwtTokenProvider.getUserIdFromToken(token); // ✅ Sửa ở đây
+                System.out.println("✅ User authenticated: " + username);
                 var userDetails = userDetailsService.loadUserByUsername(username);
-
+                System.out.println("🐞 Username from token: " + username);
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                System.out.println("✅ User authenticated: " + username);
+
             }
         } catch (Exception e) {
             System.err.println("❌ Token validation failed: " + e.getMessage());
@@ -55,4 +58,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }
