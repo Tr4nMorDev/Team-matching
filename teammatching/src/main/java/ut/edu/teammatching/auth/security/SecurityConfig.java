@@ -2,8 +2,13 @@ package ut.edu.teammatching.auth.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -11,6 +16,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import ut.edu.teammatching.repositories.UserRepository;
+import ut.edu.teammatching.services.UserService;
+
 import java.util.List;
 
 @Configuration
@@ -20,8 +29,8 @@ public class SecurityConfig {
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
     }
-
     @Bean
+    @Lazy
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -42,6 +51,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -57,14 +71,19 @@ public class SecurityConfig {
                 .requestMatchers("/api/ratings/**").permitAll()
                 .requestMatchers("/api/notifications/**").permitAll()
                 .requestMatchers("/api/messages/**").permitAll()
-                .requestMatchers("/api/blogs/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/blogs/**").permitAll()  // Cho phép xem bài viết công khai
+                    .requestMatchers(HttpMethod.POST, "/api/blogs/**").permitAll()  // Chỉ cho phép người dùng đăng nhập tạo bài viết
+                    .requestMatchers(HttpMethod.PUT, "/api/blogs/**").authenticated()
                 .requestMatchers("/api/comments/**").permitAll()
                 .requestMatchers("/api/friends/**").authenticated()
                 .requestMatchers("/imagedefault.jpg").permitAll()
                 .requestMatchers("/api/protected-resource").authenticated()
+                    .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
+
 }
