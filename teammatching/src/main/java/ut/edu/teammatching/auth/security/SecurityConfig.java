@@ -52,7 +52,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/teams/**").authenticated()
-                .requestMatchers("/api/teams/community-available").permitAll() // <== thêm dòng này
                 .requestMatchers("/api/projects/**").permitAll()
                 .requestMatchers("/api/tasks/**").permitAll()
                 .requestMatchers("/api/ratings/**").permitAll()
