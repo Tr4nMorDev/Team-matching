@@ -9,7 +9,7 @@ on:
       - fix-e
       - karus
       - testAPI
-      - TestfrontAPI
+      - TestAPIf
   pull_request:
     branches:
       - main

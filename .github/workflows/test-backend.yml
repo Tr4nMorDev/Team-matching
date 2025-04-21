@@ -11,7 +11,7 @@ on:
       - testAPI
       - Testteamtask
       - karus
-      - TestfrontAPI
+      - TestAPIf
   pull_request:
     branches:
       - main
