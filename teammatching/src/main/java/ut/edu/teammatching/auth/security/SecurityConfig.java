@@ -61,7 +61,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/comments/**").permitAll()
                 .requestMatchers("/api/friends/**").authenticated()
                 .requestMatchers("/imagedefault.jpg").permitAll()
+                    .requestMatchers("/ws/**", "/app/**", "/topic/**", "/queue/**").permitAll()
                 .requestMatchers("/api/protected-resource").authenticated()
+
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
