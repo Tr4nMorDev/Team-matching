@@ -35,13 +35,15 @@ public class MessageService {
         );
     }
 
-    // Get private chat history between two users
     public List<MessageDTO> getPrivateChatHistory(Long user1, Long user2) {
-        List<Message> messages = messageRepository.findBySenderIdAndReceiverIdOrderBySentAtAsc(user1, user2);
-        return messages.stream().map(this::convertToDTO).collect(Collectors.toList());
+        List<Message> messages = messageRepository
+                .findBySenderIdAndReceiverIdInBothDirections(user1, user2);
+
+        return messages.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    // Get team chat history by team ID
     public List<MessageDTO> getTeamChatHistory(Long teamId) {
         List<Message> messages = messageRepository.findByTeamIdOrderBySentAtAsc(teamId);
         return messages.stream().map(this::convertToDTO).collect(Collectors.toList());

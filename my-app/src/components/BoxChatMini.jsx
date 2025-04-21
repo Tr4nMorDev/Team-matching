@@ -23,6 +23,7 @@ export default function BoxChatMini({ user, currentUser, onClose }) {
       try {
         const response = await fetch(`/api/messages/private?user1=${currentUser.id}&user2=${user.id}`);
         const data = await response.json();
+        console.log(data);
         setMessages(data); // Lưu tin nhắn vào state
       } catch (error) {
         console.error("Error loading messages", error);
@@ -54,7 +55,7 @@ export default function BoxChatMini({ user, currentUser, onClose }) {
     sendMessage("/app/chat.private", msg);
 
     // Cập nhật state với tin nhắn gửi đi
-    setMessages((prev) => [...prev, { ...msg, senderId: currentUser }]);
+    setMessages((prev) => [...prev, msg]);
 
     setInput(""); // Xóa input sau khi gửi tin nhắn
   };
@@ -83,20 +84,20 @@ export default function BoxChatMini({ user, currentUser, onClose }) {
           {messages.map((msg, index) => (
               <motion.div
                   key={index}
-                  className={`flex items-center gap-2 ${msg.senderId?.id === currentUser.id ? "justify-end" : "justify-start"}`}
+                  className={`flex items-center gap-2 ${msg.senderId === currentUser.id ? "justify-end" : "justify-start"}`}
               >
-                {msg.senderId?.id !== currentUser.id && (
+                {msg.senderId !== currentUser.id && (
                     <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full" />
                 )}
                 <div
                     className={`p-2 rounded-lg w-fit max-w-[80%] text-amber-700 ${
-                        msg.senderId?.id === currentUser.id ? "bg-blue-100" : "bg-gray-200"
+                        msg.senderId === currentUser.id ? "bg-blue-100" : "bg-gray-200"
                     }`}
                 >
                   <p className="text-sm">{msg.content}</p>
                 </div>
-                {msg.senderId?.id === currentUser.id && (
-                    <img src={currentUser.avatar} alt="Avatar" className="w-8 h-8 rounded-full" />
+                {msg.senderId === currentUser.id && (
+                    <img src={currentUser.profilePicture} alt="Avatar" className="w-8 h-8 rounded-full" />
                 )}
               </motion.div>
           ))}
