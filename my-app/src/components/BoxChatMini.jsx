@@ -1,30 +1,48 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import useWebSocket from "./websocket.js";
 
 export default function BoxChatMini({ user, currentUser, onClose }) {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);  // Lưu trữ tin nhắn
+  const [input, setInput] = useState("");  // Nội dung tin nhắn
+  const messagesEndRef = useRef(null);  // Dùng để tự động scroll xuống cuối khi có tin nhắn mới
 
-  const { sendMessage } = useWebSocket(
+  // WebSocket để gửi và nhận tin nhắn
+  const { sendMessage, messagesSocket } = useWebSocket(
       (msg) => {
-        setMessages((prev) => [...prev, msg]);  // Chỉ lưu vào state
+        // Nhận tin nhắn mới qua WebSocket và cập nhật lại giao diện
+        setMessages((prev) => [...prev, msg]);
       },
-      `/user/${currentUser.id}/queue/private`  // Từ Spring: @SendToUser
+      `/user/${currentUser.id}/queue/messages`  // Từ Spring: @SendToUser
   );
 
+  // Load lịch sử tin nhắn khi người dùng vào chat
   useEffect(() => {
-    // Load lịch sử tin nhắn (chỉ load khi bắt đầu, không lưu vào DB)
-    fetch(
-        `/api/messages/private?user1=${currentUser.id}&user2=${user.id}`
-    )
-        .then((res) => res.json())
-        .then((data) => setMessages(data)); // Chỉ hiển thị từ response API
+    const loadMessages = async () => {
+      try {
+        const response = await fetch(`/api/messages/private?user1=${currentUser.id}&user2=${user.id}`);
+        const data = await response.json();
+        setMessages(data); // Lưu tin nhắn vào state
+      } catch (error) {
+        console.error("Error loading messages", error);
+      }
+    };
+
+    loadMessages();
   }, [user.id, currentUser.id]);
 
+  // Tự động cuộn xuống cuối khi có tin nhắn mới
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]); // Chạy khi messages thay đổi
+
+  // Xử lý gửi tin nhắn
   const handleSend = () => {
     if (!input.trim()) return;
+
     const msg = {
       senderId: currentUser.id,
       receiverId: user.id,
@@ -32,13 +50,13 @@ export default function BoxChatMini({ user, currentUser, onClose }) {
       messageType: "PRIVATE",
     };
 
-    // Gửi tin nhắn qua WebSocket mà không lưu vào database
-    sendMessage("/app/private", msg);
+    // Gửi tin nhắn qua WebSocket
+    sendMessage("/app/chat.private", msg);
 
-    // Chỉ lưu vào state để hiển thị tin nhắn, không gọi API lưu vào database
+    // Cập nhật state với tin nhắn gửi đi
     setMessages((prev) => [...prev, { ...msg, senderId: currentUser }]);
 
-    setInput("");
+    setInput(""); // Xóa input sau khi gửi tin nhắn
   };
 
   return (
@@ -65,7 +83,7 @@ export default function BoxChatMini({ user, currentUser, onClose }) {
           {messages.map((msg, index) => (
               <motion.div
                   key={index}
-                  className={`flex items-center gap-2 ${msg.senderId?.id === currentUser.id ? "justify-end" : ""}`}
+                  className={`flex items-center gap-2 ${msg.senderId?.id === currentUser.id ? "justify-end" : "justify-start"}`}
               >
                 {msg.senderId?.id !== currentUser.id && (
                     <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full" />
@@ -82,6 +100,8 @@ export default function BoxChatMini({ user, currentUser, onClose }) {
                 )}
               </motion.div>
           ))}
+          {/* Ref giúp tự động cuộn tới cuối khi tin nhắn mới được thêm vào */}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input */}
