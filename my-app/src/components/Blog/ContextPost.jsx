@@ -8,7 +8,6 @@ import { data } from "react-router-dom";
 const MainContent = () => {
   const { isLoggedIn } = useAuth();
   const [blogs, setBlogs] = useState([]);
-  console.log(blogs);
   useEffect(() => {
     getBlogs()
       .then((data) => setBlogs(data))

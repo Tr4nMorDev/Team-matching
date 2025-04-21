@@ -35,13 +35,13 @@ public class AuthService {
                     encodedPassword,
                     Role.STUDENT,
                     request.getGender(),
-                    null,  // Profile picture
-                    null,  // Skills
-                    null,  // Hobbies
-                    null,  // Projects
-                    null,  // Phone number
-                    "Unknown Major", // Default Major
-                    1 // Default Term
+                    request.getProfilePicture(),  // Sửa ở đây
+                    request.getSkills(),          // Sửa ở đây
+                    request.getHobbies(),         // Sửa ở đây
+                    request.getProjects(),        // Sửa ở đây
+                    request.getPhoneNumber(),     // Sửa ở đây
+                    request.getMajor(),           // Sửa ở đây
+                    request.getTerm()             // Sửa ở đây
             );
         } else if (request.getRole() == Role.LECTURER) {
             user = new Lecturer(
@@ -51,15 +51,16 @@ public class AuthService {
                     encodedPassword,
                     Role.LECTURER,
                     request.getGender(),
-                    null,  // Profile picture
-                    null,  // Skills
-                    null,  // Hobbies
-                    null,  // Projects
-                    null,  // Phone number
-                    "Unknown Department",  // Default department
-                    "Unknown Research Areas" // Default research areas
+                    request.getProfilePicture(),  // Sửa ở đây
+                    request.getSkills(),          // Sửa ở đây
+                    request.getHobbies(),         // Sửa ở đây
+                    request.getProjects(),        // Sửa ở đây
+                    request.getPhoneNumber(),     // Sửa ở đây
+                    request.getDepartment(),      // Sửa ở đây
+                    request.getResearchAreas()    // Sửa ở đây
             );
-        } else {
+        }
+        else {
             throw new IllegalArgumentException("Invalid role: " + request.getRole());
         }
 
