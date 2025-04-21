@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.yaml.snakeyaml.events.Event;
 import ut.edu.teammatching.models.User;
 import ut.edu.teammatching.enums.Role;
 
@@ -17,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
         "blogs"
     })
     Optional<User> findByUsername(String username);
-    
+
     Optional<User> findByEmail(String email);
     List<User> findByRole(Role role);
     boolean existsByUsername(String username);

@@ -2,6 +2,8 @@ package ut.edu.teammatching.services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import ut.edu.teammatching.dto.TeamDTO;
+import ut.edu.teammatching.enums.JoinRequestStatus;
 import ut.edu.teammatching.enums.TeamType;
 import ut.edu.teammatching.models.Lecturer;
 import ut.edu.teammatching.models.Student;
@@ -13,8 +15,8 @@ import ut.edu.teammatching.repositories.LecturerRepository;
 import org.springframework.security.core.Authentication;
 import ut.edu.teammatching.repositories.UserRepository;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TeamService {
@@ -36,8 +38,97 @@ public class TeamService {
         return teamRepository.findAll();
     }
 
-    public Optional<Team> getTeamById(Long id) {
-        return teamRepository.findById(id);
+    public void handleJoinRequest(Long teamId, Long studentId, boolean accept, String leaderUsername) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhóm"));
+
+        if (team.getLeader() == null || !team.getLeader().getUsername().equals(leaderUsername)) {
+            throw new RuntimeException("Chỉ leader có thể xử lý yêu cầu");
+        }
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên"));
+
+        if (!team.getJoinRequests().containsKey(student)) {
+            throw new RuntimeException("Không có yêu cầu từ sinh viên này");
+        }
+
+        if (accept) {
+            team.getJoinRequests().put(student, JoinRequestStatus.ACCEPTED);
+            team.addStudent(student);
+        } else {
+            team.getJoinRequests().put(student, JoinRequestStatus.REJECTED);
+        }
+
+        teamRepository.save(team);
+    }
+
+    public List<Team> getCommunityAvailableTeams(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
+
+        return teamRepository.findAll().stream()
+                .filter(team -> !team.getStudents().contains(user))
+                .collect(Collectors.toList());
+    }
+
+    public List<TeamDTO> getTeamsOfUser(String username) {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) throw new RuntimeException("Không tìm thấy người dùng");
+
+        User user = userOpt.get();
+
+        // Nếu là Student => lấy danh sách team tham gia + team đang làm leader
+        if (user instanceof Student student) {
+            List<Team> joinedTeams = teamRepository.findAllByStudentsContains(student);
+            List<Team> leadTeams = teamRepository.findAllByLeader(student);
+            Set<Team> combined = new HashSet<>();
+            combined.addAll(joinedTeams);
+            combined.addAll(leadTeams);
+
+            // Chuyển đổi từ List<Team> thành List<TeamDTO>
+            List<TeamDTO> teamDTOs = new ArrayList<>();
+            for (Team team : combined) {
+                // Chuyển đổi từ Team sang TeamDTO trực tiếp
+                TeamDTO teamDTO = new TeamDTO();
+                teamDTO.setId(team.getId());
+                teamDTO.setTeamName(team.getTeamName()); // Đổi từ team.getName() thành team.getTeamName()
+                teamDTO.setTeamType(team.getTeamType()); // Đổi từ team.getType() thành team.getTeamType()
+                teamDTO.setTeamPicture(team.getTeamPicture()); // Đổi từ team.getPicture() thành team.getTeamPicture()
+                teamDTO.setDescription(team.getDescription()); // Đổi từ team.getDescription() thành team.getDescription()
+                teamDTO.setLeaderName(team.getLeader() != null ? team.getLeader().getFullName() : null);
+                teamDTO.setLecturerName(team.getLecturer() != null ? team.getLecturer().getFullName() : null);
+                teamDTO.setMembersCount(team.getStudents().size()); // Giả sử size() là số lượng thành viên
+
+                teamDTOs.add(teamDTO);
+            }
+            return teamDTOs;
+        }
+
+        // Nếu là Lecturer => lấy danh sách team hướng dẫn
+        if (user instanceof Lecturer lecturer) {
+            List<Team> teams = teamRepository.findAllByLecturer(lecturer);
+
+            // Chuyển đổi từ List<Team> thành List<TeamDTO>
+            List<TeamDTO> teamDTOs = new ArrayList<>();
+            for (Team team : teams) {
+                // Chuyển đổi từ Team sang TeamDTO trực tiếp
+                TeamDTO teamDTO = new TeamDTO();
+                teamDTO.setId(team.getId());
+                teamDTO.setTeamName(team.getTeamName()); // Đổi từ team.getName() thành team.getTeamName()
+                teamDTO.setTeamType(team.getTeamType()); // Đổi từ team.getType() thành team.getTeamType()
+                teamDTO.setTeamPicture(team.getTeamPicture()); // Đổi từ team.getPicture() thành team.getTeamPicture()
+                teamDTO.setDescription(team.getDescription()); // Đổi từ team.getDescription() thành team.getDescription()
+                teamDTO.setLeaderName(team.getLeader() != null ? team.getLeader().getFullName() : null);
+                teamDTO.setLecturerName(team.getLecturer() != null ? team.getLecturer().getFullName() : null);
+                teamDTO.setMembersCount(team.getStudents().size()); // Giả sử size() là số lượng thành viên
+
+                teamDTOs.add(teamDTO);
+            }
+            return teamDTOs;
+        }
+
+        return Collections.emptyList(); // nếu là user khác thì trả về rỗng
     }
 
     @Transactional
@@ -67,6 +158,10 @@ public class TeamService {
             Student student = (Student) creator;
             team.getStudents().add(student);   // Thêm vào team trước
             team.setLeader(student);           // Rồi mới set leader
+        }
+
+        for (Student student : team.getStudents()) {
+            student.getTeams().add(team);  // Đảm bảo student biết về team mà họ tham gia
         }
 
         // Lưu team vào cơ sở dữ liệu

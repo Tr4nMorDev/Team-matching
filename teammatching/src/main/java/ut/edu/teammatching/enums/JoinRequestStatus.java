@@ -1,4 +1,7 @@
 package ut.edu.teammatching.enums;
 
-public class JoinRequestStatus {
+public enum JoinRequestStatus {
+    ACCEPTED,
+    PENDING,
+    REJECTED
 }

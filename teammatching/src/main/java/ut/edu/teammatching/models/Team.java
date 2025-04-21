@@ -3,6 +3,7 @@ package ut.edu.teammatching.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import ut.edu.teammatching.enums.JoinRequestStatus;
 import ut.edu.teammatching.enums.TeamType;
 
 import java.util.*;
@@ -71,6 +72,12 @@ public class Team {
     @Column(name = "role")
     private Map<Long, String> roles = new HashMap<>();
 
+    @ElementCollection
+    @CollectionTable(name = "join_requests", joinColumns = @JoinColumn(name = "team_id"))
+    @MapKeyJoinColumn(name = "student_id")
+    @Column(name = "status")
+    private Map<Student, JoinRequestStatus> joinRequests = new HashMap<>();
+
     /** 🔥 Kiểm tra ràng buộc: Nếu team là Academic thì phải có giảng viên */
     @PrePersist
     private void prePersist() {
@@ -109,4 +116,5 @@ public class Team {
             this.leader = students.get(0); // Gán leader là sinh viên đầu tiên trong team
         }
     }
+
 }

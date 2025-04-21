@@ -1,5 +1,6 @@
 package ut.edu.teammatching.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,6 +30,7 @@ public class Student extends User {
     private Integer term;
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "student_team",
             joinColumns = @JoinColumn(name = "student_id"),

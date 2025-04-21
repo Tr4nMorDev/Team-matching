@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ut.edu.teammatching.dto.AssignRoleRequest;
 import ut.edu.teammatching.dto.CreateTeamDTO;
+import ut.edu.teammatching.dto.TeamDTO;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Team;
 import ut.edu.teammatching.models.User;
@@ -28,10 +29,40 @@ public class TeamController {
         return teamService.getAllTeams();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Team> getTeamById(@PathVariable Long id) {
-        Optional<Team> team = teamService.getTeamById(id);
-        return team.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    /**
+     * ✅ Endpoint cho leader chấp nhận hoặc từ chối yêu cầu tham gia nhóm
+     */
+    @PostMapping("/{teamId}/join-requests/{studentId}/handle")
+    public ResponseEntity<String> handleJoinRequest(
+            @PathVariable Long teamId,
+            @PathVariable Long studentId,
+            @RequestParam boolean accept,
+            Authentication authentication
+    ) {
+        String leaderUsername = authentication.getName(); // lấy từ JWT token
+
+        try {
+            teamService.handleJoinRequest(teamId, studentId, accept, leaderUsername);
+            return ResponseEntity.ok(accept ? "Đã chấp nhận yêu cầu" : "Đã từ chối yêu cầu");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/community-available")
+    public ResponseEntity<List<Team>> getCommunityAvailableTeams(Authentication authentication) {
+        String username = authentication.getName();
+        List<Team> availableTeams = teamService.getCommunityAvailableTeams(username);
+        return ResponseEntity.ok(availableTeams);
+    }
+
+    @GetMapping("/user/{username}")
+    public ResponseEntity<List<TeamDTO>> getTeamsOfUser(@PathVariable String username) {
+        List<TeamDTO> teamDTOs = teamService.getTeamsOfUser(username);
+        if (teamDTOs.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Nếu không tìm thấy đội nhóm
+        }
+        return ResponseEntity.ok(teamDTOs); // Trả về danh sách đội nhóm
     }
 
     @PostMapping
