@@ -89,13 +89,13 @@ const AboutStudent = () => {
             <strong>Birth Date:</strong> 24 January
           </p>
           <p className="text-gray-600">
-            <strong>Birth Year:</strong> 1994
+            <strong>Term:</strong> {user.userID.term}
           </p>
           <p className="text-gray-600">
             <strong>Adress:</strong> TP HCM
           </p>
           <p className="text-gray-600">
-            <strong>Interested in:</strong> Designing
+            <strong>Major:</strong> {user.userID.major}
           </p>
           <p className="text-gray-600 flex items-center gap-2">
             <Languages className="w-4 h-4 text-gray-500" />
