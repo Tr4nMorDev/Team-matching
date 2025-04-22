@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile; // Import cho MultipartFile
 import ut.edu.teammatching.dto.AssignRoleRequest;
 import ut.edu.teammatching.dto.CreateTeamDTO;
+import ut.edu.teammatching.dto.JoinRequestResponse;
 import ut.edu.teammatching.dto.TeamDTO;
+import ut.edu.teammatching.enums.JoinRequestStatus;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Team;
 import ut.edu.teammatching.models.User;
@@ -18,7 +20,9 @@ import ut.edu.teammatching.services.TeamService;
 import java.io.File; // Import cho File
 import java.io.IOException; // Import cho IOException
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/teams")
@@ -53,9 +57,9 @@ public class TeamController {
     }
 
     @GetMapping("/community-available")
-    public ResponseEntity<List<Team>> getCommunityAvailableTeams(Authentication authentication) {
+    public ResponseEntity<List<TeamDTO>> getCommunityAvailableTeams(Authentication authentication) {
         String username = authentication.getName();
-        List<Team> availableTeams = teamService.getCommunityAvailableTeams(username);
+        List<TeamDTO> availableTeams = teamService.getCommunityAvailableTeams(username);
         return ResponseEntity.ok(availableTeams);
     }
 
@@ -175,5 +179,41 @@ public class TeamController {
     public ResponseEntity<?> assignRole(@RequestBody AssignRoleRequest request) {
         Team updatedTeam = teamService.assignRole(request.getLeaderId(), request.getTeamId(), request.getMemberId(), request.getRole());
         return ResponseEntity.ok(updatedTeam);
+    }
+
+    @PostMapping("/teams/{teamId}/join")
+    public ResponseEntity<JoinRequestResponse> sendJoinRequest(
+            @PathVariable Long teamId,
+            @RequestParam Long studentId) {
+
+        try {
+            teamService.sendJoinRequest(teamId, studentId);
+            return ResponseEntity.ok(new JoinRequestResponse(true, "Yêu cầu tham gia nhóm đã được gửi!"));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(new JoinRequestResponse(false, ex.getMessage()));
+        }
+    }
+
+    // Lấy danh sách sinh viên đã gửi yêu cầu vào nhóm
+    @GetMapping("/{teamId}/join-requests")
+    public ResponseEntity<List<Student>> getJoinRequests(@PathVariable Long teamId) {
+        // Lấy thông tin nhóm từ teamId
+        Team team = teamService.getTeamById(teamId);
+
+        // Kiểm tra xem nhóm có tồn tại không
+        if (team == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Lấy danh sách sinh viên có yêu cầu gia nhập nhóm
+        Map<Student, JoinRequestStatus> joinRequests = team.getJoinRequests();
+
+        // Chuyển đổi Map thành danh sách sinh viên
+        List<Student> studentsWithRequests = joinRequests.entrySet().stream()
+                .filter(entry -> entry.getValue() == JoinRequestStatus.PENDING) // Chỉ lấy các yêu cầu đang chờ
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(studentsWithRequests);
     }
 }

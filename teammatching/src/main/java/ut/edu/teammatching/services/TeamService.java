@@ -40,36 +40,49 @@ public class TeamService {
     }
 
     public void handleJoinRequest(Long teamId, Long studentId, boolean accept, String leaderUsername) {
+        // Tìm kiếm nhóm
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhóm"));
 
+        // Kiểm tra quyền của leader
         if (team.getLeader() == null || !team.getLeader().getUsername().equals(leaderUsername)) {
             throw new RuntimeException("Chỉ leader có thể xử lý yêu cầu");
         }
 
+        // Tìm kiếm sinh viên
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên"));
 
+        // Kiểm tra xem sinh viên đã gửi yêu cầu chưa
         if (!team.getJoinRequests().containsKey(student)) {
             throw new RuntimeException("Không có yêu cầu từ sinh viên này");
         }
 
+        // Cập nhật trạng thái yêu cầu
         if (accept) {
-            team.getJoinRequests().put(student, JoinRequestStatus.ACCEPTED);
-            team.addStudent(student);
+            // Kiểm tra nếu sinh viên chưa được thêm vào nhóm
+            if (!team.getStudents().contains(student)) {
+                team.getJoinRequests().put(student, JoinRequestStatus.ACCEPTED);
+                team.addStudent(student); // Thêm sinh viên vào nhóm
+            } else {
+                throw new RuntimeException("Sinh viên này đã là thành viên của nhóm");
+            }
         } else {
             team.getJoinRequests().put(student, JoinRequestStatus.REJECTED);
         }
 
+        // Lưu nhóm với những thay đổi
         teamRepository.save(team);
     }
 
-    public List<Team> getCommunityAvailableTeams(String username) {
+
+    public List<TeamDTO> getCommunityAvailableTeams(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
 
         return teamRepository.findAll().stream()
                 .filter(team -> !team.getStudents().contains(user))
+                .map(TeamDTO::fromTeam)  // chuyển thành DTO
                 .collect(Collectors.toList());
     }
 
@@ -132,10 +145,39 @@ public class TeamService {
         return Collections.emptyList(); // nếu là user khác thì trả về rỗng
     }
 
+    public void sendJoinRequest(Long teamId, Long studentId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhóm"));
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên"));
+
+        // Nếu sinh viên đã là thành viên
+        if (team.getStudents().contains(student)) {
+            throw new RuntimeException("Sinh viên đã là thành viên của nhóm!");
+        }
+
+        // Nếu sinh viên đã gửi yêu cầu rồi
+        if (team.getJoinRequests().containsKey(student)) {
+            JoinRequestStatus status = team.getJoinRequests().get(student);
+            if (status == JoinRequestStatus.PENDING) {
+                throw new RuntimeException("Yêu cầu tham gia nhóm của sinh viên đang chờ xử lý!");
+            } else if (status == JoinRequestStatus.ACCEPTED) {
+                throw new RuntimeException("Yêu cầu đã được chấp nhận!");
+            } else if (status == JoinRequestStatus.REJECTED) {
+                throw new RuntimeException("Yêu cầu đã bị từ chối, vui lòng liên hệ leader!");
+            }
+        }
+
+        // Thêm vào danh sách yêu cầu
+        team.getJoinRequests().put(student, JoinRequestStatus.PENDING);
+        teamRepository.save(team);
+    }
+
     @Transactional
     public Team createTeam(String teamName, String description, TeamType teamType, String teamPicture, Authentication authentication) {
         // Lấy thông tin người dùng từ JWT token
-        String username = authentication.getName();  // Lấy username từ JWT token
+        String username = authentication.getName();
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) {
             throw new RuntimeException("Không tìm thấy người dùng!");
@@ -330,4 +372,9 @@ public class TeamService {
                 .map(TeamDTO::fromTeam)
                 .collect(Collectors.toList());
     }
+
+    public Team getTeamById(Long teamId) {
+        return teamRepository.findById(teamId).orElse(null);
+    }
+
 }
