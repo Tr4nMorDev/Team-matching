@@ -12,6 +12,7 @@ on:
       - Testteamtask
       - karus
       - TestAPIf
+      - www
   pull_request:
     branches:
       - main

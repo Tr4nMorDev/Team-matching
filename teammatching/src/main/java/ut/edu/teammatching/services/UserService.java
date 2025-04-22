@@ -41,14 +41,20 @@ public class UserService {
                 .orElseThrow(()     -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
+    public UserDTO getUserDTOById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        return UserDTO.fromUser(user);
+    }
+
     //lay thong tin user theo username
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     // Tìm kiếm user theo từ khóa
-    public List<UserDTO> searchUsers(String keyword) {
-        return userRepository.searchUsers(keyword).stream()
+    public List<UserDTO> searchUsers(String keyword, Long currentUserId) {
+        return userRepository.searchUsers(keyword, currentUserId).stream()
                 .map(UserDTO::fromUser)
                 .collect(Collectors.toList());
     }

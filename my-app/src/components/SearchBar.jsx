@@ -1,24 +1,29 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function SearchBar() {
     const [search, setSearch] = useState("");
     const [results, setResults] = useState({ users: [], teams: [] });
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const containerRef = useRef(null); // ref đến container chính
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        const cancelToken = axios.CancelToken.source(); // Tạo token hủy yêu cầu
+        const userId = localStorage.getItem("userId");
+        const cancelToken = axios.CancelToken.source();
 
         const delayDebounce = setTimeout(() => {
             if (search.trim() !== "") {
                 setLoading(true);
+
                 axios
-                    .get(`/api/search?keyword=${encodeURIComponent(search)}`, {
+                    .get(`/api/search?keyword=${encodeURIComponent(search)}&currentUserId=${userId}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
-                        cancelToken: cancelToken.token, // Gắn token hủy
+                        cancelToken: cancelToken.token,
                     })
                     .then((res) => setResults(res.data))
                     .catch((err) => {
@@ -35,12 +40,25 @@ function SearchBar() {
 
         return () => {
             clearTimeout(delayDebounce);
-            cancelToken.cancel(); // Hủy yêu cầu khi component unmount hoặc search thay đổi
+            cancelToken.cancel();
         };
     }, [search]);
 
+    // Reset search khi click ra ngoài
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setSearch("");
+                setResults({ users: [], teams: [] });
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     return (
-        <div className="relative w-full max-w-md mx-auto">
+        <div className="relative w-full max-w-md mx-auto" ref={containerRef}>
             <input
                 type="text"
                 value={search}
@@ -63,7 +81,11 @@ function SearchBar() {
                                 <div className="border-b border-gray-300">
                                     <p className="px-2 pt-2 text-xs text-gray-400">👤 Người dùng</p>
                                     {results.users.map((user) => (
-                                        <div key={user.id} className="p-2 hover:bg-gray-100 cursor-pointer">
+                                        <div
+                                            key={user.id}
+                                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => navigate(`/pageprofile/${user.id}`)}
+                                        >
                                             {user.fullName}
                                         </div>
                                     ))}
@@ -74,8 +96,12 @@ function SearchBar() {
                                 <div className="pt-2">
                                     <p className="px-2 pt-2 text-xs text-gray-400">👥 Nhóm</p>
                                     {results.teams.map((team) => (
-                                        <div key={team.id} className="p-2 hover:bg-gray-100 cursor-pointer">
-                                            {team.teamName} {/* Sử dụng đúng thuộc tính */}
+                                        <div
+                                            key={team.id}
+                                            className="p-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => navigate(`/team/${team.id}`)} // nếu có trang team
+                                        >
+                                            {team.teamName}
                                         </div>
                                     ))}
                                 </div>

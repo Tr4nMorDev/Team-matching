@@ -12,6 +12,7 @@ import GroupsComponent from "./components/Group/Group";
 import GroupDashBoard from "./components/Group/AfterJoinGroup";
 import UserList from "./api/UserList";
 import SearchBar from "./components/SearchBar";
+import ProfilePage from "./components/Profile/ProfilePage.jsx";
 
 function App() {
   const { isLoggedIn, role, user } = useAuth();
@@ -69,6 +70,7 @@ function App() {
         {/*<Route path="/group/:namegroup" element={<GroupDashBoard />} />*/}
           <Route path="/group/:teamId" element={<GroupDashBoard />} />
         <Route path="api/user" element={<UserList />} />
+          <Route path="/pageprofile/:userId" element={<ProfilePage />} />
       </Routes>
     </>
   );

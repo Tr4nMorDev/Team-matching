@@ -23,8 +23,11 @@ public class SearchController {
     private final TeamService teamService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> search(@RequestParam("keyword") String keyword) {
-        List<UserDTO> users = userService.searchUsers(keyword);
+    public ResponseEntity<Map<String, Object>> search(
+            @RequestParam("keyword") String keyword,
+            @RequestParam("currentUserId") Long currentUserId // 👈 nhận ID của người tìm kiếm
+    ) {
+        List<UserDTO> users = userService.searchUsers(keyword, currentUserId);
         List<TeamDTO> teams = teamService.searchTeams(keyword);
 
         Map<String, Object> response = new HashMap<>();
@@ -32,4 +35,5 @@ public class SearchController {
         response.put("teams", teams);
         return ResponseEntity.ok(response);
     }
+
 }
