@@ -10,11 +10,12 @@ const CommunityGroups = () => {
     const fetchCommunityGroups = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:8080/api/teams/community-available", {
+        const response = await axios.get("/api/teams/community-available", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log(response);
         setCommunityGroups(response.data);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách nhóm cộng đồng:", error);
@@ -23,6 +24,30 @@ const CommunityGroups = () => {
 
     fetchCommunityGroups();
   }, []);
+
+  const handleJoinGroup = (groupId) => {
+    const token = localStorage.getItem("token");
+    const studentId = localStorage.getItem("userId");  // Giả sử bạn lưu studentId vào localStorage
+
+    if (!studentId) {
+      alert("Chưa đăng nhập!");
+      return;
+    }
+
+    axios
+        .post(`/api/teams/teams/${groupId}/join?studentId=${studentId}`, {}, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          console.log(response.data);
+          addPendingGroup(groupId); // Thêm nhóm vào danh sách nhóm đang chờ xử lý
+        })
+        .catch((error) => {
+          console.error("Lỗi khi gửi yêu cầu tham gia nhóm:", error);
+        });
+  };
 
   const renderGroupList = (groupList) => (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -60,8 +85,7 @@ const CommunityGroups = () => {
                     }`}
                     onClick={() => {
                       if (!isJoined && !isPending) {
-                        addPendingGroup(group.id);
-                        // TODO: Gửi join request API tại đây
+                        handleJoinGroup(group.id); // Gọi hàm gửi yêu cầu tham gia nhóm
                       }
                     }}
                     disabled={isPending}
