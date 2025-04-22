@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useGroupContext } from "../../context/GroupContext";
 import { useNavigate } from "react-router-dom";
-import CreateGroupForm from "./CreateGroupForm"; // Import CreateGroupForm component
 
 const MyGroups = () => {
   const { username } = useGroupContext() || {};
   const navigate = useNavigate();
   const [myGroups, setMyGroups] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateGroupForm, setShowCreateGroupForm] = useState(false); // State to control visibility of CreateGroupForm
 
   useEffect(() => {
     const localUsername = username || localStorage.getItem("username");
@@ -97,16 +95,6 @@ const MyGroups = () => {
         ) : (
             <p className="text-center">Bạn chưa tham gia nhóm nào.</p> // Thông báo nếu không có nhóm
         )}
-
-        {/* Button to show Create Group Form */}
-        <div className="text-center mt-6">
-          {showCreateGroupForm && (
-              <CreateGroupForm
-                  onCreate={handleCreateGroup}
-                  onClose={() => setShowCreateGroupForm(false)}
-              />
-          )}
-        </div>
       </div>
   );
 };
