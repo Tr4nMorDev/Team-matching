@@ -18,6 +18,7 @@ public class MessageDTO {
 
     private Long id;
     private Long senderId;
+    private String senderName;
     private String content;
     private Instant timestamp;
     private Long receiverId;  // For private messages, the receiver will be set

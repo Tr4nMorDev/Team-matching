@@ -27,6 +27,7 @@ public class MessageService {
         return new MessageDTO(
                 message.getId(),
                 message.getSender().getId(),
+                message.getSender().getFullName(),
                 message.getContent(),
                 message.getSentAt(),
                 message.getReceiver() != null ? message.getReceiver().getId() : null,
