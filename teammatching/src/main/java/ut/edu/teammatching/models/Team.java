@@ -61,14 +61,6 @@ public class Team {
     @JoinColumn(name = "leader_id")
     private Student leader;
 
-    // Đảm bảo chỉ có một leader duy nhất
-    public void setLeader(Student newLeader) {
-        if (newLeader == null || !students.contains(newLeader)) {
-            throw new IllegalStateException("Leader phải là một thành viên của team!");
-        }
-        this.leader = newLeader;
-    }
-
     @ElementCollection
     @CollectionTable(name = "team_roles", joinColumns = @JoinColumn(name = "team_id"))
     @MapKeyColumn(name = "user_id") // Lưu ID của User
@@ -80,6 +72,14 @@ public class Team {
     @MapKeyJoinColumn(name = "student_id")
     @Column(name = "status")
     private Map<Student, JoinRequestStatus> joinRequests = new HashMap<>();
+
+    // Đảm bảo chỉ có một leader duy nhất
+    public void setLeader(Student newLeader) {
+        if (newLeader == null || !students.contains(newLeader)) {
+            throw new IllegalStateException("Leader phải là một thành viên của team!");
+        }
+        this.leader = newLeader;
+    }
 
     /** 🔥 Kiểm tra ràng buộc: Nếu team là Academic thì phải có giảng viên */
     @PrePersist

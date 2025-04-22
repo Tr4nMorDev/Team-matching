@@ -3,6 +3,7 @@ package ut.edu.teammatching.services;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ut.edu.teammatching.dto.TeamDTO;
+import ut.edu.teammatching.dto.TeamMemberDTO;
 import ut.edu.teammatching.dto.UserDTO;
 import ut.edu.teammatching.enums.JoinRequestStatus;
 import ut.edu.teammatching.enums.TeamType;
@@ -199,12 +200,10 @@ public class TeamService {
             team.setLecturer(lecturer);
         } else if (creator instanceof Student) {
             Student student = (Student) creator;
-            team.getStudents().add(student);   // Thêm vào team trước
+            if (!team.getStudents().contains(student)) {
+                team.getStudents().add(student);   // Thêm vào team trước
+            }
             team.setLeader(student);           // Rồi mới set leader
-        }
-
-        for (Student student : team.getStudents()) {
-            student.getTeams().add(team);  // Đảm bảo student biết về team mà họ tham gia
         }
 
         // Lưu team vào cơ sở dữ liệu
@@ -367,6 +366,7 @@ public class TeamService {
         team.getRoles().put(memberId, role);
         return teamRepository.save(team);
     }
+
     public List<TeamDTO> searchTeams(String keyword) {
         return teamRepository.searchTeam(keyword).stream()
                 .map(TeamDTO::fromTeam)
@@ -377,4 +377,19 @@ public class TeamService {
         return teamRepository.findById(teamId).orElse(null);
     }
 
+    public List<TeamMemberDTO> getMembersByTeamId(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Team not found"));
+
+        // Tạo một danh sách thành viên bao gồm cả sinh viên và giảng viên
+        List<User> members = new ArrayList<>(team.getStudents());
+        if (team.getLecturer() != null) {
+            members.add(team.getLecturer());
+        }
+
+        // Chuyển đổi các thành viên thành TeamMemberDTO và trả về
+        return members.stream()
+                .map(user -> new TeamMemberDTO(user, team)) // Truyền vào cả team để xác định vai trò
+                .collect(Collectors.toList());
+    }
 }

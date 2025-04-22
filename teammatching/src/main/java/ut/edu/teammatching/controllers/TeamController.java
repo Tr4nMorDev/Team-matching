@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile; // Import cho MultipartFile
-import ut.edu.teammatching.dto.AssignRoleRequest;
-import ut.edu.teammatching.dto.CreateTeamDTO;
-import ut.edu.teammatching.dto.JoinRequestResponse;
-import ut.edu.teammatching.dto.TeamDTO;
+import ut.edu.teammatching.dto.*;
 import ut.edu.teammatching.enums.JoinRequestStatus;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Team;
@@ -215,5 +212,15 @@ public class TeamController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(studentsWithRequests);
+    }
+
+    @GetMapping("/{teamId}/members")
+    public ResponseEntity<List<TeamMemberDTO>> getMembersByTeamId(@PathVariable Long teamId) {
+        try {
+            List<TeamMemberDTO> members = teamService.getMembersByTeamId(teamId);
+            return ResponseEntity.ok(members);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(null); // Trả về HTTP 404 nếu team không tồn tại
+        }
     }
 }
