@@ -10,7 +10,7 @@ const CommunityGroups = () => {
     const fetchCommunityGroups = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("/api/teams/community-available", {
+        const response = await axios.get("http://localhost:8080/api/teams/community-available", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
