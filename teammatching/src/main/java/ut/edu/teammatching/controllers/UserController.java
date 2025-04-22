@@ -32,11 +32,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByUsername(username));
     }
 
-    // Tìm kiếm use r theo keyword
-    @GetMapping("/search")
-    public ResponseEntity<List<User>> searchUsers(@RequestParam String keyword) {
-        return ResponseEntity.ok(userService.searchUsers(keyword));
-    }
+//    // Tìm kiếm use r theo keyword
+//    @GetMapping("/search")
+//    public ResponseEntity<List<User>> searchUsers(@RequestParam String keyword) {
+//        return ResponseEntity.ok(userService.searchUsers(keyword));
+//    }
 
     // Tạo mới user
     @PostMapping

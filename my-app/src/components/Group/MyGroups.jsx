@@ -76,7 +76,7 @@ const MyGroups = () => {
                 <button
                     className="mt-4 py-2 px-4 rounded-full bg-blue-500 text-white cursor-pointer"
                     onClick={() => {
-                      navigate(`/group/${group.teamName}`); // Đảm bảo sử dụng đúng tên nhóm
+                      navigate(`/group/${group.id}`); // Đảm bảo sử dụng đúng tên nhóm
                     }}
                 >
                   Enroll

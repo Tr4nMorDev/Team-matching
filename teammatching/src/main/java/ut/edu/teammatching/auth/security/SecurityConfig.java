@@ -63,7 +63,7 @@ public class SecurityConfig {
                 .requestMatchers("/imagedefault.jpg").permitAll()
                     .requestMatchers("/ws/**", "/app/**", "/topic/**", "/queue/**").permitAll()
                 .requestMatchers("/api/protected-resource").authenticated()
-
+                    .requestMatchers("/api/search/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

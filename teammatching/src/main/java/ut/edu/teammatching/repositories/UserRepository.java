@@ -4,8 +4,10 @@ import lombok.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.yaml.snakeyaml.events.Event;
+import ut.edu.teammatching.dto.UserDTO;
 import ut.edu.teammatching.models.User;
 import ut.edu.teammatching.enums.Role;
 
@@ -32,9 +34,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @NonNull
     Optional<User> findById(@NonNull Long id);
 
-    // Tìm kiếm user theo keyword (JPQL thay vì nativeQuery)
     @Query("SELECT u FROM User u WHERE " +
             "LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<User> searchUsers(String keyword);
+    List<User> searchUsers(@Param("keyword") String keyword);
 }

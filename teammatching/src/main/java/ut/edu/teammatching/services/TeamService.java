@@ -3,6 +3,7 @@ package ut.edu.teammatching.services;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ut.edu.teammatching.dto.TeamDTO;
+import ut.edu.teammatching.dto.UserDTO;
 import ut.edu.teammatching.enums.JoinRequestStatus;
 import ut.edu.teammatching.enums.TeamType;
 import ut.edu.teammatching.models.Lecturer;
@@ -323,5 +324,10 @@ public class TeamService {
         // Gán vai trò
         team.getRoles().put(memberId, role);
         return teamRepository.save(team);
+    }
+    public List<TeamDTO> searchTeams(String keyword) {
+        return teamRepository.searchTeam(keyword).stream()
+                .map(TeamDTO::fromTeam)
+                .collect(Collectors.toList());
     }
 }

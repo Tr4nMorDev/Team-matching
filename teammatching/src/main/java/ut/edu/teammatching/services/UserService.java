@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import ut.edu.teammatching.repositories.UserRepository;
 import ut.edu.teammatching.models.User;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import ut.edu.teammatching.enums.Role;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Lecturer;
@@ -45,10 +47,11 @@ public class UserService {
     }
 
     // Tìm kiếm user theo từ khóa
-    public List<User> searchUsers(String keyword) {
-        return userRepository.searchUsers(keyword);
+    public List<UserDTO> searchUsers(String keyword) {
+        return userRepository.searchUsers(keyword).stream()
+                .map(UserDTO::fromUser)
+                .collect(Collectors.toList());
     }
-
     //tao moi user
     public User createUser(User user) {
 
