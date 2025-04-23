@@ -11,4 +11,7 @@ import java.util.Optional;
 public interface LecturerRepository extends JpaRepository<Lecturer, Long> {
     @NonNull
     Optional<Lecturer> findById(@NonNull Long id);
+
+    Optional<Lecturer> findByEmail(String email);
+    Optional<Lecturer> findByPhoneNumber(String phoneNumber);
 }

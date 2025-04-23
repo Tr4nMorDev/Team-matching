@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ut.edu.teammatching.dto.TeamDTO;
+import ut.edu.teammatching.dto.team.TeamDTO;
 import ut.edu.teammatching.dto.UserDTO;
 import ut.edu.teammatching.services.TeamService;
 import ut.edu.teammatching.services.UserService;
