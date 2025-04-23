@@ -1,73 +1,110 @@
-import React from "react";
-import { useGroupContext } from "../../context/GroupContext";
-import { useNavigate } from "react-router-dom"; // Dùng useNavigate để chuyển hướng
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import CreateGroupForm from "./CreateGroupForm";
+import { useAuth } from "../../context/useAuth.jsx";
 
 const MyGroups = () => {
-  const { isGroupJoined } = useGroupContext();
-  const navigate = useNavigate(); // Khởi tạo navigate
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [myGroups, setMyGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Giả lập dữ liệu nhóm cá nhân
-  const myGroups = [
-    {
-      name: "My Group 1",
-      photo: "/avata.jpg",
-      ki: "Ki 1",
-      description: "This is a personal group",
-      members: 5,
-    },
-    {
-      name: "My Group 2",
-      photo: "/avata.jpg",
-      ki: "Ki 2",
-      description: "Another personal group",
-      members: 8,
-    },
-  ];
+  useEffect(() => {
+    if (!user.username) {
+      console.error("Username không tồn tại");
+      setLoading(false);
+      return;
+    }
+
+    const fetchGroups = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Token không tồn tại");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/teams/user/${user.username}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) throw new Error("Không thể tải danh sách nhóm");
+        const data = await response.json();
+        // Lấy số lượng thành viên cho từng nhóm
+        for (let group of data) {
+          const countResponse = await fetch(`/api/teams/${group.id}/members/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (countResponse.ok) {
+            const memberCount = await countResponse.json();
+            group.members = memberCount; // Gán số lượng thành viên vào mỗi nhóm
+          } else {
+            group.members = 0; // Nếu không lấy được số lượng thành viên, gán là 0
+          }
+        }
+        setMyGroups(data);
+      } catch (error) {
+        console.error("Lỗi khi tải nhóm:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGroups();
+  }, [user]);
+
+  const handleCreateGroup = (newGroup) => {
+    const formattedGroup = {
+      teamName: newGroup.teamName,
+      description: newGroup.description,
+      photo: newGroup.teamPicture,
+      members: newGroup.members ? newGroup.members.length : 1,
+    };
+  };
 
   const renderGroupList = (groupList) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-      {groupList.map((group, index) => {
-        // Không cần kiểm tra isJoined vì chỉ cần hiển thị nút "Enroll"
-        return (
-          <div
-            key={index}
-            className="bg-white p-6 rounded-2xl shadow-lg text-center"
-          >
-            <img
-              src={group.photo}
-              alt={group.name}
-              className="w-24 h-24 mx-auto rounded-full object-cover mb-4"
-            />
-            <h2 className="text-lg font-semibold text-blue-600">
-              {group.name}
-            </h2>
-            <div className="text-lg font-semibold text-cyan-950">
-              <h2>Kì : {group.ki}</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        {groupList.map((group, index) => (
+            <div key={index} className="bg-white p-6 rounded-2xl shadow-lg text-center">
+              <img
+                  src={group.photo || "/path/to/default-image.jpg"} // Hình ảnh mặc định
+                  alt={group.teamName}
+                  className="w-24 h-24 mx-auto rounded-full object-cover mb-4"
+              />
+              <h2 className="text-lg font-semibold text-blue-600">{group.teamName}</h2>
+              <p className="text-gray-500 text-sm">{group.description}</p>
+              <div className="flex justify-around text-sm text-gray-700 mt-4">
+                <span>Member: {group.members}</span>
+              </div>
+              <button
+                  className="mt-4 py-2 px-4 rounded-full bg-blue-500 text-white cursor-pointer"
+                  onClick={() => {
+                    navigate(`/group/${group.id}`);
+                  }}
+              >
+                Tham gia
+              </button>
             </div>
-            <p className="text-gray-500 text-sm">{group.description}</p>
-            <div className="flex justify-around text-sm text-gray-700 mt-4">
-              <span>Member: {group.members}</span>
-            </div>
-            <button
-              className="mt-4 py-2 px-4 rounded-full bg-blue-500 text-white cursor-pointer"
-              onClick={() => {
-                // Chuyển hướng đến trang nhóm với tên nhóm
-                navigate(`/group/${group.name}`);
-              }}
-            >
-              Enroll
-            </button>
-          </div>
-        );
-      })}
-    </div>
+        ))}
+      </div>
   );
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4 text-center">Nhóm của tôi</h2>
-      {renderGroupList(myGroups)}
-    </div>
+      <div>
+        <h2 className="text-2xl font-bold mb-4 text-center">Nhóm của tôi</h2>
+        {loading ? (
+            <p className="text-center">Đang tải nhóm...</p> // Hiển thị khi đang tải dữ liệu
+        ) : myGroups.length > 0 ? (
+            renderGroupList(myGroups)
+        ) : (
+            <p className="text-center">Bạn chưa tham gia nhóm nào.</p>
+        )}
+
+      </div>
   );
 };
 

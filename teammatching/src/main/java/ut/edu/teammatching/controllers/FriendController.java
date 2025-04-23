@@ -16,19 +16,15 @@ public class FriendController {
 
     private final FriendService friendService;
 
-    // Gửi yêu cầu kết bạn
-    @PostMapping("/request")
-    public ResponseEntity<FriendDTO> sendFriendRequest(@RequestParam Long senderId, @RequestParam Long receiverId) {
-        // Kiểm tra nếu hai người đã là bạn
+    @PostMapping("/request/{senderId}/{receiverId}")
+    public ResponseEntity<FriendDTO> sendFriendRequest(@PathVariable Long senderId, @PathVariable Long receiverId) {
         if (friendService.isFriend(senderId, receiverId)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Không cho gửi yêu cầu nếu đã là bạn
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-        // Nếu chưa là bạn, thực hiện gửi yêu cầu
         FriendDTO friendDTO = friendService.sendFriendRequest(senderId, receiverId);
         return ResponseEntity.status(HttpStatus.CREATED).body(friendDTO);
     }
-
 
     // Phản hồi yêu cầu kết bạn
     @PostMapping("/{id}/respond")
@@ -66,9 +62,9 @@ public class FriendController {
         return ResponseEntity.ok(count);
     }
 
-    // Kiểm tra nếu hai người là bạn
-    @GetMapping("/check")
-    public ResponseEntity<Boolean> isFriend(@RequestParam Long userId1, @RequestParam Long userId2) {
+    // Kiểm tra bạn
+    @GetMapping("/check/{userId1}/{userId2}")
+    public ResponseEntity<Boolean> isFriend(@PathVariable Long userId1, @PathVariable Long userId2) {
         boolean isFriend = friendService.isFriend(userId1, userId2);
         return ResponseEntity.ok(isFriend);
     }

@@ -22,7 +22,7 @@ public class UserDTO {
     private List<String> skills;
     private List<String> hobbies;
     private List<String> projects;
-
+    private String roleInTeam;
     private Object userID; // 👈 đổi sang Object để linh hoạt
 
 

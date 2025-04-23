@@ -9,6 +9,8 @@ on:
       - fix-e
       - karus
       - testAPI
+      - TestAPIf
+      - www
   pull_request:
     branches:
       - main

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import ut.edu.teammatching.repositories.UserRepository;
 import ut.edu.teammatching.models.User;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import ut.edu.teammatching.enums.Role;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Lecturer;
@@ -39,16 +41,23 @@ public class UserService {
                 .orElseThrow(()     -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
+    public UserDTO getUserDTOById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        return UserDTO.fromUser(user);
+    }
+
     //lay thong tin user theo username
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     // Tìm kiếm user theo từ khóa
-    public List<User> searchUsers(String keyword) {
-        return userRepository.searchUsers(keyword);
+    public List<UserDTO> searchUsers(String keyword, Long currentUserId) {
+        return userRepository.searchUsers(keyword, currentUserId).stream()
+                .map(UserDTO::fromUser)
+                .collect(Collectors.toList());
     }
-
     //tao moi user
     public User createUser(User user) {
 
