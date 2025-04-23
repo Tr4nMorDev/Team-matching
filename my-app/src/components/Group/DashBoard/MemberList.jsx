@@ -40,7 +40,7 @@ const MemberList = () => {
                     className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                     onClick={() => alert("Thêm thành viên")}
                 >
-                    Thêm thành viên
+                    +Add Member
                 </button>
             </div>
 
@@ -68,7 +68,7 @@ const MemberList = () => {
                             onClick={() => handleDeleteMember(member.id)}
                             className="text-red-500 hover:text-red-700"
                         >
-                            Xóa
+                            Remove
                         </button>
                     </motion.li>
                 ))}
