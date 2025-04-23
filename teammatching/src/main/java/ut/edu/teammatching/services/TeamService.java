@@ -40,39 +40,40 @@ public class TeamService {
         return teamRepository.findAll();
     }
 
-    public void handleJoinRequest(Long teamId, Long studentId, boolean accept, String leaderUsername) {
-        // Tìm kiếm nhóm
+    public void handleJoinRequest(Long teamId, Long studentId, boolean accept, String username) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy nhóm"));
 
-        // Kiểm tra quyền của leader
-        if (team.getLeader() == null || !team.getLeader().getUsername().equals(leaderUsername)) {
-            throw new RuntimeException("Chỉ leader có thể xử lý yêu cầu");
+        boolean isLeader = team.getLeader() != null && team.getLeader().getUsername().equals(username);
+        boolean isLecturer = team.getLecturer() != null &&
+                team.getLecturer().getUsername().equals(username);
+        System.out.println(team.getTeamType());
+        if (!isLeader && !isLecturer) {
+            throw new RuntimeException("Chỉ leader hoặc giảng viên (cho nhóm academic) mới có quyền xử lý yêu cầu");
         }
 
-        // Tìm kiếm sinh viên
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên"));
 
-        // Kiểm tra xem sinh viên đã gửi yêu cầu chưa
-        if (!team.getJoinRequests().containsKey(student)) {
+        JoinRequestStatus currentStatus = team.getJoinRequests().get(student);
+        if (currentStatus == null) {
             throw new RuntimeException("Không có yêu cầu từ sinh viên này");
         }
 
-        // Cập nhật trạng thái yêu cầu
+        if (currentStatus == JoinRequestStatus.ACCEPTED) {
+            throw new RuntimeException("Yêu cầu đã được chấp nhận trước đó");
+        }
+
         if (accept) {
-            // Kiểm tra nếu sinh viên chưa được thêm vào nhóm
-            if (!team.getStudents().contains(student)) {
-                team.getJoinRequests().put(student, JoinRequestStatus.ACCEPTED);
-                team.addStudent(student); // Thêm sinh viên vào nhóm
-            } else {
+            if (team.getStudents().contains(student)) {
                 throw new RuntimeException("Sinh viên này đã là thành viên của nhóm");
             }
+            team.getJoinRequests().put(student, JoinRequestStatus.ACCEPTED);
+            team.addStudent(student);
         } else {
             team.getJoinRequests().put(student, JoinRequestStatus.REJECTED);
         }
 
-        // Lưu nhóm với những thay đổi
         teamRepository.save(team);
     }
 
@@ -370,5 +371,12 @@ public class TeamService {
         return members.stream()
                 .map(user -> new TeamMemberDTO(user, team)) // Truyền vào cả team để xác định vai trò
                 .collect(Collectors.toList());
+    }
+    public int countMembers(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
+
+        // Kiểm tra nếu students là null để tránh NullPointerException
+        return (team.getStudents() != null) ? team.getStudents().size() : 0;
     }
 }

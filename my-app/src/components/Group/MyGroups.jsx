@@ -8,7 +8,6 @@ const MyGroups = () => {
   const navigate = useNavigate();
   const [myGroups, setMyGroups] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
 
   useEffect(() => {
     if (!user.username) {
@@ -65,8 +64,6 @@ const MyGroups = () => {
       photo: newGroup.teamPicture,
       members: newGroup.members ? newGroup.members.length : 1,
     };
-
-    setMyGroups((prevGroups) => [...prevGroups, formattedGroup]);
   };
 
   const renderGroupList = (groupList) => (
@@ -107,22 +104,6 @@ const MyGroups = () => {
             <p className="text-center">Bạn chưa tham gia nhóm nào.</p>
         )}
 
-        {/* Nút để hiển thị Create Group Form */}
-        <div className="text-center mt-6">
-          <button
-              onClick={() => setShowCreateGroupForm(true)} // Hiển thị form khi nhấn
-              className="py-2 px-4 bg-green-500 text-white rounded-full"
-          >
-            Tạo nhóm mới
-          </button>
-
-          {showCreateGroupForm && (
-              <CreateGroupForm
-                  onCreate={handleCreateGroup}
-                  onClose={() => setShowCreateGroupForm(false)}
-              />
-          )}
-        </div>
       </div>
   );
 };

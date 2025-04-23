@@ -22,6 +22,10 @@ public class Blog {
     @Column(name = "blogs_id", nullable = false)
     private Long id;
 
+//    @Lob
+//    @Column(name = "tittles", nullable = false)
+//    private String tittle;
+//
     @Lob
     @Column(name = "content", nullable = false)
     private String content;
