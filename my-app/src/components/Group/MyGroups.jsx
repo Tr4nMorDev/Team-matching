@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useGroupContext } from "../../context/GroupContext";
 import { useNavigate } from "react-router-dom";
+import CreateGroupForm from "./CreateGroupForm";
+import { useAuth } from "../../context/useAuth.jsx";
 
 const MyGroups = () => {
-  const { username } = useGroupContext() || {};
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [myGroups, setMyGroups] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
 
   useEffect(() => {
-    const localUsername = username || localStorage.getItem("username");
-    if (!localUsername) {
+    if (!user.username) {
       console.error("Username không tồn tại");
       setLoading(false);
       return;
@@ -25,13 +26,27 @@ const MyGroups = () => {
       }
 
       try {
-        const response = await fetch(`/api/teams/user/${localUsername}`, {
+        const response = await fetch(`/api/teams/user/${user.username}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         if (!response.ok) throw new Error("Không thể tải danh sách nhóm");
         const data = await response.json();
+        // Lấy số lượng thành viên cho từng nhóm
+        for (let group of data) {
+          const countResponse = await fetch(`/api/teams/${group.id}/members/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (countResponse.ok) {
+            const memberCount = await countResponse.json();
+            group.members = memberCount; // Gán số lượng thành viên vào mỗi nhóm
+          } else {
+            group.members = 0; // Nếu không lấy được số lượng thành viên, gán là 0
+          }
+        }
         setMyGroups(data);
       } catch (error) {
         console.error("Lỗi khi tải nhóm:", error);
@@ -41,14 +56,14 @@ const MyGroups = () => {
     };
 
     fetchGroups();
-  }, [username]);
+  }, [user]);
 
   const handleCreateGroup = (newGroup) => {
     const formattedGroup = {
       teamName: newGroup.teamName,
       description: newGroup.description,
-      photo: newGroup.teamPicture,  // Đảm bảo rằng trường này khớp với API trả về
-      members: newGroup.members ? newGroup.members.length : 1, // Đảm bảo số lượng thành viên đúng
+      photo: newGroup.teamPicture,
+      members: newGroup.members ? newGroup.members.length : 1,
     };
 
     setMyGroups((prevGroups) => [...prevGroups, formattedGroup]);
@@ -56,32 +71,28 @@ const MyGroups = () => {
 
   const renderGroupList = (groupList) => (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        {groupList.map((group, index) => {
-          return (
-              <div key={index} className="bg-white p-6 rounded-2xl shadow-lg text-center">
-                <img
-                    src={group.photo || "/path/to/default-image.jpg"} // Thêm hình ảnh mặc định
-                    alt={group.teamName}
-                    className="w-24 h-24 mx-auto rounded-full object-cover mb-4"
-                />
-                <h2 className="text-lg font-semibold text-blue-600">
-                  {group.teamName}
-                </h2>
-                <p className="text-gray-500 text-sm">{group.description}</p>
-                <div className="flex justify-around text-sm text-gray-700 mt-4">
-                  <span>Member: {group.members}</span>
-                </div>
-                <button
-                    className="mt-4 py-2 px-4 rounded-full bg-blue-500 text-white cursor-pointer"
-                    onClick={() => {
-                      navigate(`/group/${group.id}`); // Đảm bảo sử dụng đúng tên nhóm
-                    }}
-                >
-                  Enroll
-                </button>
+        {groupList.map((group, index) => (
+            <div key={index} className="bg-white p-6 rounded-2xl shadow-lg text-center">
+              <img
+                  src={group.photo || "/path/to/default-image.jpg"} // Hình ảnh mặc định
+                  alt={group.teamName}
+                  className="w-24 h-24 mx-auto rounded-full object-cover mb-4"
+              />
+              <h2 className="text-lg font-semibold text-blue-600">{group.teamName}</h2>
+              <p className="text-gray-500 text-sm">{group.description}</p>
+              <div className="flex justify-around text-sm text-gray-700 mt-4">
+                <span>Member: {group.members}</span>
               </div>
-          );
-        })}
+              <button
+                  className="mt-4 py-2 px-4 rounded-full bg-blue-500 text-white cursor-pointer"
+                  onClick={() => {
+                    navigate(`/group/${group.id}`);
+                  }}
+              >
+                Tham gia
+              </button>
+            </div>
+        ))}
       </div>
   );
 
@@ -93,8 +104,25 @@ const MyGroups = () => {
         ) : myGroups.length > 0 ? (
             renderGroupList(myGroups)
         ) : (
-            <p className="text-center">Bạn chưa tham gia nhóm nào.</p> // Thông báo nếu không có nhóm
+            <p className="text-center">Bạn chưa tham gia nhóm nào.</p>
         )}
+
+        {/* Nút để hiển thị Create Group Form */}
+        <div className="text-center mt-6">
+          <button
+              onClick={() => setShowCreateGroupForm(true)} // Hiển thị form khi nhấn
+              className="py-2 px-4 bg-green-500 text-white rounded-full"
+          >
+            Tạo nhóm mới
+          </button>
+
+          {showCreateGroupForm && (
+              <CreateGroupForm
+                  onCreate={handleCreateGroup}
+                  onClose={() => setShowCreateGroupForm(false)}
+              />
+          )}
+        </div>
       </div>
   );
 };

@@ -15,8 +15,17 @@ const CommunityGroups = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(response);
-        setCommunityGroups(response.data);
+        const groupsWithMemberCount = await Promise.all(response.data.map(async (group) => {
+          // Lấy số lượng thành viên cho từng nhóm
+          const memberCountResponse = await axios.get(`/api/teams/${group.id}/members/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          group.memberCount = memberCountResponse.data; // Gán số lượng thành viên vào nhóm
+          return group;
+        }));
+        setCommunityGroups(groupsWithMemberCount);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách nhóm cộng đồng:", error);
       }
@@ -27,7 +36,7 @@ const CommunityGroups = () => {
 
   const handleJoinGroup = (groupId) => {
     const token = localStorage.getItem("token");
-    const studentId = localStorage.getItem("userId");  // Giả sử bạn lưu studentId vào localStorage
+    const studentId = localStorage.getItem("userId");
 
     if (!studentId) {
       alert("Chưa đăng nhập!");
@@ -56,25 +65,18 @@ const CommunityGroups = () => {
           const isJoined = isGroupJoined(group.id);
 
           return (
-              <div
-                  key={group.id}
-                  className="bg-white p-6 rounded-2xl shadow-lg text-center"
-              >
+              <div key={group.id} className="bg-white p-6 rounded-2xl shadow-lg text-center">
                 <img
                     src={group.teamPicture || "/default-avatar.jpg"}
                     alt={group.teamName}
                     className="w-24 h-24 mx-auto rounded-full object-cover mb-4"
                 />
-                <h2 className="text-lg font-semibold text-blue-600">
-                  {group.teamName}
-                </h2>
+                <h2 className="text-lg font-semibold text-blue-600">{group.teamName}</h2>
                 <p className="text-gray-500 text-sm">{group.description}</p>
                 <div className="flex justify-around text-sm text-gray-700 mt-4">
-                  <span>Thành viên: {group.students?.length || 0}</span>
+                  <span>Thành viên: {group.memberCount || 0}</span>
                 </div>
-                {isPending && (
-                    <p className="text-yellow-500 text-sm">Chờ leader xử lý</p>
-                )}
+                {isPending && <p className="text-yellow-500 text-sm">Chờ leader xử lý</p>}
                 <button
                     className={`mt-4 py-2 px-4 rounded-full cursor-pointer ${
                         isJoined
@@ -85,7 +87,7 @@ const CommunityGroups = () => {
                     }`}
                     onClick={() => {
                       if (!isJoined && !isPending) {
-                        handleJoinGroup(group.id); // Gọi hàm gửi yêu cầu tham gia nhóm
+                        handleJoinGroup(group.id);
                       }
                     }}
                     disabled={isPending}

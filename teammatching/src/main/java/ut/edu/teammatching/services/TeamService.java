@@ -95,56 +95,35 @@ public class TeamService {
 
         // Nếu là Student => lấy danh sách team tham gia + team đang làm leader
         if (user instanceof Student student) {
+            // Lấy danh sách team mà student tham gia bằng ID của team
             List<Team> joinedTeams = teamRepository.findAllByStudentsContains(student);
             List<Team> leadTeams = teamRepository.findAllByLeader(student);
+
+            // Kết hợp các team đã tham gia và team làm leader
             Set<Team> combined = new HashSet<>();
             combined.addAll(joinedTeams);
             combined.addAll(leadTeams);
 
             // Chuyển đổi từ List<Team> thành List<TeamDTO>
-            List<TeamDTO> teamDTOs = new ArrayList<>();
-            for (Team team : combined) {
-                // Chuyển đổi từ Team sang TeamDTO trực tiếp
-                TeamDTO teamDTO = new TeamDTO();
-                teamDTO.setId(team.getId());
-                teamDTO.setTeamName(team.getTeamName()); // Đổi từ team.getName() thành team.getTeamName()
-                teamDTO.setTeamType(team.getTeamType()); // Đổi từ team.getType() thành team.getTeamType()
-                teamDTO.setTeamPicture(team.getTeamPicture()); // Đổi từ team.getPicture() thành team.getTeamPicture()
-                teamDTO.setDescription(team.getDescription()); // Đổi từ team.getDescription() thành team.getDescription()
-                teamDTO.setLeaderName(team.getLeader() != null ? team.getLeader().getFullName() : null);
-                teamDTO.setLecturerName(team.getLecturer() != null ? team.getLecturer().getFullName() : null);
-                teamDTO.setMembersCount(team.getStudents().size()); // Giả sử size() là số lượng thành viên
-
-                teamDTOs.add(teamDTO);
-            }
-            return teamDTOs;
+            return convertToTeamDTOList(combined);
         }
 
         // Nếu là Lecturer => lấy danh sách team hướng dẫn
         if (user instanceof Lecturer lecturer) {
             List<Team> teams = teamRepository.findAllByLecturer(lecturer);
-
-            // Chuyển đổi từ List<Team> thành List<TeamDTO>
-            List<TeamDTO> teamDTOs = new ArrayList<>();
-            for (Team team : teams) {
-                // Chuyển đổi từ Team sang TeamDTO trực tiếp
-                TeamDTO teamDTO = new TeamDTO();
-                teamDTO.setId(team.getId());
-                teamDTO.setTeamName(team.getTeamName()); // Đổi từ team.getName() thành team.getTeamName()
-                teamDTO.setTeamType(team.getTeamType()); // Đổi từ team.getType() thành team.getTeamType()
-                teamDTO.setTeamPicture(team.getTeamPicture()); // Đổi từ team.getPicture() thành team.getTeamPicture()
-                teamDTO.setDescription(team.getDescription()); // Đổi từ team.getDescription() thành team.getDescription()
-                teamDTO.setLeaderName(team.getLeader() != null ? team.getLeader().getFullName() : null);
-                teamDTO.setLecturerName(team.getLecturer() != null ? team.getLecturer().getFullName() : null);
-                teamDTO.setMembersCount(team.getStudents().size()); // Giả sử size() là số lượng thành viên
-
-                teamDTOs.add(teamDTO);
-            }
-            return teamDTOs;
+            return convertToTeamDTOList(teams);
         }
 
         return Collections.emptyList(); // nếu là user khác thì trả về rỗng
     }
+
+    // Phương thức chuyển đổi từ List<Team> thành List<TeamDTO>
+    private List<TeamDTO> convertToTeamDTOList(Collection<Team> teams) {
+        return teams.stream()
+                .map(TeamDTO::fromTeam) // Chuyển đổi từng Team thành TeamDTO
+                .collect(Collectors.toList());
+    }
+
 
     public void sendJoinRequest(Long teamId, Long studentId) {
         Team team = teamRepository.findById(teamId)

@@ -27,6 +27,7 @@ const GroupChatBox = () => {
         if (input.trim()) {
             const messagePayload = {
                 senderId: user.id,
+                senderName: user.fullName,
                 teamId: teamId,
                 content: input,
                 timestamp: new Date().toISOString(),

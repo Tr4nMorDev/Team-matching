@@ -16,7 +16,7 @@ public class MessageController {
 
     private final MessageService messageService;
 
-    // Get private chat history between two users
+    // lay lich su nhan tin giu 2 nguoi
     @GetMapping("/private")
     public ResponseEntity<List<MessageDTO>> getPrivateChat(
             @RequestParam Long user1,
@@ -26,7 +26,7 @@ public class MessageController {
         return ResponseEntity.ok(messages);
     }
 
-    // Get team chat history by team ID
+    // lay lich su chat team bang id
     @GetMapping("/team/{teamId}")
     public ResponseEntity<List<MessageDTO>> getTeamChat(@PathVariable Long teamId) {
         List<MessageDTO> messages = messageService.getTeamChatHistory(teamId);

@@ -19,6 +19,7 @@ import java.io.IOException; // Import cho IOException
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -222,5 +223,9 @@ public class TeamController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(null); // Trả về HTTP 404 nếu team không tồn tại
         }
+    }
+    @GetMapping("/{teamId}/members/count")
+    public int countMembers(@PathVariable Long teamId) {
+        return teamService.countMembers(teamId); // Gọi phương thức từ service
     }
 }
