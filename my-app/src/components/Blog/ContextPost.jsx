@@ -26,8 +26,8 @@ const MainContent = () => {
           <BlogItem
             key={blog.id}
             postId={blog.id}
-            name={blog.fullName}
-            avatar={blog.profilePicture}
+            name={blog.authorName}
+            avatar={blog.authorAvatar}
             time={blog.createdAt}
             images={blog.images}
             content={blog.content}
