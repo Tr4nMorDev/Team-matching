@@ -10,13 +10,11 @@ import ut.edu.teammatching.models.Team; // Thêm import Team
 public class TeamMemberDTO {
     private Long id;
     private String fullName;
-    private String role;
     private String type;  // "LEADER", "LECTURER", "MEMBER"
 
     public TeamMemberDTO(User user, Team team) { // Thêm tham số team
         this.id = user.getId();
         this.fullName = user.getFullName();
-        this.role = user.getRole().toString(); // Gán vai trò người dùng
 
         if (user instanceof Student) {
             System.out.println("Team Leader: " + team.getLeader());

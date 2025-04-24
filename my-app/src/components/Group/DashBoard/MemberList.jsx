@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import AddMember from "./AddMember";
 
 const MemberList = () => {
     const { teamId } = useParams();
@@ -12,6 +13,7 @@ const MemberList = () => {
     const [isLecturer, setIsLecturer] = useState(false);
     const [loading, setLoading] = useState(true);
     const [deletingId, setDeletingId] = useState(null); // Để xử lý loading khi xoá
+    const [showAddMember, setShowAddMember] = useState(false);
 
     const currentUserId = parseInt(localStorage.getItem("userId"));
 
@@ -35,10 +37,6 @@ const MemberList = () => {
                 setIsLeader(current?.type === "LEADER");
                 setIsLecturer(current?.type === "LECTURER");
 
-                console.log("Lecturer Exists: ", lecturerExists);
-                console.log("Is Leader: ", current?.type === "LEADER");
-                console.log("Has Lecturer: ", hasLecturer);
-
                 const teamRes = await axios.get(`/api/teams/${teamId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -46,8 +44,7 @@ const MemberList = () => {
                 });
                 console.log("Team Res: ", teamRes.data);
 
-                setTeamType(teamRes.data.type);
-                console.log("Team Type: ", teamRes.data.type);
+                setTeamType(teamRes.data?.teamType || "");
             } catch (error) {
                 console.error("Lỗi khi tải danh sách thành viên:", error);
             } finally {
@@ -78,7 +75,7 @@ const MemberList = () => {
             alert("Xoá thành viên thành công!");
         } catch (error) {
             console.error("Lỗi khi xoá thành viên:", error);
-            alert("Xoá thất bại. Có thể bạn không có quyền hoặc thành viên không tồn tại.");
+            alert("Xoá thất bại. Bạn không thể xoá thành viên này.");
         } finally {
             setDeletingId(null);
         }
@@ -94,9 +91,9 @@ const MemberList = () => {
                     {(isLeader || isLecturer) && (
                         <button
                             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                            onClick={() => alert("Thêm thành viên")}
+                            onClick={() => setShowAddMember(prev => !prev)}
                         >
-                            + Add Member
+                            {showAddMember ? "✖ Close" : "+ Add Member"}
                         </button>
                     )}
                     {teamType === "ACADEMIC" && isLeader && !hasLecturer && (
@@ -107,13 +104,14 @@ const MemberList = () => {
                             + Assign Lecturer
                         </button>
                     )}
+
                 </div>
             </div>
 
             <ul className="space-y-2">
                 {members.map((member, index) => {
                     const isBothLeaderAndLecturer =
-                        member.type === "LEADER" && member.role === "LECTURER";
+                        member.type === "LEADER" && member.type === "LECTURER";
 
                     const canRemove =
                         (isLeader || isLecturer) && !isBothLeaderAndLecturer;
@@ -152,6 +150,20 @@ const MemberList = () => {
                     );
                 })}
             </ul>
+            {/* ✅ Hiển thị component AddMember khi cần */}
+            {showAddMember && (
+                <div className="fixed inset-0 backdrop-blur-sm bg-transparent flex items-center justify-center z-50">
+                    <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-md">
+                        <AddMember
+                            teamId={teamId}
+                            onClose={() => setShowAddMember(false)}
+                            onAddSuccess={(newMember) => {
+                                setMembers(prev => [...prev, newMember]);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

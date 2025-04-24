@@ -14,7 +14,7 @@ const OtherSection = ({ onMemberClick, onRequestClick, onRatingClick }) => {
         onClick={onRequestClick}
       />
       <SidebarItem
-        label="Gửi đánh giá"
+        label="Comment"
         icon={<span className="text-yellow-500">●</span>}
         onClick={onRatingClick}
       />
