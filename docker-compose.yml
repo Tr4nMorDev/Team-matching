@@ -21,6 +21,9 @@ services:
       - "5173:80"
     depends_on:
       - backend
+    volumes:
+      - ./my-app:/app # Mount code vào container
+      - /app/node_modules # tránh lỗi khi cài module trong container
 
   # Service cho Backend (Java với Maven)
   backend:
@@ -34,6 +37,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
     ports:
       - "8080:8080"
+    volumes:
+      - ./teammatching:/app # Mount code vào container
 
   # Service cho Frontend (React)
 
