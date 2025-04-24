@@ -13,6 +13,8 @@ on:
       - karus
       - TestAPIf
       - www
+      - main
+      - test-docker
   pull_request:
     branches:
       - main
