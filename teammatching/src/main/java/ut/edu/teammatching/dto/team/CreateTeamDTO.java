@@ -1,4 +1,4 @@
-package ut.edu.teammatching.dto;
+package ut.edu.teammatching.dto.team;
 
 import lombok.Data;
 import ut.edu.teammatching.enums.TeamType;

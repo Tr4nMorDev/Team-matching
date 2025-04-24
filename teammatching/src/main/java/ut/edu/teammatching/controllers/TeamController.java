@@ -7,10 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile; // Import cho MultipartFile
 import ut.edu.teammatching.dto.*;
+import ut.edu.teammatching.dto.team.CreateTeamDTO;
+import ut.edu.teammatching.dto.team.JoinRequestResponse;
+import ut.edu.teammatching.dto.team.TeamDTO;
+import ut.edu.teammatching.dto.team.TeamMemberDTO;
 import ut.edu.teammatching.enums.JoinRequestStatus;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Team;
 import ut.edu.teammatching.models.User;
+import ut.edu.teammatching.repositories.TeamRepository;
 import ut.edu.teammatching.repositories.UserRepository;
 import ut.edu.teammatching.services.TeamService;
 
@@ -19,7 +24,6 @@ import java.io.IOException; // Import cho IOException
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,6 +32,7 @@ import java.util.stream.Collectors;
 public class TeamController {
     private final TeamService teamService;
     private final UserRepository userRepository;
+    private final TeamRepository teamRepository;
 
     @GetMapping
     public List<Team> getAllTeams() {
@@ -134,18 +139,35 @@ public class TeamController {
         return ResponseEntity.ok(teamService.setLeader(id, studentId));
     }
 
-    @DeleteMapping("/{id}/remove-student/{studentId}")
-    public ResponseEntity<Void> removeStudent(@PathVariable Long id, @PathVariable Long studentId) {
-        teamService.removeStudent(id, studentId);
-        return ResponseEntity.ok().build();
+    @DeleteMapping("/{teamId}/remove-student")
+    public ResponseEntity<String> removeStudentFromTeam(
+            @PathVariable Long teamId,
+            @RequestParam Long studentIdToRemove,
+            Authentication authentication) {
+
+        String username = authentication.getName();
+        Optional<User> userOpt = userRepository.findByUsername(username);
+
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Người dùng không hợp lệ");
+        }
+
+        User currentUser = userOpt.get();
+
+        try {
+            teamService.removeStudent(teamId, studentIdToRemove, currentUser.getId());
+            return ResponseEntity.ok("Đã xóa sinh viên khỏi team.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/{teamId}/add-student")
-    public ResponseEntity<?> addStudentToTeam(
+    public ResponseEntity<String> addStudentToTeam(
             @PathVariable Long teamId,
             @RequestParam Long studentIdToAdd,
-            Authentication authentication
-    ) {
+            Authentication authentication) {
+
         String username = authentication.getName();
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) {
@@ -153,24 +175,36 @@ public class TeamController {
         }
 
         User currentUser = userOpt.get();
-        if (!(currentUser instanceof Student currentStudent)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Chỉ sinh viên mới có thể thêm thành viên vào team");
-        }
 
         try {
-            teamService.addStudent(teamId, studentIdToAdd, currentStudent.getId());
-            return ResponseEntity.ok("Đã thêm sinh viên vào team");
+            teamService.addStudent(teamId, studentIdToAdd, currentUser.getId());
+            return ResponseEntity.ok("Đã thêm sinh viên vào team.");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PostMapping("/{teamId}/assign-lecturer")
-    public ResponseEntity<Team> assignLecturer(@RequestParam Long leaderId,
-                                               @PathVariable Long teamId,
-                                               @RequestParam Long lecturerId) {
-        Team team = teamService.assignLecturer(leaderId, teamId, lecturerId);
-        return ResponseEntity.ok(team);
+    public ResponseEntity<String> assignLecturer(
+            @RequestParam Long leaderId,
+            @PathVariable Long teamId,
+            @RequestParam Long lecturerId,
+            Authentication authentication) {
+
+        String username = authentication.getName();
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Người dùng không hợp lệ");
+        }
+
+        User currentUser = userOpt.get();
+
+        try {
+            Team team = teamService.assignLecturer(leaderId, teamId, lecturerId, currentUser.getId());
+            return ResponseEntity.ok("Đã bổ nhiệm giảng viên thành công.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/{teamId}/assign-role")
@@ -221,11 +255,22 @@ public class TeamController {
             List<TeamMemberDTO> members = teamService.getMembersByTeamId(teamId);
             return ResponseEntity.ok(members);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(null); // Trả về HTTP 404 nếu team không tồn tại
+            return ResponseEntity.status(404).body(null);
         }
     }
     @GetMapping("/{teamId}/members/count")
     public int countMembers(@PathVariable Long teamId) {
-        return teamService.countMembers(teamId); // Gọi phương thức từ service
+        return teamService.countMembers(teamId);
+    }
+
+    @GetMapping("/{teamId}")
+    public ResponseEntity<TeamDTO> getTeamDtoById(@PathVariable Long teamId) {
+        try {
+            TeamDTO teamDTO = teamService.getTeamDtoById(teamId);  // Gọi phương thức để lấy TeamDTO
+            return ResponseEntity.ok(teamDTO);  // Trả về TeamDTO nếu tìm thấy
+        } catch (RuntimeException e) {
+            // Nếu không tìm thấy team, trả về lỗi 404
+            return ResponseEntity.status(404).body(null);
+        }
     }
 }

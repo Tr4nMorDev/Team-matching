@@ -2,9 +2,8 @@ package ut.edu.teammatching.services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import ut.edu.teammatching.dto.TeamDTO;
-import ut.edu.teammatching.dto.TeamMemberDTO;
-import ut.edu.teammatching.dto.UserDTO;
+import ut.edu.teammatching.dto.team.TeamDTO;
+import ut.edu.teammatching.dto.team.TeamMemberDTO;
 import ut.edu.teammatching.enums.JoinRequestStatus;
 import ut.edu.teammatching.enums.TeamType;
 import ut.edu.teammatching.models.Lecturer;
@@ -255,51 +254,58 @@ public class TeamService {
      * Xóa một sinh viên khỏi team.
      */
     @Transactional
-    public void removeStudent(Long teamId, Long studentId) {
-        // Tìm team theo ID
+    public void removeStudent(Long teamId, Long studentIdToRemove, Long requesterId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
 
-        // Tìm student theo ID
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên!"));
+        User requester = userRepository.findById(requesterId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người yêu cầu!"));
 
-        // Không cho phép xóa leader khỏi team
-        if (student.equals(team.getLeader())) {
+        Student studentToRemove = studentRepository.findById(studentIdToRemove)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên cần xóa!"));
+
+        // Chỉ leader hoặc giảng viên mới được xóa thành viên
+        boolean isLeader = requester.equals(team.getLeader());
+        boolean isLecturer = team.getLecturer() != null && requester.equals(team.getLecturer());
+
+        if (!isLeader && !isLecturer) {
+            throw new IllegalStateException("Chỉ leader hoặc giảng viên mới có quyền xóa thành viên khỏi team!");
+        }
+
+        if (studentToRemove.equals(team.getLeader())) {
             throw new IllegalStateException("Không thể xóa leader khỏi team! Hãy chuyển leader trước.");
         }
 
-        // Xóa sinh viên khỏi danh sách thành viên team
-        team.getStudents().remove(student);
+        team.getStudents().remove(studentToRemove);
         teamRepository.save(team);
     }
 
     @Transactional
-    public void addStudent(Long teamId, Long studentIdToAdd, Long currentStudentId) {
-        // Lấy team theo ID
+    public void addStudent(Long teamId, Long studentIdToAdd, Long requesterId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
 
-        // Lấy sinh viên hiện tại
-        Student currentStudent = studentRepository.findById(currentStudentId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên!"));
+        User requester = userRepository.findById(requesterId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người yêu cầu!"));
 
-        // Kiểm tra xem sinh viên hiện tại có phải là thành viên của team không
-        if (!team.getStudents().contains(currentStudent)) {
-            throw new IllegalStateException("Chỉ thành viên trong team mới có quyền thêm người!");
-        }
-
-        // Lấy sinh viên cần thêm vào team
         Student studentToAdd = studentRepository.findById(studentIdToAdd)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên cần thêm!"));
 
-        // Nếu sinh viên này chưa có trong team, thêm vào
+        // Chỉ leader hoặc giảng viên mới được thêm thành viên
+        boolean isLeader = requester.equals(team.getLeader());
+        boolean isLecturer = team.getLecturer() != null && requester.equals(team.getLecturer());
+
+        if (!isLeader && !isLecturer) {
+            throw new IllegalStateException("Chỉ leader hoặc giảng viên mới có quyền thêm thành viên vào team!");
+        }
+
         if (!team.getStudents().contains(studentToAdd)) {
             team.getStudents().add(studentToAdd);
-            // Nếu leader chưa được chỉ định, gán leader là sinh viên đầu tiên trong team
+
             if (team.getLeader() == null && !team.getStudents().isEmpty()) {
-                team.setLeader(team.getStudents().get(0)); // Gán leader là sinh viên đầu tiên
+                team.setLeader(team.getStudents().get(0));
             }
+
             teamRepository.save(team);
         } else {
             throw new IllegalStateException("Sinh viên này đã là thành viên của team!");
@@ -308,15 +314,19 @@ public class TeamService {
 
     // Bổ nhiệm giảng viên hướng dẫn
     @Transactional
-    public Team assignLecturer(Long leaderId, Long teamId, Long lecturerId) {
+    public Team assignLecturer(Long leaderId, Long teamId, Long lecturerId, Long requesterId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
 
-        if (!team.getLeader().getId().equals(leaderId)) {
+        if (team.getTeamType() != TeamType.ACADEMIC) {
+            throw new RuntimeException("Chỉ team loại ACADEMIC mới có thể bổ nhiệm giảng viên.");
+        }
+
+        if (!team.getLeader().getId().equals(requesterId)) {
             throw new RuntimeException("Chỉ có Leader mới được bổ nhiệm giảng viên");
         }
 
-        Lecturer lecturer = lecturerRepository.findById(lecturerId) // Đúng cách
+        Lecturer lecturer = lecturerRepository.findById(lecturerId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy giảng viên"));
 
         team.setLecturer(lecturer);
@@ -378,5 +388,12 @@ public class TeamService {
 
         // Kiểm tra nếu students là null để tránh NullPointerException
         return (team.getStudents() != null) ? team.getStudents().size() : 0;
+    }
+
+    public TeamDTO getTeamDtoById(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy team với ID: " + teamId));
+
+        return TeamDTO.fromTeam(team);  // Chuyển đổi từ Team sang TeamDTO
     }
 }

@@ -4,8 +4,6 @@ import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import ut.edu.teammatching.dto.TeamDTO;
-import ut.edu.teammatching.dto.UserDTO;
 import ut.edu.teammatching.models.Team;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Lecturer;
