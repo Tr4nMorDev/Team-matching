@@ -44,28 +44,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/imagespost/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/api/users/**").authenticated() // Yêu cầu authentication
-                        .requestMatchers("/api/teams/**").authenticated()
-                        .requestMatchers("/api/projects/**").permitAll()
-                        .requestMatchers("/api/tasks/**").permitAll()
-                        .requestMatchers("/api/ratings/**").permitAll()
-                        .requestMatchers("/api/notifications/**").permitAll()
-                        .requestMatchers("/api/messages/**").permitAll()
-                        .requestMatchers("/api/blogs/**").permitAll()
-                        .requestMatchers("/api/comments/**").permitAll()
-                        .requestMatchers("/api/friends/**").authenticated()
-                        .requestMatchers("/imagedefault.jpg").permitAll()
-                        .requestMatchers("/api/protected-resource").authenticated()
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth.requestMatchers("/imagespost/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/api/users/**").permitAll()
+                .requestMatchers("/api/teams/**").authenticated()
+                .requestMatchers("/api/projects/**").permitAll()
+                .requestMatchers("/api/tasks/**").permitAll()
+                .requestMatchers("/api/ratings/**").permitAll()
+                .requestMatchers("/api/notifications/**").permitAll()
+                .requestMatchers("/api/messages/**").permitAll()
+                .requestMatchers("/api/blogs/**").permitAll()
+                .requestMatchers("/api/comments/**").permitAll()
+                .requestMatchers("/api/friends/**").authenticated()
+                .requestMatchers("/imagedefault.jpg").permitAll()
+                    .requestMatchers("/ws/**", "/app/**", "/topic/**", "/queue/**").permitAll()
+                .requestMatchers("/api/protected-resource").authenticated()
+                    .requestMatchers("/api/search/**").permitAll()
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

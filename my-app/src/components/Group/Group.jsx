@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import CreateGroupForm from "./AddNewGroup";
+import CreateGroupForm from "./CreateGroupForm.jsx";
 import CommunityGroups from "./CommunityGroups";
 import MyGroups from "./MyGroups";
 

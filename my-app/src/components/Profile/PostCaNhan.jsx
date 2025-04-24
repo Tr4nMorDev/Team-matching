@@ -43,7 +43,7 @@ const PostCaNhan = () => {
               />
               <div>
                 <h3 className="font-semibold text-gray-900">
-                  {user?.username || "Người dùng"}
+                  {user?.fullName || "Người dùng"}
                 </h3>
                 <p className="text-sm text-gray-500">
                   {new Date(blog.createdAt).toLocaleString()}

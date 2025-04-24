@@ -77,12 +77,50 @@ const EditUser = ({ userId, onClose }) => {
         }
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setUserData((prev) => ({
+                    ...prev,
+                    profilePicture: reader.result, // base64 string
+                }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
                 <h2 className="text-xl font-semibold mb-4">Chỉnh sửa thông tin user</h2>
                 {error && <p className="text-red-500 mb-4">{error}</p>}
                 <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 mb-1">Ảnh đại diện</label>
+                        <div className="relative w-24 h-24 mb-2 cursor-pointer group">
+                            <img
+                                src={userData.profilePicture || 'https://via.placeholder.com/150'}
+                                alt="Ảnh đại diện"
+                                className="w-24 h-24 object-cover rounded-full border"
+                                onClick={() => document.getElementById('profilePicInput').click()}
+                            />
+                            <div
+                                className="absolute bottom-0 right-0 bg-blue-500 p-1 rounded-full group-hover:opacity-100 opacity-80 transition"
+                                onClick={() => document.getElementById('profilePicInput').click()}
+                            >
+                                ✏️
+                            </div>
+                        </div>
+                        <input
+                            id="profilePicInput"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="hidden"
+                        />
+                    </div>
                     <div className="mb-4">
                         <label className="block text-gray-700">Họ tên</label>
                         <input
@@ -105,16 +143,7 @@ const EditUser = ({ userId, onClose }) => {
                             required
                         />
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-gray-700">Ảnh đại diện (URL)</label>
-                        <input
-                            type="text"
-                            name="profilePicture"
-                            value={userData.profilePicture}
-                            onChange={handleChange}
-                            className="w-full p-2 border rounded"
-                        />
-                    </div>
+
                     <div className="mb-4">
                         <label className="block text-gray-700">Giới tính</label>
                         <select

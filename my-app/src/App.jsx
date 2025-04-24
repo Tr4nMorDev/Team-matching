@@ -11,6 +11,8 @@ import ProfileStudent from "./components/Profile/ProfileInfoStudent";
 import GroupsComponent from "./components/Group/Group";
 import GroupDashBoard from "./components/Group/AfterJoinGroup";
 import UserList from "./api/UserList";
+import SearchBar from "./components/SearchBar";
+import ProfilePage from "./components/Profile/ProfilePage.jsx";
 
 function App() {
   const { isLoggedIn, role, user } = useAuth();
@@ -44,16 +46,9 @@ function App() {
         </div>
 
         {/* Middle: Search Bar */}
-        <div className="relative w-100 md:block">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search here..."
-            className="w-full px-4 py-2 bg-blue-100 rounded-lg outline-none text-black"
-          />
-          <Search className="absolute right-3 top-2.5 w-6 h-5 text-gray-500" />
-        </div>
+          <div className="relative w-100 md:block">
+              <SearchBar search={search} setSearch={setSearch} />
+          </div>
 
         {/* Right: Navbar Icons */}
         <NavbarIcons
@@ -72,8 +67,10 @@ function App() {
         <Route path="/" element={<MainContent />} />
         <Route path="/profile" element={<ProfileStudent />} />
         <Route path="/group" element={<GroupsComponent />} />
-        <Route path="/group/:namegroup" element={<GroupDashBoard />} />
+        {/*<Route path="/group/:namegroup" element={<GroupDashBoard />} />*/}
+          <Route path="/group/:teamId" element={<GroupDashBoard />} />
         <Route path="api/user" element={<UserList />} />
+          <Route path="/pageprofile/:userId" element={<ProfilePage />} />
       </Routes>
     </>
   );

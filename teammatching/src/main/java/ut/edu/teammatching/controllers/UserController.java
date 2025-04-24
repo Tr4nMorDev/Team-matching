@@ -3,7 +3,9 @@ package ut.edu.teammatching.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ut.edu.teammatching.exceptions.ResourceNotFoundException;
 import ut.edu.teammatching.models.User;
+import ut.edu.teammatching.repositories.UserRepository;
 import ut.edu.teammatching.services.UserService;
 import ut.edu.teammatching.dto.UserDTO;
 import java.util.List;
@@ -20,23 +22,28 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
+
     // Lấy thông tin user theo ID
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
+    @GetMapping("/dto/{id}")
+    public ResponseEntity<UserDTO> getUserDTOById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserDTOById(id));
+    }
     // Lấy thông tin theo username
     @GetMapping("/username/{username}")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
         return ResponseEntity.ok(userService.getUserByUsername(username));
     }
 
-    // Tìm kiếm use r theo keyword
-    @GetMapping("/search")
-    public ResponseEntity<List<User>> searchUsers(@RequestParam String keyword) {
-        return ResponseEntity.ok(userService.searchUsers(keyword));
-    }
+//    // Tìm kiếm use r theo keyword
+//    @GetMapping("/search")
+//    public ResponseEntity<List<User>> searchUsers(@RequestParam String keyword) {
+//        return ResponseEntity.ok(userService.searchUsers(keyword));
+//    }
 
     // Tạo mới user
     @PostMapping

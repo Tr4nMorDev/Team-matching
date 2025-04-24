@@ -1,8 +1,10 @@
 package ut.edu.teammatching.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import ut.edu.teammatching.enums.JoinRequestStatus;
 import ut.edu.teammatching.enums.TeamType;
 
 import java.util.*;
@@ -33,6 +35,7 @@ public class Team {
     //Lưu người tạo team
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id")
+    @JsonBackReference
     private User createdBy;
 
     @ManyToMany
@@ -41,6 +44,7 @@ public class Team {
             joinColumns = @JoinColumn(name = "team_id"),
             inverseJoinColumns = @JoinColumn(name = "student_id")
     )
+    @JsonBackReference
     private List<Student> students = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -57,6 +61,18 @@ public class Team {
     @JoinColumn(name = "leader_id")
     private Student leader;
 
+    @ElementCollection
+    @CollectionTable(name = "team_roles", joinColumns = @JoinColumn(name = "team_id"))
+    @MapKeyColumn(name = "user_id") // Lưu ID của User
+    @Column(name = "role")
+    private Map<Long, String> roles = new HashMap<>();
+
+    @ElementCollection
+    @CollectionTable(name = "join_requests", joinColumns = @JoinColumn(name = "team_id"))
+    @MapKeyJoinColumn(name = "student_id")
+    @Column(name = "status")
+    private Map<Student, JoinRequestStatus> joinRequests = new HashMap<>();
+
     // Đảm bảo chỉ có một leader duy nhất
     public void setLeader(Student newLeader) {
         if (newLeader == null || !students.contains(newLeader)) {
@@ -64,12 +80,6 @@ public class Team {
         }
         this.leader = newLeader;
     }
-
-    @ElementCollection
-    @CollectionTable(name = "team_roles", joinColumns = @JoinColumn(name = "team_id"))
-    @MapKeyColumn(name = "user_id") // Lưu ID của User
-    @Column(name = "role")
-    private Map<Long, String> roles = new HashMap<>();
 
     /** 🔥 Kiểm tra ràng buộc: Nếu team là Academic thì phải có giảng viên */
     @PrePersist
@@ -109,4 +119,5 @@ public class Team {
             this.leader = students.get(0); // Gán leader là sinh viên đầu tiên trong team
         }
     }
+
 }

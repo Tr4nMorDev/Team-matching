@@ -15,7 +15,7 @@ my-app/dist-ssr
 my-app/*.local
 
 # Không chặn package-lock.json
-!my-app/package-lock.json
+!my-app/package-lock.jsongit
 
 # Editor directories and files
 .vscode/*

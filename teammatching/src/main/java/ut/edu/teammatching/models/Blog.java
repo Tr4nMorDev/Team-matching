@@ -1,5 +1,6 @@
 package ut.edu.teammatching.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -21,6 +22,10 @@ public class Blog {
     @Column(name = "blogs_id", nullable = false)
     private Long id;
 
+//    @Lob
+//    @Column(name = "tittles", nullable = false)
+//    private String tittle;
+//
     @Lob
     @Column(name = "content", nullable = false)
     private String content;
@@ -39,7 +44,7 @@ public class Blog {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
-
+    @JsonBackReference
     private User author;
 
     // Liên kết với Comment

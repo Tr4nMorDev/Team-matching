@@ -4,215 +4,168 @@ import { X } from "lucide-react";
 
 const EditProfileModal = ({ onClose, user }) => {
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    userName: user?.userName || "",
-    city: user?.city || "",
-    dateOfBirth: user?.dateOfBirth || "",
-    maritalStatus: user?.maritalStatus || "Single",
-    age: user?.age || "",
-    country: user?.country || "USA",
-    state: user?.state || "",
-    address: user?.address || "",
-    gender: user?.gender || "Male",
+    fullName: user?.fullName || "",
+    gender: user?.gender || "MALE",
+    email: user?.email || "",
+    skills: user?.skills || [],
+    hobbies: user?.hobbies || [],
+    projects: user?.projects || [],
+    phoneNumber: user?.phoneNumber || "",
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleArrayChange = (name, value) => {
+    setFormData({ ...formData, [name]: value.split(",").map(item => item.trim()) });
   };
 
   const handleSubmit = () => {
-    console.log("Form Data:", formData);
+    console.log("Updated Profile:", formData);
     onClose();
   };
-//** */
+
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0, scale: 1.2 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-md transition-opacity duration-300 z-20"
-      >
+      <AnimatePresence>
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          className="relative bg-white bg-opacity-90 rounded-[30px] shadow-lg w-[800px] flex overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 1.2 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-md z-20"
         >
-          {/* Nút đóng */}
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2 }}
-            onClick={onClose}
-            className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
+          <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative bg-white rounded-2xl shadow-lg w-[600px] p-8"
           >
-            <X className="w-7 h-7 cursor-pointer" />
-          </motion.button>
+            <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+                onClick={onClose}
+                className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
+            >
+              <X className="w-7 h-7" />
+            </motion.button>
 
-      <div className="w-full p-8 backdrop-blur-lg">
-                  <h2 className="text-2xl font-semibold mb-6 text-gray-900">
-                    Personal Information
-                  </h2>
-                  <div className="flex justify-center mb-4">
-                    <div className="relative">
-                      <img
-                        src="/avata.jpg"
-                        alt="Profile"
-                        className="w-32 h-32 rounded-full object-cover"
-                      />
-                      <button className="absolute bottom-0 right-0 bg-blue-500 p-1 rounded-full text-white">
-                        ✎
-                      </button>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* First Name */}
-                    <input
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      placeholder="First Name"
-                      className="border p-2 rounded-md w-full text-gray-600"
-                    />
-                    {/* Last Name */}
-                    <input
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      placeholder="Last Name"
-                      className="border p-2 rounded-md w-full text-gray-600"
-                    />
-                    {/* Username */}
-                    <input
-                      name="userName"
-                      value={formData.userName}
-                      onChange={handleChange}
-                      placeholder="Username"
-                      className="border p-2 rounded-md w-full text-gray-600"
-                    />
-                    {/* City */}
-                    <input
-                      name="city"
-                      value={formData.city}
-                      onChange={handleChange}
-                      placeholder="City"
-                      className="border p-2 rounded-md w-full text-gray-600"
-                    />
-                    {/* Date of Birth */}
-                    <input
-                      type="date"
-                      name="dateOfBirth"
-                      value={formData.dateOfBirth}
-                      onChange={handleChange}
-                      className="border p-2 rounded-md w-full text-gray-600"
-                    />
-                    {/* Age */}
-                    <input
-                      type="number"
-                      name="age"
-                      value={formData.age}
-                      onChange={handleChange}
-                      placeholder="Age"
-                      className="border p-2 rounded-md w-full text-gray-600"
-                    />
-                    {/* Country */}
-                    <select
-                      name="country"
-                      value={formData.country}
-                      onChange={handleChange}
-                      className="border p-2 rounded-md w-full text-gray-600"
-                    >
-                      <option value="USA">USA</option>
-                      <option value="Vietnam">Vietnam</option>
-                      <option value="UK">UK</option>
-                      <option value="Canada">Canada</option>
-                    </select>
-                    {/* State */}
-                    <input
-                      name="state"
-                      value={formData.state}
-                      onChange={handleChange}
-                      placeholder="State"
-                      className="border p-2 rounded-md w-full text-gray-600"
-                    />
-                    {/* Address */}
-                    <input
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      placeholder="Address"
-                      className="border p-2 rounded-md w-full text-gray-600"
-                    />
-                    {/* Marital Status */}
-                    <select
-                      name="maritalStatus"
-                      value={formData.maritalStatus}
-                      onChange={handleChange}
-                      className="border p-2 rounded-md w-full text-gray-600"
-                    >
-                      <option value="Single">Single</option>
-                      <option value="Married">Married</option>
-                      <option value="Divorced">Divorced</option>
-                      <option value="Widowed">Widowed</option>
-                    </select>
-                    {/* Gender */}
-                    <div className="flex gap-4">
-                      <label className="flex items-center">
+            <h2 className="text-2xl font-semibold mb-6 text-gray-900">Edit Profile</h2>
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <img
+                    src="/avata.jpg"
+                    alt="Profile"
+                    className="w-28 h-28 rounded-full object-cover"
+                />
+                <button className="absolute bottom-0 right-0 bg-blue-500 p-1 rounded-full text-white">
+                  ✎
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <input
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  placeholder="Full Name"
+                  className="border p-2 rounded-md w-full text-gray-600"
+              />
+              <input
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Email"
+                  className="border p-2 rounded-md w-full text-gray-600"
+              />
+              <input
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  placeholder="Phone Number"
+                  className="border p-2 rounded-md w-full text-gray-600"
+              />
+              <div>
+                <label className="block mb-1 text-gray-700">Gender:</label>
+                <div className="flex gap-4">
+                  {["MALE", "FEMALE", "OTHER"].map((g) => (
+                      <label key={g} className="flex items-center">
                         <input
-                          type="radio"
-                          name="gender"
-                          value="Male"
-                          checked={formData.gender === "Male"}
-                          onChange={handleChange}
+                            type="radio"
+                            name="gender"
+                            value={g}
+                            checked={formData.gender === g}
+                            onChange={handleChange}
                         />
-                        <span className="ml-2">Male</span>
+                        <span className="ml-2">{g.charAt(0) + g.slice(1).toLowerCase()}</span>
                       </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="gender"
-                          value="Female"
-                          checked={formData.gender === "Female"}
-                          onChange={handleChange}
-                        />
-                        <span className="ml-2">Female</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="radio"
-                          name="gender"
-                          value="Other"
-                          checked={formData.gender === "Other"}
-                          onChange={handleChange}
-                        />
-                        <span className="ml-2">Other</span>
-                      </label>
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-2 mt-4">
-                    <button
-                      onClick={onClose}
-                      className="bg-red-500 text-white px-4 py-2 rounded-md cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleSubmit}
-                      className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer"
-                    >
-                      Submit
-                    </button>
-                  </div>
+                  ))}
                 </div>
-              </motion.div>
-            </motion.div>
-          </AnimatePresence>
-        );
-      };
+              </div>
 
-      export default EditProfileModal;
+              <div>
+                <label className="block mb-1 text-gray-700">
+                  Skills (comma separated):
+                </label>
+                <input
+                    name="skills"
+                    value={formData.skills.join(", ")}
+                    onChange={(e) => handleArrayChange("skills", e.target.value)}
+                    placeholder="e.g. Java, Spring, SQL"
+                    className="border p-2 rounded-md w-full text-gray-600"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-gray-700">
+                  Hobbies (comma separated):
+                </label>
+                <input
+                    name="hobbies"
+                    value={formData.hobbies.join(", ")}
+                    onChange={(e) => handleArrayChange("hobbies", e.target.value)}
+                    placeholder="e.g. Football, Coding, Reading"
+                    className="border p-2 rounded-md w-full text-gray-600"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1 text-gray-700">
+                  Projects (comma separated):
+                </label>
+                <input
+                    name="projects"
+                    value={formData.projects.join(", ")}
+                    onChange={(e) => handleArrayChange("projects", e.target.value)}
+                    placeholder="e.g. Website Clone, Chat App"
+                    className="border p-2 rounded-md w-full text-gray-600"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                  onClick={onClose}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                  onClick={handleSubmit}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md"
+              >
+                Save
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+  );
+};
+
+export default EditProfileModal;
