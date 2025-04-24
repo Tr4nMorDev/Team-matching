@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  # Service cho MySQL
+  teammatching-db:
+    image: mysql:8.0
+    container_name: teammatching-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: teammatching
+    ports:
+      - "3307:3306"
+    volumes:
+      - teammatching_data:/var/lib/mysql
+
+  frontend:
+    build: ./my-app # Chỉ đến folder chứa Dockerfile frontend
+    container_name: teammatching-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  # Service cho Backend (Java với Maven)
+  backend:
+    build: ./teammatching # Chỉ đến folder chứa Dockerfile backend
+    container_name: teammatching-backend
+    depends_on:
+      - teammatching-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://teammatching-db:3306/teammatching
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8080:8080"
+
+  # Service cho Frontend (React)
+
+volumes:
+  teammatching_data:
