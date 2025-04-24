@@ -3,6 +3,7 @@ package ut.edu.teammatching.dto;
 import ut.edu.teammatching.models.Blog;
 
 public class BlogDTO {
+    private Long id; // 👈 Thêm dòng này
     private String title;
     private String content;
     private String image;
@@ -11,6 +12,7 @@ public class BlogDTO {
     private String authorAvatar;  // Thêm trường authorAvatar
 
     public BlogDTO(Blog blog) {
+        this.id = blog.getId(); // 👈 Nhớ set luôn ID
         this.title = blog.getContent();  // Assuming you want to use a separate 'title' field, you may need to adjust this.
         this.content = blog.getContent();
         this.authorName = blog.getAuthor().getFullName();
@@ -18,7 +20,13 @@ public class BlogDTO {
         this.image = blog.getImages();
         this.authorAvatar = blog.getAuthor().getProfilePicture(); 
     }
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
     // Getters and setters (optional if using lombok)
     public String getTitle() {
         return title;

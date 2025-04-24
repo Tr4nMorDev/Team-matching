@@ -29,7 +29,7 @@ const MainContent = () => {
             name={blog.authorName}
             avatar={blog.authorAvatar}
             time={blog.createdAt}
-            images={blog.images}
+            images={blog.image}
             content={blog.content}
             like={blog.likeCount}
           />

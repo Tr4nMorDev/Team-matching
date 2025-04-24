@@ -142,6 +142,8 @@ public class BlogController {
     public ResponseEntity<?> toggleLike(@RequestBody LikeRequest likeRequest) {
         Long postId = likeRequest.getPostId();
         Long userId = likeRequest.getUserId();
+        System.out.println("Received postId: " + postId);
+        System.out.println("Received userId: " + userId);
 
         if (postId == null || userId == null) {
             return ResponseEntity.badRequest().body("Post ID and User ID are required.");
@@ -172,6 +174,7 @@ public class BlogController {
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody Blog updatedBlog) {
+
         try {
             return blogRepository.findById(id)
                     .map(blog -> {
