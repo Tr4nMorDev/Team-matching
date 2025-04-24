@@ -16,8 +16,16 @@ FROM eclipse-temurin:21
 # Thiết lập thư mục làm việc trong container
 WORKDIR /app
 
+# Tạo thư mục /app nếu chưa có
+RUN mkdir -p /app
+
 # Sao chép file JAR đã được build từ bước 1 vào image cuối
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=builder /app/target/teammatching-0.0.1-SNAPSHOT.jar app.jar
+
+
+# ✅ Add this line
+RUN chmod +x app.jar
+
 
 # Mở cổng 8080 để ứng dụng có thể truy cập
 EXPOSE 8080

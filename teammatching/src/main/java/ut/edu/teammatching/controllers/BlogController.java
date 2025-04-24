@@ -50,7 +50,10 @@ public class BlogController {
     public ResponseEntity<?> getAllPosts() {
         try {
             List<Blog> blogs = blogRepository.findAll();
-            return ResponseEntity.ok(blogs);
+            List<BlogDTO> blogDTOs = blogs.stream()
+                    .map(BlogDTO::new) // dùng constructor BlogDTO(Blog blog)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(blogDTOs);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error fetching posts: " + e.getMessage());
         }
