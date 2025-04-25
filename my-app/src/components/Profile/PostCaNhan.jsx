@@ -12,16 +12,12 @@ dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
 const PostCaNhan = () => {
-
   const { isLoggedIn, user } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
   const [blogs, setBlogs] = useState([]);
 
-  const idToUse = userId || user?.id;
-  const isOwnPage = user && userId === user.id;
-
   useEffect(() => {
-    if (!idToUse) return;
+    if (!user) return;
 
     const fetchBlogs = async () => {
       try {
@@ -36,7 +32,7 @@ const PostCaNhan = () => {
     };
 
     fetchBlogs();
-  }, [idToUse]);
+  }, [user]);
 
   return (
     <>
@@ -62,53 +58,55 @@ const PostCaNhan = () => {
                 </p>
               </div>
             </div>
-                <MoreVertical className="text-gray-500 cursor-pointer" />
-              </div>
 
-              {/* Nội dung blog */}
-              <p className="mt-3 text-gray-700">{blog.content}</p>
+            {/* Icon 3 chấm (chưa làm menu) */}
+            <MoreVertical className="text-gray-500 cursor-pointer" />
+          </div>
 
-              {/* Ảnh nếu có */}
-              {blog.image && (
-                  <div className="w-full max-h-[600px] overflow-hidden rounded-lg mt-3">
-                    <img
-                        src={blog.image}
-                        alt="Ảnh bài blog"
-                        className="w-full h-auto max-h-[600px] object-cover"
-                    />
-                  </div>
-              )}
+          {/* Nội dung blog */}
+          <p className="mt-3 text-gray-700">{blog.content}</p>
 
-              {/* Nút like & comment */}
-              <div className="mt-3">
-                <div className="flex justify-between items-center p-3 border-t border-gray-200 rounded-lg bg-gray-100">
-                  <button
-                      className="flex items-center gap-2 text-gray-700 hover:text-blue-500 cursor-pointer"
-                      onClick={() => {
-                        if (!isLoggedIn) return setShowLogin(true);
-                        // TODO: xử lý like
-                      }}
-                  >
-                    <ThumbsUp size={25} className="mr-2" />
-                    Thích
-                  </button>
-                  <button
-                      className="flex items-center gap-2 text-gray-700 hover:text-blue-500 cursor-pointer"
-                      onClick={() => {
-                        if (!isLoggedIn) return setShowLogin(true);
-                        // TODO: xử lý comment
-                      }}
-                  >
-                    <MessageCircle size={25} className="mr-2" />
-                    Bình luận
-                  </button>
-                </div>
-              </div>
+          {/* Ảnh nếu có */}
+          {blog.image && (
+            <div className="w-full max-h-[600px] overflow-hidden rounded-lg mt-3">
+              <img
+                src={blog.image}
+                alt="Ảnh bài blog"
+                className="w-full h-auto max-h-[600px] object-cover"
+              />
             </div>
-        ))}
+          )}
 
-        {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
-      </>
+          {/* Nút like & comment */}
+          <div className="mt-3">
+            <div className="flex justify-between items-center p-3 border-t border-gray-200 rounded-lg bg-gray-100">
+              <button
+                className="flex items-center gap-2 text-gray-700 hover:text-blue-500 cursor-pointer"
+                onClick={() => {
+                  if (!isLoggedIn) return setShowLogin(true);
+                  // TODO: xử lý like
+                }}
+              >
+                <ThumbsUp size={25} className="mr-2" />
+                Thích
+              </button>
+              <button
+                className="flex items-center gap-2 text-gray-700 hover:text-blue-500 cursor-pointer"
+                onClick={() => {
+                  if (!isLoggedIn) return setShowLogin(true);
+                  // TODO: xử lý comment
+                }}
+              >
+                <MessageCircle size={25} className="mr-2" />
+                Bình luận
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+    </>
   );
 };
 
