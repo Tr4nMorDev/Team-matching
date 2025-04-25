@@ -100,6 +100,8 @@ public class BlogController {
             blog.setAuthor(author);
         }
 
+        blog.setCreatedAt(LocalDateTime.now());
+
         // Handle image if provided
         if (request.getImages() != null && !request.getImages().isEmpty()) {
             try {

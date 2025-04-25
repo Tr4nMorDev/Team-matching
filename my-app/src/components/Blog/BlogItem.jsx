@@ -122,7 +122,7 @@ const BlogItem = ({ postId, name, avatar, images, time, content, like }) => {
                 size={18}
                 className={`mr-2 ${liked ? "text-blue-500" : ""}`}
               />
-              {likeCount} Thích
+              {likeCount} Like
             </button>
             <button
               className="flex items-center gap-2 text-gray-700 hover:text-blue-500 cursor-pointer"
@@ -132,7 +132,7 @@ const BlogItem = ({ postId, name, avatar, images, time, content, like }) => {
               }}
             >
               <MessageCircle size={18} className="mr-2" />
-              Bình luận
+              Comment
             </button>
           </div>
         </div>

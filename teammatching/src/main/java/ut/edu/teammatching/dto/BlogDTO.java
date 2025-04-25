@@ -1,8 +1,13 @@
 package ut.edu.teammatching.dto;
 
+import lombok.Data;
 import ut.edu.teammatching.models.Blog;
 import java.time.Instant;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+
+@Data
 public class BlogDTO {
     private Long id;
     private String title;
@@ -13,6 +18,7 @@ public class BlogDTO {
     private String authorAvatar;
     private Instant createdAt;  // Thêm trường createdAt
 
+
     public BlogDTO(Blog blog) {
         this.id = blog.getId();
         this.title = blog.getContent();  // Nếu có trường tittle thì đổi lại cho hợp lý
@@ -21,6 +27,7 @@ public class BlogDTO {
         this.likeCount = blog.getLikeCount();
         this.image = blog.getImages();
         this.authorAvatar = blog.getAuthor().getProfilePicture();
+
         this.createdAt = blog.getCreatedAt();  // Thêm gán createdAt
     }
 
@@ -79,6 +86,7 @@ public class BlogDTO {
 
     public void setAuthorAvatar(String authorAvatar) {
         this.authorAvatar = authorAvatar;
+
     }
 
     public Instant getCreatedAt() {

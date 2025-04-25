@@ -1,14 +1,27 @@
 package ut.edu.teammatching.repositories;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ut.edu.teammatching.models.Lecturer;
 import ut.edu.teammatching.models.Team;
 import ut.edu.teammatching.models.User;
 
+import java.util.List;
 import java.util.Optional;
 
 
 public interface LecturerRepository extends JpaRepository<Lecturer, Long> {
     @NonNull
     Optional<Lecturer> findById(@NonNull Long id);
+
+    Optional<Lecturer> findByEmail(String email);
+    Optional<Lecturer> findByPhoneNumber(String phoneNumber);
+    @Query("SELECT l FROM Lecturer l WHERE " +
+            "(LOWER(l.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(l.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR l.phoneNumber LIKE CONCAT('%', :keyword, '%')) " +
+            "AND l.id <> :currentUserId")
+    List<Lecturer> findLecturersByKeyword(@Param("keyword") String keyword, @Param("currentUserId") Long currentUserId);
+
 }
