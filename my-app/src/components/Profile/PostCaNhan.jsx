@@ -4,27 +4,16 @@ import { useAuth } from "../../context/useAuth";
 import LoginModal from "../LoginModal";
 import axios from "axios";
 
-const PostCaNhan = () => {
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/vi";
+
+dayjs.extend(relativeTime);
+dayjs.locale("vi");
+
+const PostCaNhan = ({ blogs }) => {
   const { isLoggedIn, user } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
-  const [blogs, setBlogs] = useState([]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchBlogs = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:8080/api/blogs/user/${user.id}`
-        );
-        setBlogs(res.data);
-      } catch (err) {
-        console.error("Lỗi khi lấy blog:", err);
-      }
-    };
-
-    fetchBlogs();
-  }, [user]);
 
   return (
     <>
@@ -46,7 +35,7 @@ const PostCaNhan = () => {
                   {user?.fullName || "Người dùng"}
                 </h3>
                 <p className="text-sm text-gray-500">
-                  {new Date(blog.createdAt).toLocaleString()}
+                  {blog.createdAt ? dayjs(blog.createdAt).fromNow() : "Chưa có"}
                 </p>
               </div>
             </div>

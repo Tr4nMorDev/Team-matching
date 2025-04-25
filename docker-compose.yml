@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  teammatching-db:
+    image: mysql:8.0
+    container_name: teammatching-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: teammatching
+    ports:
+      - "3308:3306"
+    volumes:
+      - teammatching_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./teammatching
+    container_name: teammatching-backend
+    depends_on:
+      teammatching-db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://teammatching-db:3306/teammatching
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./my-app
+    container_name: teammatching-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    volumes:
+      - ./my-app:/app
+      - /app/node_modules
+
+volumes:
+  teammatching_data:

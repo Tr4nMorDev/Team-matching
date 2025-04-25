@@ -8,14 +8,14 @@ import { GroupProvider } from "./context/GroupContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AuthProvider>
-      <GroupProvider>
-        <BrowserRouter>
-          <div className="bg-gray-100 ">
+    <BrowserRouter>
+      <AuthProvider>
+        <GroupProvider>
+          <div className="bg-gray-100">
             <App />
           </div>
-        </BrowserRouter>
-      </GroupProvider>
-    </AuthProvider>
+        </GroupProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>
 );

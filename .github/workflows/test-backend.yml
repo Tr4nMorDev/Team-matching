@@ -13,6 +13,9 @@ on:
       - karus
       - TestAPIf
       - www
+      - main
+      - test-docker
+      - fix-time
   pull_request:
     branches:
       - main

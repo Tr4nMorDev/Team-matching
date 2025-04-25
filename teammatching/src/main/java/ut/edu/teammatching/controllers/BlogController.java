@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,7 +52,10 @@ public class BlogController {
     public ResponseEntity<?> getAllPosts() {
         try {
             List<Blog> blogs = blogRepository.findAll();
-            return ResponseEntity.ok(blogs);
+            List<BlogDTO> blogDTOs = blogs.stream()
+                    .map(BlogDTO::new) // dùng constructor BlogDTO(Blog blog)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(blogDTOs);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error fetching posts: " + e.getMessage());
         }
@@ -96,6 +101,8 @@ public class BlogController {
             blog.setAuthor(author);
         }
 
+        blog.setCreatedAt(Instant.now());
+
         // Handle image if provided
         if (request.getImages() != null && !request.getImages().isEmpty()) {
             try {
@@ -139,6 +146,8 @@ public class BlogController {
     public ResponseEntity<?> toggleLike(@RequestBody LikeRequest likeRequest) {
         Long postId = likeRequest.getPostId();
         Long userId = likeRequest.getUserId();
+        System.out.println("Received postId: " + postId);
+        System.out.println("Received userId: " + userId);
 
         if (postId == null || userId == null) {
             return ResponseEntity.badRequest().body("Post ID and User ID are required.");
@@ -169,6 +178,7 @@ public class BlogController {
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody Blog updatedBlog) {
+
         try {
             return blogRepository.findById(id)
                     .map(blog -> {

@@ -8,12 +8,24 @@ import { data } from "react-router-dom";
 const MainContent = () => {
   const { isLoggedIn } = useAuth();
   const [blogs, setBlogs] = useState([]);
-  console.log(blogs);
   useEffect(() => {
     getBlogs()
       .then((data) => setBlogs(data))
       .catch(console.error);
   }, []);
+
+  const formatTime = (date) => {
+    const options = {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    };
+    return new Date(date).toLocaleString("en-US", options); // Thay đổi 'en-US' thành locale bạn muốn
+  };
 
   return (
     <main className="flex justify-center bg-gray-100 min-h-screen py-10">
@@ -27,12 +39,13 @@ const MainContent = () => {
           <BlogItem
             key={blog.id}
             postId={blog.id}
-            name={blog.fullName}
-            avatar={blog.profilePicture}
-            time={blog.createdAt}
-            images={blog.images}
+            name={blog.authorName}
+            avatar={blog.authorAvatar}
+            time={formatTime(blog.createdAt)}
+            images={blog.image}
             content={blog.content}
             like={blog.likeCount}
+            comment={blog.comments}
           />
         ))}
       </div>

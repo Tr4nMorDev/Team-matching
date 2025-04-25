@@ -11,6 +11,9 @@ on:
       - testAPI
       - TestAPIf
       - www
+      - main
+      - test-docker
+      - fix-time
   pull_request:
     branches:
       - main
