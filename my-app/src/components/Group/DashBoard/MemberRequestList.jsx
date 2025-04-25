@@ -20,7 +20,7 @@ const MemberRequestList = () => {
                     throw new Error("Failed to fetch requests");
                 }
                 const data = await response.json();
-                console.log(response);
+                console.log("Fetched requests:", data);
                 setRequests(data); // Cập nhật danh sách yêu cầu
             } catch (error) {
                 console.error("Error fetching join requests:", error);
@@ -31,25 +31,28 @@ const MemberRequestList = () => {
     }, [teamId]);
 
     // Xử lý yêu cầu gia nhập nhóm (chấp nhận hoặc từ chối)
-    const handleJoinRequest = async (studentId, accept) => {
+    const handleJoinRequest = async (request, accept) => {
         const token = localStorage.getItem("token");
         try {
-            const response = await fetch(`/api/teams/${teamId}/join-requests/${studentId}/handle?accept=${accept}`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await fetch(
+                `/api/teams/${teamId}/join-requests/${request.id}/handle?accept=${accept}`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
             if (!response.ok) {
                 throw new Error("Failed to handle request");
             }
 
             const result = await response.json();
-            console.log(result);
+            console.log("Request handled:", result);
 
-            // Cập nhật lại danh sách yêu cầu sau khi xử lý
-            setRequests(requests.filter(request => request.studentId !== studentId)); // Loại bỏ yêu cầu đã xử lý
+            // Xoá khỏi danh sách sau khi xử lý
+            setRequests(prev => prev.filter(r => r.id !== request.id));
         } catch (error) {
             console.error("Error handling join request:", error);
         }
@@ -61,7 +64,7 @@ const MemberRequestList = () => {
             <ul className="space-y-2">
                 {requests.map((request, index) => (
                     <motion.li
-                        key={index}
+                        key={request.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -69,7 +72,7 @@ const MemberRequestList = () => {
                     >
                         <div className="flex items-center gap-3">
                             <img
-                                src={request.avatar} // Đảm bảo backend trả về avatar
+                                src={request.profilePicture}
                                 alt="Avatar"
                                 className="w-10 h-10 rounded-full"
                             />
@@ -78,13 +81,13 @@ const MemberRequestList = () => {
                         <div className="space-x-2">
                             <button
                                 className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600"
-                                onClick={() => handleJoinRequest(request.id, true)}
+                                onClick={() => handleJoinRequest(request, true)}
                             >
                                 Chấp nhận
                             </button>
                             <button
                                 className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-                                onClick={() => handleJoinRequest(request.id, false)}
+                                onClick={() => handleJoinRequest(request, false)}
                             >
                                 Từ chối
                             </button>

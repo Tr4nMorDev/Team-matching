@@ -5,59 +5,50 @@ import axios from "axios";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [hasFetched, setHasFetched] = useState(false);
 
-  // Kiểm tra và khôi phục trạng thái đăng nhập khi component mount
-
+  // Hàm login
   const login = (token, userData) => {
     console.log("Token received:", token);
     setIsLoggedIn(true);
     setToken(token);
     setUser(userData);
+    setRole(userData.role);
     localStorage.setItem("token", token);
     localStorage.setItem("username", userData.username);
   };
 
+  // Hàm logout
   const logout = () => {
     setIsLoggedIn(false);
     setUser(null);
     setRole(null);
     setToken(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("username");
   };
 
-  // Lấy thông tin người dùng sau khi đăng nhập
+  // Lấy thông tin user từ API
   const getProtectedData = async () => {
+    const storedToken = localStorage.getItem("token");
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        "http://localhost:8080/api/protected-resource",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
+      const response = await axios.get("http://localhost:8080/api/protected-resource", {
+        headers: {
+          Authorization: `Bearer ${storedToken}`,
+        },
+      });
+      return response.data;
     } catch (error) {
       console.error("Error fetching protected data:", error);
       throw error;
     }
   };
 
-  // Lấy thông tin người dùng khi đăng nhập
+  // Lấy user khi app khởi động
   useEffect(() => {
     const fetchUser = async () => {
       const storedToken = localStorage.getItem("token");
@@ -74,14 +65,24 @@ export const AuthProvider = ({ children }) => {
       }
       setHasFetched(true);
     };
+
     fetchUser();
-  }, [user]);
+  }, []); // Chạy 1 lần duy nhất
+
+  // Cập nhật localStorage khi token thay đổi
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token");
+    }
+  }, [token]);
 
   return (
-    <AuthContext.Provider
-      value={{ isLoggedIn, role, user, token, login, logout }}
-    >
-      {children}
-    </AuthContext.Provider>
+      <AuthContext.Provider
+          value={{ isLoggedIn, role, user, token, login, logout, hasFetched }}
+      >
+        {children}
+      </AuthContext.Provider>
   );
 };
