@@ -11,28 +11,9 @@ import "dayjs/locale/vi";
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
-const PostCaNhan = () => {
+const PostCaNhan = ({ blogs }) => {
   const { isLoggedIn, user } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
-  const [blogs, setBlogs] = useState([]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchBlogs = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:8080/api/blogs/user/${user.id}`
-        );
-
-        setBlogs(res.data);
-      } catch (err) {
-        console.error("Lỗi khi lấy blog:", err);
-      }
-    };
-
-    fetchBlogs();
-  }, [user]);
 
   return (
     <>
