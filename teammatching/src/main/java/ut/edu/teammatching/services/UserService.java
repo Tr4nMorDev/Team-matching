@@ -94,18 +94,40 @@ public class UserService {
 
         return userRepository.save(user);
     }
-    //cap nhat thong tin user
     public User updateUser(Long id, User newUserData) {
         User user = getUserById(id);
+
+        // Cập nhật thông tin chung
         user.setUsername(newUserData.getUsername());
+        user.setProfilePicture(newUserData.getProfilePicture());
         user.setEmail(newUserData.getEmail());
         user.setSkills(newUserData.getSkills());
         user.setHobbies(newUserData.getHobbies());
+
+        // Cập nhật mật khẩu nếu có thay đổi
         if (newUserData.getPassword() != null && !newUserData.getPassword().isEmpty()) {
             user.setPassword(newUserData.getPassword());
         }
+
+        // Kiểm tra nếu user là một Student và cập nhật các thông tin đặc biệt của Student
+        if (user instanceof Student) {
+            Student student = (Student) user;
+            Student newStudentData = (Student) newUserData;
+            student.setMajor(newStudentData.getMajor());
+            student.setTerm(newStudentData.getTerm());
+        }
+
+        // Kiểm tra nếu user là một Lecturer và cập nhật các thông tin đặc biệt của Lecturer
+        if (user instanceof Lecturer) {
+            Lecturer lecturer = (Lecturer) user;
+            Lecturer newLecturerData = (Lecturer) newUserData;
+            lecturer.setDepartment(newLecturerData.getDepartment());
+            lecturer.setResearchAreas(newLecturerData.getResearchAreas());
+        }
+
         return userRepository.save(user);
     }
+
 
     //xoa user theo id
     public void deleteUser(Long id) {
