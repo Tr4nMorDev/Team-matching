@@ -7,11 +7,11 @@ import FriendsList from "../FriendList";
 import axios from 'axios';
 
 const ProfileStudent = ({ userId }) => {
-  const { role, user } = useAuth();
+  const {user } = useAuth();
   const [activeTab, setActiveTab] = useState("Timeline");
   const [profileData, setProfileData] = useState(user);
   const [loading, setLoading] = useState(true);
-  const [isFriend, setIsFriend] = useState(false);  // New state to track friendship status
+  const [isFriend, setIsFriend] = useState(false);
   const token = localStorage.getItem("token");
 
   useEffect(() => {

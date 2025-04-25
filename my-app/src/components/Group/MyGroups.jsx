@@ -10,12 +10,6 @@ const MyGroups = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user.username) {
-      console.error("Username không tồn tại");
-      setLoading(false);
-      return;
-    }
-
     const fetchGroups = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -71,7 +65,7 @@ const MyGroups = () => {
         {groupList.map((group, index) => (
             <div key={index} className="bg-white p-6 rounded-2xl shadow-lg text-center">
               <img
-                  src={group.photo || "/path/to/default-image.jpg"} // Hình ảnh mặc định
+                  src={group.teamPicture || "/avata.jpg"} // Hình ảnh mặc định
                   alt={group.teamName}
                   className="w-24 h-24 mx-auto rounded-full object-cover mb-4"
               />

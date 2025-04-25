@@ -2,6 +2,7 @@ package ut.edu.teammatching.services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import ut.edu.teammatching.dto.UserDTO;
 import ut.edu.teammatching.dto.team.TeamDTO;
 import ut.edu.teammatching.dto.team.TeamMemberDTO;
 import ut.edu.teammatching.enums.JoinRequestStatus;
@@ -46,7 +47,7 @@ public class TeamService {
         boolean isLeader = team.getLeader() != null && team.getLeader().getUsername().equals(username);
         boolean isLecturer = team.getLecturer() != null &&
                 team.getLecturer().getUsername().equals(username);
-        System.out.println(team.getTeamType());
+
         if (!isLeader && !isLecturer) {
             throw new RuntimeException("Chỉ leader hoặc giảng viên (cho nhóm academic) mới có quyền xử lý yêu cầu");
         }
@@ -144,8 +145,6 @@ public class TeamService {
                 throw new RuntimeException("Yêu cầu tham gia nhóm của sinh viên đang chờ xử lý!");
             } else if (status == JoinRequestStatus.ACCEPTED) {
                 throw new RuntimeException("Yêu cầu đã được chấp nhận!");
-            } else if (status == JoinRequestStatus.REJECTED) {
-                throw new RuntimeException("Yêu cầu đã bị từ chối, vui lòng liên hệ leader!");
             }
         }
 
