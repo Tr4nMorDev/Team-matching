@@ -4,7 +4,12 @@ import axios from "axios";
 import { postComment } from "../../api/userApi";
 import { useAuth } from "../../context/useAuth";
 
-export default function CommentForm({ onSubmit, image, postId }) {
+export default function CommentForm({
+  onSubmit,
+  image,
+  postId,
+  setShowCommentBox,
+}) {
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
   const { isLoggedIn, user, token } = useAuth();
@@ -20,9 +25,8 @@ export default function CommentForm({ onSubmit, image, postId }) {
         commentbyid: user?.id,
         token,
       });
-
+      setShowCommentBox?.(false);
       setComment("");
-      onSubmit?.(comment.trim()); // optional callback
     } catch (err) {
       alert("Đã xảy ra lỗi khi gửi bình luận.");
     } finally {

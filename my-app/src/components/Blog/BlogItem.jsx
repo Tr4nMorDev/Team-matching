@@ -138,6 +138,7 @@ const BlogItem = ({
                   postId={postId}
                   token={token}
                   onSubmit={handleCommentSubmit} // Pass submit handler
+                  setShowCommentBox={setShowCommentBox} // ✅ truyền vào
                 />
               </div>
             )}
