@@ -8,6 +8,7 @@ import ut.edu.teammatching.models.Blog;
 import ut.edu.teammatching.repositories.BlogRepository;
 import ut.edu.teammatching.repositories.UserRepository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +41,7 @@ public class BlogService {
         return userRepository.findById(userId).map(user -> {
             blog.setAuthor(user);
             blog.setLikeCount(0);
-            blog.setCreatedAt(LocalDateTime.now());
+            blog.setCreatedAt(Instant.now());
             return blogRepository.save(blog);
         });
     }

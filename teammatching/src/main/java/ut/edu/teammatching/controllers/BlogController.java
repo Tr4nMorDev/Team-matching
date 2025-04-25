@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -100,7 +101,7 @@ public class BlogController {
             blog.setAuthor(author);
         }
 
-        blog.setCreatedAt(LocalDateTime.now());
+        blog.setCreatedAt(Instant.now());
 
         // Handle image if provided
         if (request.getImages() != null && !request.getImages().isEmpty()) {
