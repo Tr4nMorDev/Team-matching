@@ -38,8 +38,13 @@ public class Blog {
     @Column(name = "like_count", nullable = false)
     private Integer likeCount = 0;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+    }
 
     // Liên kết với User (tác giả bài viết)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
