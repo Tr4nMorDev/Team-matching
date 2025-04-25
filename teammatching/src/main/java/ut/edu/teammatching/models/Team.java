@@ -104,8 +104,8 @@ public class Team {
         }
 
         // Kiểm tra nếu leader không phải là thành viên của team
-        if (this.leader == null || !students.contains(this.leader)) {
-            throw new IllegalStateException("Mỗi team phải có một leader và leader phải là thành viên trong team!");
+        if (this.leader != null && students.stream().noneMatch(student -> student.getId().equals(this.leader.getId()))) {
+            throw new IllegalStateException("Leader phải là thành viên trong team!");
         }
     }
 

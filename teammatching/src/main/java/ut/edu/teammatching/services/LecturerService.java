@@ -11,7 +11,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class LecturerService {
-    private LecturerRepository lecturerRepository;
+
+    private final LecturerRepository lecturerRepository;
+
+    public LecturerService(LecturerRepository lecturerRepository) {
+        this.lecturerRepository = lecturerRepository;
+    }
+
     public List<UserBasicInfoDTO> searchLecturersByKeyword(String keyword, Long currentUserId) {
         List<Lecturer> matchedLecturers = lecturerRepository.findLecturersByKeyword(keyword, currentUserId);
 
@@ -22,9 +28,9 @@ public class LecturerService {
                         lecturer.getFullName(),
                         lecturer.getEmail(),
                         lecturer.getPhoneNumber(),
-                        Role.LECTURER // 👈 Role LECTURER cho giảng viên
+                        Role.LECTURER
                 ))
                 .collect(Collectors.toList());
     }
-
 }
+

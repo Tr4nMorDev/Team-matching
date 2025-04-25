@@ -313,15 +313,11 @@ public class TeamService {
                 throw new IllegalStateException("Chỉ team Academic mới có giảng viên!");
             }
 
-//            if (!(team.getCreatedBy().equals(requester) && requester.equals(team.getLeader()))) {
-//                throw new IllegalStateException("Chỉ leader (người tạo team) mới có thể gán giảng viên cho team Academic!");
-//            }
-
             if (team.getLecturer() != null) {
                 throw new IllegalStateException("Team đã có giảng viên rồi!");
             }
 
-            team.setLecturer(lecturerToAdd);
+            team.addMember(lecturerToAdd);
         }
 
         else {
