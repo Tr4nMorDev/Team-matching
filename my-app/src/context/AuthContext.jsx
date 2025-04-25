@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Đúng
 import axios from "axios";
 
 // Tạo context
@@ -10,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [role, setRole] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [hasFetched, setHasFetched] = useState(false);
+  const navigate = useNavigate();
 
   // Kiểm tra và khôi phục trạng thái đăng nhập khi component mount
 
@@ -28,6 +30,7 @@ export const AuthProvider = ({ children }) => {
     setRole(null);
     setToken(null);
     localStorage.removeItem("token");
+    navigate("/");
   };
 
   // Lấy thông tin người dùng sau khi đăng nhập
