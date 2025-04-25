@@ -6,14 +6,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ut.edu.teammatching.models.Lecturer;
+import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.User;
 import ut.edu.teammatching.services.UserService;
-import ut.edu.teammatching.models.Student;
-import ut.edu.teammatching.models.Lecturer;
-import ut.edu.teammatching.models.Blog;
-import ut.edu.teammatching.models.Comment;
-import ut.edu.teammatching.models.Notification;
-import ut.edu.teammatching.models.Message;
+import ut.edu.teammatching.dto.UserDTO;
+import ut.edu.teammatching.dto.StudentDetailDTO;
+import ut.edu.teammatching.dto.LecturerDetailDTO;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,51 +30,24 @@ public class ProtectedResourceController {
     public ResponseEntity<?> getProtectedResource() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        
-        // Lấy thông tin user đầy đủ
+
+        // Lấy thông tin người dùng từ dịch vụ
         User user = userService.findByUsername(username);
-        
-        // Tạo response map với cấu trúc rõ ràng
+
+        // Tạo DTO cho user
+        UserDTO userDTO = new UserDTO(user);
+
+        // Tạo response map
         Map<String, Object> response = new HashMap<>();
-        
-        // Thông tin cơ bản
-        response.put("id", user.getId());
-        response.put("username", user.getUsername());
-        response.put("email", user.getEmail());
-        response.put("fullName", user.getFullName());
-        response.put("gender", user.getGender());
-        response.put("profilePicture", user.getProfilePicture());
-        response.put("role", user.getRole());
-        response.put("skills", user.getSkills());
-        response.put("hobbies", user.getHobbies());
-        response.put("projects", user.getProjects());
-        response.put("phoneNumber", user.getPhoneNumber());
-        
-        // Thông tin Student hoặc Lecturer
-        if (user instanceof Student) {
-            Student student = (Student) user;
-            response.put("major", student.getMajor());
-            response.put("term", student.getTerm());
-            response.put("teams", student.getTeams());
-            response.put("assignedTasks", student.getAssignedTasks());
-            response.put("receivedRatings", student.getReceivedRatings());
-            response.put("givenRatings", student.getGivenRatings());
-            response.put("leaders", student.getLeaders());
-        } else if (user instanceof Lecturer) {
-            Lecturer lecturer = (Lecturer) user;
-            response.put("researchAreas", lecturer.getResearchAreas());
-            response.put("receivedRatings", lecturer.getReceivedRatings());
-            response.put("givenRatings", lecturer.getGivenRatings());
+        response.put("user", userDTO);
+
+        // Cung cấp thêm thông tin chi tiết tùy theo loại người dùng (Student or Lecturer)
+        if (user instanceof Student student) {
+            response.put("details", new StudentDetailDTO(student));  // Cung cấp thông tin chi tiết của Student
+        } else if (user instanceof Lecturer lecturer) {
+            response.put("details", new LecturerDetailDTO(lecturer));  // Cung cấp thông tin chi tiết của Lecturer
         }
-        
-        // Thông tin quan hệ
-        response.put("blogs", user.getBlogs());
-        response.put("comments", user.getComments());
-        response.put("receivedNotifications", user.getReceivedNotifications());
-        response.put("sentNotifications", user.getSentNotifications());
-        response.put("sentMessages", user.getSentMessages());
-        response.put("receivedMessages", user.getReceivedMessages());
-        
+
         return ResponseEntity.ok(response);
     }
-} 
+}

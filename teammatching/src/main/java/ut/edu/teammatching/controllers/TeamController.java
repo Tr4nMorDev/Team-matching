@@ -177,31 +177,8 @@ public class TeamController {
         User currentUser = userOpt.get();
 
         try {
-            teamService.addStudent(teamId, studentIdToAdd, currentUser.getId());
+            teamService.addMember(teamId, studentIdToAdd, currentUser.getId());
             return ResponseEntity.ok("Đã thêm sinh viên vào team.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/{teamId}/assign-lecturer")
-    public ResponseEntity<String> assignLecturer(
-            @RequestParam Long leaderId,
-            @PathVariable Long teamId,
-            @RequestParam Long lecturerId,
-            Authentication authentication) {
-
-        String username = authentication.getName();
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Người dùng không hợp lệ");
-        }
-
-        User currentUser = userOpt.get();
-
-        try {
-            Team team = teamService.assignLecturer(leaderId, teamId, lecturerId, currentUser.getId());
-            return ResponseEntity.ok("Đã bổ nhiệm giảng viên thành công.");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

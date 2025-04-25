@@ -2,6 +2,7 @@ package ut.edu.teammatching.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import ut.edu.teammatching.enums.JoinRequestStatus;
@@ -49,6 +50,7 @@ public class Team {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lecturer_id")
+    @JsonIgnoreProperties({"supervisedTeams", "givenRatings", "receivedRatings", "sentMessages"})
     private Lecturer lecturer;
 
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -89,6 +91,7 @@ public class Team {
             throw new IllegalStateException("Team phải có leader hoặc được tạo bởi giảng viên!");
         }
 
+        // Kiểm tra nếu leader không phải là thành viên của team
         if (this.leader != null && !students.contains(this.leader)) {
             throw new IllegalStateException("Leader phải là thành viên của team!");
         }
@@ -100,23 +103,46 @@ public class Team {
             throw new IllegalStateException("Academic Team phải có giảng viên!");
         }
 
+        // Kiểm tra nếu leader không phải là thành viên của team
         if (this.leader == null || !students.contains(this.leader)) {
             throw new IllegalStateException("Mỗi team phải có một leader và leader phải là thành viên trong team!");
         }
     }
 
-    public void addStudent(Student student) {
-        if (student == null) {
-            throw new IllegalArgumentException("Student không được null!");
+    public void addMember(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User không được null!");
         }
 
-        if (!students.contains(student)) {
-            students.add(student);
-        }
+        // Kiểm tra nếu là Student
+        if (user instanceof Student student) {
+            // Kiểm tra xem student đã là thành viên trong team chưa
+            if (!students.contains(student)) {
+                students.add(student);
+            }
 
-        // Chỉ gán leader nếu team là Academic hoặc Non-Academic, và leader đang null
-        if (this.leader == null && !students.isEmpty()) {
-            this.leader = students.get(0); // Gán leader là sinh viên đầu tiên trong team
+            // Chỉ gán leader nếu team là Academic hoặc Non-Academic, và leader đang null
+            if (this.leader == null && !students.isEmpty()) {
+                this.leader = students.get(0); // Gán leader là sinh viên đầu tiên trong team
+            }
+
+            // Kiểm tra lại nếu leader không phải là thành viên, throw lỗi
+            if (this.leader != null && !students.contains(this.leader)) {
+                throw new IllegalStateException("Leader phải là thành viên của team!");
+            }
+
+        }
+        else if (user instanceof Lecturer lecturer) {
+            if (this.teamType == TeamType.ACADEMIC) {
+                if (this.lecturer != null) {
+                    throw new IllegalStateException("Team đã có giảng viên rồi!");
+                }
+                this.lecturer = lecturer;  // Gán giảng viên vào team
+            } else {
+                throw new IllegalStateException("Chỉ team Academic mới có giảng viên!");
+            }
+        } else {
+            throw new IllegalArgumentException("Chỉ có thể thêm Student hoặc Lecturer!");
         }
     }
 

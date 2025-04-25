@@ -59,11 +59,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/messages/**").permitAll()
                 .requestMatchers("/api/blogs/**").permitAll()
                 .requestMatchers("/api/comments/**").authenticated()
+                .requestMatchers("/api/lecturer-join-requests/**").permitAll()
                 .requestMatchers("/api/friends/**").authenticated()
                 .requestMatchers("/imagedefault.jpg").permitAll()
                     .requestMatchers("/ws/**", "/app/**", "/topic/**", "/queue/**").permitAll()
                 .requestMatchers("/api/protected-resource").authenticated()
-                    .requestMatchers("/api/search/**").permitAll()
+                    .requestMatchers("/api/search/**").authenticated()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

@@ -11,6 +11,7 @@ import ut.edu.teammatching.models.Team;
 @AllArgsConstructor
 public class TeamDTO {
     private Long id;
+    private Long leaderId;
     private String teamName;
     private TeamType teamType;
     private String teamPicture;
@@ -30,6 +31,7 @@ public class TeamDTO {
         // set thêm leader name
         if (team.getLeader() != null) {
             dto.setLeaderName(team.getLeader().getFullName());
+            dto.setLeaderId(team.getLeader().getId());
         }
 
         // set thêm lecturer name
