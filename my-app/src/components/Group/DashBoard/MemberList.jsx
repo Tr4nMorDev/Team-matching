@@ -115,7 +115,8 @@ const MemberList = () => {
 
                     const canRemove =
                         (isLeader || isLecturer) && !isBothLeaderAndLecturer;
-
+                    console.log(members);
+                    console.log(member.profilePicture);
                     return (
                         <motion.li
                             key={member.id}
@@ -126,7 +127,7 @@ const MemberList = () => {
                         >
                             <div className="flex items-center gap-2">
                                 <img
-                                    src={"/avatar.jpg"}
+                                    src={member.memberPicture}
                                     alt="Avatar"
                                     className="w-8 h-8 rounded-full"
                                 />

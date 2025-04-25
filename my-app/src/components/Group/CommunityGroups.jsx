@@ -63,11 +63,11 @@ const CommunityGroups = () => {
         {groupList.map((group) => {
           const isPending = isGroupPending(group.id);
           const isJoined = isGroupJoined(group.id);
-
+          console.log(group);
           return (
               <div key={group.id} className="bg-white p-6 rounded-2xl shadow-lg text-center">
                 <img
-                    src={group.teamPicture || "/default-avatar.jpg"}
+                    src={group.teamPicture || "/avata.jpg"}
                     alt={group.teamName}
                     className="w-24 h-24 mx-auto rounded-full object-cover mb-4"
                 />
