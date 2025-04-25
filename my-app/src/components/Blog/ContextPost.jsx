@@ -14,13 +14,18 @@ const MainContent = () => {
       .catch(console.error);
   }, []);
 
-    const formatTime = (date) => {
-        const options = {
-            weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
-            hour: '2-digit', minute: '2-digit', second: '2-digit'
-        };
-        return new Date(date).toLocaleString('en-US', options); // Thay đổi 'en-US' thành locale bạn muốn
+  const formatTime = (date) => {
+    const options = {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     };
+    return new Date(date).toLocaleString("en-US", options); // Thay đổi 'en-US' thành locale bạn muốn
+  };
 
   return (
     <main className="flex justify-center bg-gray-100 min-h-screen py-10">
@@ -40,6 +45,7 @@ const MainContent = () => {
             images={blog.image}
             content={blog.content}
             like={blog.likeCount}
+            comment={blog.comments}
           />
         ))}
       </div>

@@ -2,13 +2,17 @@ package ut.edu.teammatching.dto;
 
 import lombok.Data;
 import ut.edu.teammatching.models.Blog;
+import ut.edu.teammatching.models.Comment;
 import java.time.Instant;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class BlogDTO {
+    // Getters and Setters
     private Long id;
     private String title;
     private String content;
@@ -17,6 +21,7 @@ public class BlogDTO {
     private Integer likeCount;
     private String authorAvatar;
     private Instant createdAt;  // Thêm trường createdAt
+    private List<CommentDTO> comments; // Thêm trường để chứa danh sách comment
 
 
     public BlogDTO(Blog blog) {
@@ -29,71 +34,14 @@ public class BlogDTO {
         this.authorAvatar = blog.getAuthor().getProfilePicture();
 
         this.createdAt = blog.getCreatedAt();  // Thêm gán createdAt
+        this.comments = blog.getComments().stream()
+                .map(comment -> new CommentDTO(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getAuthor().getFullName(),
+                        comment.getAuthor().getProfilePicture()
+                ))
+                .collect(Collectors.toList());
     }
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getAuthorName() {
-        return authorName;
-    }
-
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
-    }
-
-    public Integer getLikeCount() {
-        return likeCount;
-    }
-
-    public void setLikeCount(Integer likeCount) {
-        this.likeCount = likeCount;
-    }
-
-    public String getAuthorAvatar() {
-        return authorAvatar;
-    }
-
-    public void setAuthorAvatar(String authorAvatar) {
-        this.authorAvatar = authorAvatar;
-
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
 }

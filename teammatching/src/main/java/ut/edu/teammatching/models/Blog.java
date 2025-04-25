@@ -2,6 +2,8 @@ package ut.edu.teammatching.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +19,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name="blogs")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
