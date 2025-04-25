@@ -13,9 +13,9 @@ const ProfileStudent = ({ userId }) => {
   const [loading, setLoading] = useState(true);
   const [isFriend, setIsFriend] = useState(false);  // New state to track friendship status
   const token = localStorage.getItem("token");
+  const idToUse = userId || user?.id;
 
   useEffect(() => {
-    const idToUse = userId || user?.id;
 
     if (idToUse) {
       axios.get(`/api/users/dto/${idToUse}`, {
@@ -148,7 +148,7 @@ const ProfileStudent = ({ userId }) => {
             {activeTab === "Timeline" && (
                 <>
                   <CreatePost />
-                  <PostCaNhan />
+                  <PostCaNhan userId={idToUse}/>
                 </>
             )}
             {activeTab === "About" && <AboutStudent className="w-full" />}

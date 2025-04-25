@@ -14,6 +14,14 @@ const MainContent = () => {
       .catch(console.error);
   }, []);
 
+    const formatTime = (date) => {
+        const options = {
+            weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        };
+        return new Date(date).toLocaleString('en-US', options); // Thay đổi 'en-US' thành locale bạn muốn
+    };
+
   return (
     <main className="flex justify-center bg-gray-100 min-h-screen py-10">
       <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-4 flex flex-col gap-4 mt-5">
@@ -28,7 +36,7 @@ const MainContent = () => {
             postId={blog.id}
             name={blog.authorName}
             avatar={blog.authorAvatar}
-            time={blog.createdAt}
+            time={formatTime(blog.createdAt)}
             images={blog.image}
             content={blog.content}
             like={blog.likeCount}

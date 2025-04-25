@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +38,8 @@ public class Blog {
     @Column(name = "like_count", nullable = false)
     private Integer likeCount = 0;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
-    private Instant createdAt;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     // Liên kết với User (tác giả bài viết)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
