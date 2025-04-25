@@ -190,7 +190,7 @@ const ProfileStudent = ({ userId }) => {
           {activeTab === "About" && (
             <AboutStudent className="w-full" about={profileData} />
           )}
-          {activeTab === "Friends" && <FriendsList className="w-full" />}
+          {activeTab === "Friends" && <FriendsList className="w-full" userId={idToUse}/>}
         </div>
 
         {/* Photo Section - Only visible when on Timeline tab */}
