@@ -11,14 +11,23 @@ import "dayjs/locale/vi";
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
-const BlogItem = ({ postId, name, avatar, images, time, content, like }) => {
+const BlogItem = ({
+  postId,
+  name,
+  avatar,
+  images,
+  time,
+  content,
+  like,
+  comment,
+}) => {
   const { isLoggedIn, user, token } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [likeCount, setLikeCount] = useState(like);
   const [liked, setLiked] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
-  const [commentList, setCommentList] = useState([]);
+  const [commentList, setCommentList] = useState(comment || []); // Use existing comments or empty array
 
   const handleLike = async () => {
     if (!isLoggedIn) return setShowLogin(true);
@@ -99,16 +108,41 @@ const BlogItem = ({ postId, name, avatar, images, time, content, like }) => {
           </div>
         )}
 
-        {showCommentBox && (
-          <div className="w-full h-auto object-cover ">
-            <CommentBox
-              isLoggedIn={isLoggedIn}
-              image={user?.profilePicture || "avatar.jpg"}
-              postId={postId}
-              token={token}
-            />
+        {/* Comment list and form */}
+        <div className="mt-3">
+          <div className="w-full">
+            <div className="space-y-2">
+              {commentList.map((comment, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <img
+                    src={comment.authorAvatar || "/avata.jpg"}
+                    alt="Commenter"
+                    className="h-8 w-8 rounded-full"
+                  />
+                  <div className="flex flex-col">
+                    <p className="font-semibold text-gray-800">
+                      {comment.authorName}
+                    </p>
+                    <p className="text-sm text-gray-600">{comment.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Comment box */}
+            {showCommentBox && (
+              <div className="mt-4">
+                <CommentBox
+                  isLoggedIn={isLoggedIn}
+                  image={user?.profilePicture || "avatar.jpg"}
+                  postId={postId}
+                  token={token}
+                  onSubmit={handleCommentSubmit} // Pass submit handler
+                />
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         <div className="mt-3">
           <div className="flex justify-between items-center p-3 border-t border-gray-200 rounded-lg bg-gray-100">
@@ -116,7 +150,10 @@ const BlogItem = ({ postId, name, avatar, images, time, content, like }) => {
               className={`flex items-center gap-2 cursor-pointer ${
                 liked ? "text-blue-500 scale-105" : "text-gray-700"
               } transition-all duration-200 ease-in-out`}
-              onClick={handleLike}
+              onClick={() => {
+                if (!isLoggedIn) return setShowLogin(true);
+                handleLike();
+              }}
             >
               <ThumbsUp
                 size={18}
@@ -137,7 +174,6 @@ const BlogItem = ({ postId, name, avatar, images, time, content, like }) => {
           </div>
         </div>
       </div>
-
       {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
     </>
   );

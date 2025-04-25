@@ -27,27 +27,21 @@ public class CommentController {
 
     // POST: Thêm comment mới
     @PostMapping
-    public ResponseEntity<?> addComment(@RequestBody CommentRequest request,
-                                            @AuthenticationPrincipal User user) {
-        System.out.println("Đã vào add comment");
-        System.out.println("User: " + user); // Xem giá trị của user
-        System.out.println("📝 Nhận comment request:");
-        System.out.println("postId: " + request.getBlogId());
-        System.out.println("comment: " + request.getContent());
-//        System.out.println("commentbyid: " + user.getId());
-
-        if (user == null) {
-            return ResponseEntity.status(401).body("Bạn chưa đăng nhập");
-        }
-
-        // 🖨️ Log giá trị nhận được từ frontend
+    public ResponseEntity<?> addComment(@RequestBody CommentRequest request) {
+        System.out.println("✅ [CommentController] Nhận request comment:");
+        System.out.println("↪ postId: " + request.getBlogId());
+        System.out.println("↪ comment: " + request.getContent());
+        System.out.println("↪ userId: " + request.getUserId());
 
         try {
-            Comment comment = commentService.createComment(request, user);
+            Comment comment = commentService.createComment(request);
             return ResponseEntity.ok(comment);
         } catch (RuntimeException e) {
+            System.err.println("❌ Lỗi khi tạo comment: " + e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+
 
 }

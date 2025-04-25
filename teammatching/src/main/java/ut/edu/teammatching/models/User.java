@@ -26,6 +26,7 @@ import java.util.List;
 @Getter
 @Setter
 @Inheritance(strategy = InheritanceType.JOINED) // Kế thừa với bảng riêng cho từng subclass
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name="users")
 
 public abstract class User {

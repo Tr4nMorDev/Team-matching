@@ -4,6 +4,8 @@ const API_URL = "https://jsonplaceholder.typicode.com/users";
 const API_PROJECT = "http://localhost:8080";
 
 export const postComment = async ({ postId, comment, commentbyid, token }) => {
+  console.log("post id:", postId);
+  console.log("userid:", commentbyid);
   try {
     const response = await axios.post(
       `${API_PROJECT}/api/comments`,
