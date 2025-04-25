@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import ut.edu.teammatching.enums.NotificationType;
 
 import java.time.Instant;
 
@@ -23,10 +22,6 @@ public class Notification {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type")
-    private NotificationType type;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "recipient_id", nullable = false)
@@ -39,7 +34,7 @@ public class Notification {
     private Boolean isRead = false;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "sender_id", nullable = false)
+    @JoinColumn(name = "sender_id")
     private User sender;
 
     // Nếu thông báo liên quan đến team
@@ -54,7 +49,7 @@ public class Notification {
 
     // Thông báo nếu tới hạn Deadline
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "task_id", nullable = false)
+    @JoinColumn(name = "task_id")
     private Task task;
 
     @PrePersist

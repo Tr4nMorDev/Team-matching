@@ -4,6 +4,7 @@ import { Home, Users, Bell, Mail } from "lucide-react";
 import LoginModal from "./LoginModal";
 import FriendRequestDropdown from "./FriendRequestDropdown";
 import TaskAssignmentDropdown from "./TaskAssignmentDropdown";
+import MailDropdown from "./MailDropdown";
 import { useAuth } from "../context/useAuth";
 import ProfileModal from "./Profile/ProfileModal";
 
@@ -11,9 +12,11 @@ const NavbarIcons = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showFriends, setShowFriends] = useState(false);
   const [showTask, setShowTask] = useState(false);
+  const [showMail, setShowMail] = useState(false);
   const { isLoggedIn, user } = useAuth();
   const friendsDropdownRef = useRef(null);
   const taskDropdownRef = useRef(null);
+  const mailDropdownRef = useRef(null);
   const [showProfile, setShowProfile] = useState(false);
 
   // Tự động đóng khi click ngoài
@@ -30,6 +33,12 @@ const NavbarIcons = () => {
         !taskDropdownRef.current.contains(event.target)
       ) {
         setShowTask(false);
+      }
+      if (
+          mailDropdownRef.current &&
+          !mailDropdownRef.current.contains(event.target)
+      ) {
+        setShowMail(false);
       }
     };
 
@@ -76,12 +85,22 @@ const NavbarIcons = () => {
           )}
         </div>
 
-        <Mail
-          className="w-6 h-6 cursor-pointer"
-          onClick={() => {
-            if (!isLoggedIn) return setShowLogin(true);
-          }}
-        />
+        <div className="relative">
+          <Mail
+              className="w-6 h-6 cursor-pointer"
+              onClick={() => {
+                if (!isLoggedIn) return setShowLogin(true);
+                setShowMail((prev) => !prev);
+              }}
+          />
+          {showMail && (
+              <MailDropdown
+                  showMails={showMail}
+                  setShowMails={setShowMail}
+              />
+          )}
+        </div>
+
 
         {isLoggedIn && user ? (
           <button

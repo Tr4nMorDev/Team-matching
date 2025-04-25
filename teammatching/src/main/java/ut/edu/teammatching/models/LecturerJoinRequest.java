@@ -30,7 +30,4 @@ public class LecturerJoinRequest {
 
     @Enumerated(EnumType.STRING)
     private JoinRequestStatus status = JoinRequestStatus.PENDING;
-
-    @Column(name = "message")
-    private String message; // Lời nhắn nếu cần
 }

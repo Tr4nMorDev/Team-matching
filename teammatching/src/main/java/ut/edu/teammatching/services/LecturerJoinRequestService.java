@@ -3,16 +3,20 @@ package ut.edu.teammatching.services;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ut.edu.teammatching.dto.team.LecturerJoinRequestDTO;
 import ut.edu.teammatching.enums.JoinRequestStatus;
 import ut.edu.teammatching.enums.TeamType;
-import ut.edu.teammatching.models.Lecturer;
-import ut.edu.teammatching.models.LecturerJoinRequest;
-import ut.edu.teammatching.models.Team;
+import ut.edu.teammatching.exceptions.UserNotFoundException;
+import ut.edu.teammatching.models.*;
 import ut.edu.teammatching.repositories.LecturerJoinRequestRepository;
 import ut.edu.teammatching.repositories.LecturerRepository;
+import ut.edu.teammatching.repositories.NotificationRepository;
 import ut.edu.teammatching.repositories.TeamRepository;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,11 +25,24 @@ public class LecturerJoinRequestService {
     private final TeamRepository teamRepository;
     private final TeamService teamService;
     private final LecturerJoinRequestRepository lecturerJoinRequestRepository;
+    private final NotificationRepository notificationRepository;
 
-//    private final LecturerJoinRequestRepository lecturerJoinRequestRepository;
+    // Phương thức để lấy tất cả yêu cầu gia nhập có status PENDING cho một giảng viên
+    @Transactional
+    public List<LecturerJoinRequestDTO> getPendingRequestsForLecturer(Long lecturerId) {
+        Lecturer lecturer = lecturerRepository.findById(lecturerId)
+                .orElseThrow(() -> new UserNotFoundException("Lecturer not found"));
+
+        List<LecturerJoinRequest> pendingRequests =
+                lecturerJoinRequestRepository.findByLecturerAndStatus(lecturer, JoinRequestStatus.PENDING);
+
+        return pendingRequests.stream()
+                .map(LecturerJoinRequestDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
 
     @Transactional
-    public LecturerJoinRequest sendLecturerJoinRequest(Long teamId, Long lecturerId, Long requesterId, String message) {
+    public LecturerJoinRequest sendLecturerJoinRequest(Long teamId, Long lecturerId, Long requesterId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
 
@@ -49,7 +66,6 @@ public class LecturerJoinRequestService {
         request.setTeam(team);
         request.setLecturer(lecturer);
         request.setStatus(JoinRequestStatus.PENDING);
-        request.setMessage(message);
 
         return lecturerJoinRequestRepository.save(request);
     }
@@ -79,10 +95,15 @@ public class LecturerJoinRequestService {
             }
         }
 
-//        // Kiểm tra sau khi đã gán lại leader
-//        if (team.getLeader() != null && !team.getStudents().contains(team.getLeader())) {
-//            throw new IllegalStateException("Leader phải là thành viên của team!");
-//        }
+        // Kiểm tra sau khi đã gán lại leader
+        if (team.getLeader() != null &&
+                team.getStudents().stream().noneMatch(s -> s.getId().equals(team.getLeader().getId()))) {
+            throw new IllegalStateException("Leader phải là thành viên của team!//");
+        }
+
+        if (request.getStatus() != JoinRequestStatus.PENDING) {
+            throw new RuntimeException("Yêu cầu này đã được xử lý.");
+        }
 
         if (accept) {
             request.setStatus(JoinRequestStatus.ACCEPTED);
@@ -97,6 +118,5 @@ public class LecturerJoinRequestService {
 
         return accept ? "Đã chấp nhận yêu cầu." : "Đã từ chối yêu cầu.";
     }
-
 
 }
