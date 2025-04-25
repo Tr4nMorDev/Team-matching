@@ -68,7 +68,7 @@ public class TeamService {
                 throw new RuntimeException("Sinh viên này đã là thành viên của nhóm");
             }
             team.getJoinRequests().put(student, JoinRequestStatus.ACCEPTED);
-            team.addStudent(student);
+            team.addMember(student);
         } else {
             team.getJoinRequests().put(student, JoinRequestStatus.REJECTED);
         }
@@ -281,56 +281,54 @@ public class TeamService {
     }
 
     @Transactional
-    public void addStudent(Long teamId, Long studentIdToAdd, Long requesterId) {
+    public void addMember(Long teamId, Long userIdToAdd, Long requesterId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
 
         User requester = userRepository.findById(requesterId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người yêu cầu!"));
 
-        Student studentToAdd = studentRepository.findById(studentIdToAdd)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên cần thêm!"));
+        User userToAdd = userRepository.findById(userIdToAdd)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người cần thêm!"));
 
-        // Chỉ leader hoặc giảng viên mới được thêm thành viên
-        boolean isLeader = requester.equals(team.getLeader());
-        boolean isLecturer = team.getLecturer() != null && requester.equals(team.getLecturer());
+        if (userToAdd instanceof Student studentToAdd) {
 
-        if (!isLeader && !isLecturer) {
-            throw new IllegalStateException("Chỉ leader hoặc giảng viên mới có quyền thêm thành viên vào team!");
-        }
+            boolean isLeader = requester instanceof Student && requester.equals(team.getLeader());
+            boolean isLecturer = requester instanceof Lecturer && requester.equals(team.getLecturer());
 
-        if (!team.getStudents().contains(studentToAdd)) {
-            team.getStudents().add(studentToAdd);
-
-            if (team.getLeader() == null && !team.getStudents().isEmpty()) {
-                team.setLeader(team.getStudents().get(0));
+            if (!isLeader && !isLecturer) {
+                throw new IllegalStateException("Chỉ leader hoặc giảng viên mới có quyền thêm thành viên!");
             }
 
-            teamRepository.save(team);
-        } else {
-            throw new IllegalStateException("Sinh viên này đã là thành viên của team!");
-        }
-    }
+            if (team.getStudents().contains(studentToAdd)) {
+                throw new IllegalStateException("Sinh viên này đã là thành viên của team!");
+            }
 
-    // Bổ nhiệm giảng viên hướng dẫn
-    @Transactional
-    public Team assignLecturer(Long leaderId, Long teamId, Long lecturerId, Long requesterId) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
-
-        if (team.getTeamType() != TeamType.ACADEMIC) {
-            throw new RuntimeException("Chỉ team loại ACADEMIC mới có thể bổ nhiệm giảng viên.");
+            team.addMember(studentToAdd);
         }
 
-        if (!team.getLeader().getId().equals(requesterId)) {
-            throw new RuntimeException("Chỉ có Leader mới được bổ nhiệm giảng viên");
+        else if (userToAdd instanceof Lecturer lecturerToAdd) {
+
+            if (team.getTeamType() != TeamType.ACADEMIC) {
+                throw new IllegalStateException("Chỉ team Academic mới có giảng viên!");
+            }
+
+//            if (!(team.getCreatedBy().equals(requester) && requester.equals(team.getLeader()))) {
+//                throw new IllegalStateException("Chỉ leader (người tạo team) mới có thể gán giảng viên cho team Academic!");
+//            }
+
+            if (team.getLecturer() != null) {
+                throw new IllegalStateException("Team đã có giảng viên rồi!");
+            }
+
+            team.setLecturer(lecturerToAdd);
         }
 
-        Lecturer lecturer = lecturerRepository.findById(lecturerId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy giảng viên"));
+        else {
+            throw new IllegalArgumentException("Chỉ có thể thêm Student hoặc Lecturer!");
+        }
 
-        team.setLecturer(lecturer);
-        return teamRepository.save(team);
+        teamRepository.save(team);
     }
 
     //Phân công vai trò trong team

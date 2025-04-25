@@ -1,5 +1,6 @@
 package ut.edu.teammatching.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +27,7 @@ public class Lecturer extends User {
     private String researchAreas;
 
     @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Team> supervisedTeams = new ArrayList<>();
 
     @OneToMany(mappedBy = "ratedLecturer", cascade = CascadeType.ALL, orphanRemoval = true)
