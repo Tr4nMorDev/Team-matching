@@ -21,7 +21,7 @@ export default function BoxChatMini({ user, currentUser, onClose }) {
   useEffect(() => {
     const loadMessages = async () => {
       try {
-        const response = await fetch(`/api/messages/private?user1=${currentUser.id}&user2=${user.id}`);
+        const response = await fetch(`http://localhost:8080/api/messages/private?user1=${currentUser.id}&user2=${user.id}`);
         const data = await response.json();
         console.log(data);
         setMessages(data); // Lưu tin nhắn vào state

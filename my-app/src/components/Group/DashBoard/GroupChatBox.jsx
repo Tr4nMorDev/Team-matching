@@ -43,7 +43,7 @@ const GroupChatBox = () => {
     const loadMessages = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/messages/team/${teamId}`, {
+            const response = await fetch(`http://localhost:8080/api/messages/team/${teamId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

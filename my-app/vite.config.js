@@ -15,6 +15,7 @@ export default defineConfig({
         changeOrigin: true, // cần thiết để xử lý cross-origin
         // KHÔNG cần rewrite nếu Spring Boot dùng @RequestMapping("/api")
       }
-    }
+    },
+    historyApiFallback: true,
   }
 });
