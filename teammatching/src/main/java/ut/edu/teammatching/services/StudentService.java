@@ -18,8 +18,8 @@ public class StudentService {
         this.studentRepository = studentRepository;
     }
 
-    public List<UserBasicInfoDTO> searchStudentsByKeyword(String keyword, Long currentUserId) {
-        List<Student> matchedStudents = studentRepository.findStudentsByKeyword(keyword, currentUserId);
+    public List<UserBasicInfoDTO> searchStudentsByKeyword(String keyword) {
+        List<Student> matchedStudents = studentRepository.findStudentsByKeyword(keyword);
 
         return matchedStudents.stream()
                 .map(student -> new UserBasicInfoDTO(

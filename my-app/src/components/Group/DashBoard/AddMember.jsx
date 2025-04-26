@@ -23,15 +23,15 @@ function AddMember({ teamId, onClose }) {
             setLoading(true);
 
             axios
-                .get(`/api/search/student?keyword=${encodeURIComponent(searchQuery)}&currentUserId=${currentUserId}`, {
+                .get(`/api/search/student?keyword=${encodeURIComponent(searchQuery)}`, {
                     cancelToken: cancelToken.token,
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
                 })
                 .then((res) => {
                     if (Array.isArray(res.data)) {
                         const studentsOnly = res.data.filter((user) => user.role === "STUDENT");
-                        setSearchResults(studentsOnly);
-                    } else if (res.data && Array.isArray(res.data.users)) {
-                        const studentsOnly = res.data.users.filter((user) => user.role === "STUDENT");
                         setSearchResults(studentsOnly);
                     } else {
                         console.error("Dữ liệu trả về không hợp lệ:", res.data);
@@ -54,7 +54,7 @@ function AddMember({ teamId, onClose }) {
             clearTimeout(delayDebounce);
             cancelToken.cancel();
         };
-    }, [searchQuery, currentUserId]);
+    }, [searchQuery]);
 
     const handleAdd = async (studentId) => {
         try {

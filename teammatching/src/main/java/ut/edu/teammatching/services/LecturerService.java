@@ -18,8 +18,8 @@ public class LecturerService {
         this.lecturerRepository = lecturerRepository;
     }
 
-    public List<UserBasicInfoDTO> searchLecturersByKeyword(String keyword, Long currentUserId) {
-        List<Lecturer> matchedLecturers = lecturerRepository.findLecturersByKeyword(keyword, currentUserId);
+    public List<UserBasicInfoDTO> searchLecturersByKeyword(String keyword) {
+        List<Lecturer> matchedLecturers = lecturerRepository.findLecturersByKeyword(keyword);
 
         return matchedLecturers.stream()
                 .map(lecturer -> new UserBasicInfoDTO(

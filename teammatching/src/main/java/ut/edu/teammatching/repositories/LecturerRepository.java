@@ -18,11 +18,10 @@ public interface LecturerRepository extends JpaRepository<Lecturer, Long> {
 
     Optional<Lecturer> findByEmail(String email);
     Optional<Lecturer> findByPhoneNumber(String phoneNumber);
-    @Query("SELECT l FROM Lecturer l WHERE " +
+    @Query("SELECT l FROM Lecturer l WHERE (" +
             "(LOWER(l.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(l.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR l.phoneNumber LIKE CONCAT('%', :keyword, '%')) " +
-            "AND l.id <> :currentUserId")
-    List<Lecturer> findLecturersByKeyword(@Param("keyword") String keyword, @Param("currentUserId") Long currentUserId);
+            "OR l.phoneNumber LIKE CONCAT('%', :keyword, '%'))) ")
+    List<Lecturer> findLecturersByKeyword(@Param("keyword") String keyword);
 
 }

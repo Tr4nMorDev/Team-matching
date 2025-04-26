@@ -23,7 +23,10 @@ function AssignLecturer({ teamId, onClose }) {
             setLoading(true);
 
             axios
-                .get(`/api/search/lecturer?keyword=${encodeURIComponent(searchQuery)}&currentUserId=${currentUserId}`, {
+                .get(`/api/search/lecturer?keyword=${encodeURIComponent(searchQuery)}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    },
                     cancelToken: cancelToken.token,
                 })
                 .then((res) => {
@@ -54,7 +57,7 @@ function AssignLecturer({ teamId, onClose }) {
             clearTimeout(delayDebounce);
             cancelToken.cancel();
         };
-    }, [searchQuery, currentUserId]);
+    }, [searchQuery]);
 
     const handleAssign = async (lecturerId) => {
         try {

@@ -1,6 +1,8 @@
 package ut.edu.teammatching.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,18 +46,26 @@ public class SearchController {
     @GetMapping("/student")
     public ResponseEntity<List<UserBasicInfoDTO>> searchStudents(
             @RequestParam("keyword") String keyword,
-            @RequestParam("currentUserId") Long currentUserId
+            Authentication authentication
     ) {
-        List<UserBasicInfoDTO> results = studentService.searchStudentsByKeyword(keyword, currentUserId);
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        List<UserBasicInfoDTO> results = studentService.searchStudentsByKeyword(keyword);
         return ResponseEntity.ok(results);
     }
 
     @GetMapping("/lecturer")
     public ResponseEntity<List<UserBasicInfoDTO>> searchLecturers(
             @RequestParam("keyword") String keyword,
-            @RequestParam("currentUserId") Long currentUserId
+            Authentication authentication
     ) {
-        List<UserBasicInfoDTO> results = lecturerService.searchLecturersByKeyword(keyword, currentUserId);
+        if (authentication == null || authentication.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        List<UserBasicInfoDTO> results = lecturerService.searchLecturersByKeyword(keyword);
         return ResponseEntity.ok(results);
     }
 }
