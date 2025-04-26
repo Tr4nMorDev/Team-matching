@@ -7,27 +7,29 @@ import dayjs from "dayjs";
 import CommentBox from "./CommentBox";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/vi";
-
+import SockJS from "sockjs-client";
+import { Stomp } from "@stomp/stompjs";
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
-const BlogItem = ({
-  postId,
-  name,
-  avatar,
-  images,
-  time,
-  content,
-  like,
-  comment,
-}) => {
+const BlogItem = ({ blogs, postId }) => {
+  const {
+    authorName,
+    authorAvatar,
+    images,
+    createdAt,
+    content,
+    likeCount,
+    comments,
+  } = blogs;
   const { isLoggedIn, user, token } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const [likeCount, setLikeCount] = useState(like);
+  const [like, setLike] = useState(likeCount);
   const [liked, setLiked] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
-  const [commentList, setCommentList] = useState(comment || []); // Use existing comments or empty array
+  const [commentList, setCommentList] = useState(comments || []); // Use existing comments or empty array
+  // const [stompClient, setStompClient] = useState(null);
 
   const handleLike = async () => {
     if (!isLoggedIn) return setShowLogin(true);
@@ -47,7 +49,7 @@ const BlogItem = ({
         }
       );
 
-      setLikeCount((prev) => prev + (liked ? -1 : 1));
+      setLike((prev) => prev + (liked ? -1 : 1));
       setLiked(!liked);
     } catch (error) {
       console.error("Like failed", error);
@@ -65,14 +67,14 @@ const BlogItem = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
-              src={avatar}
+              src={authorAvatar}
               alt="Profile"
               className="h-10 w-10 rounded-full"
             />
             <div>
-              <h3 className="font-semibold text-gray-900">{name}</h3>
+              <h3 className="font-semibold text-gray-900">{authorName}</h3>
               <p className="text-sm text-gray-500">
-                {time ? dayjs(time).fromNow() : "Chưa có"}
+                {createdAt ? dayjs(createdAt).fromNow() : "Chưa có"}
               </p>
             </div>
           </div>
@@ -160,7 +162,7 @@ const BlogItem = ({
                 size={18}
                 className={`mr-2 ${liked ? "text-blue-500" : ""}`}
               />
-              {likeCount} Like
+              {like} Like
             </button>
             <button
               className="flex items-center gap-2 text-gray-700 hover:text-blue-500 cursor-pointer"

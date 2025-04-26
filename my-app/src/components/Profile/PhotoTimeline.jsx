@@ -10,10 +10,10 @@ const PhotoTimeline = ({ blogs }) => {
       <div className="grid grid-cols-2 gap-2 mt-6 mb-6">
         {blogs?.map(
           (blog, i) =>
-            blog.image && (
+            blog.images && (
               <img
                 key={i}
-                src={blog.image}
+                src={blog.images}
                 alt={`Photo ${i}`}
                 className="w-full h-20 object-cover rounded-lg"
               />

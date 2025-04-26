@@ -16,6 +16,7 @@ on:
       - main
       - test-docker
       - fix-time
+      - tree-setup-loadpage
   pull_request:
     branches:
       - main
