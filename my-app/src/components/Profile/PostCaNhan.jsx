@@ -48,10 +48,10 @@ const PostCaNhan = ({ blogs }) => {
           <p className="mt-3 text-gray-700">{blog.content}</p>
 
           {/* Ảnh nếu có */}
-          {blog.image && (
+          {blog.images && (
             <div className="w-full max-h-[600px] overflow-hidden rounded-lg mt-3">
               <img
-                src={blog.image}
+                src={blog.images}
                 alt="Ảnh bài blog"
                 className="w-full h-auto max-h-[600px] object-cover"
               />

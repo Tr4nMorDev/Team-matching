@@ -11,6 +11,10 @@ import { Stomp } from "@stomp/stompjs";
 const MainContent = () => {
   const { isLoggedIn } = useAuth();
   const [blogs, setBlogs] = useState([]);
+  const [page, setPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
   const stompClientRef = useRef(null);
   useEffect(() => {
     let isMounted = true; // đảm bảo không setState nếu component đã unmount

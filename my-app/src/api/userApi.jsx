@@ -43,7 +43,4 @@ async function getBlogs() {
     throw error;
   }
 }
-
-const API_BASE_URL = "https://your-backend-domain.com/api"; // Đổi thành địa chỉ thật của backend
-
 export default getBlogs;

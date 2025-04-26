@@ -7,7 +7,8 @@ import dayjs from "dayjs";
 import CommentBox from "./CommentBox";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/vi";
-
+import SockJS from "sockjs-client";
+import { Stomp } from "@stomp/stompjs";
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
@@ -28,6 +29,7 @@ const BlogItem = ({ blogs, postId }) => {
   const [liked, setLiked] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [commentList, setCommentList] = useState(comments || []); // Use existing comments or empty array
+  // const [stompClient, setStompClient] = useState(null);
 
   const handleLike = async () => {
     if (!isLoggedIn) return setShowLogin(true);
@@ -115,13 +117,15 @@ const BlogItem = ({ blogs, postId }) => {
               {commentList.map((comment, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <img
-                    src={authorAvatar || "/avata.jpg"}
+                    src={comment.authorAvatar || "/avata.jpg"}
                     alt="Commenter"
                     className="h-8 w-8 rounded-full"
                   />
                   <div className="flex flex-col">
-                    <p className="font-semibold text-gray-800">{authorName}</p>
-                    <p className="text-sm text-gray-600">{comments.content}</p>
+                    <p className="font-semibold text-gray-800">
+                      {comment.authorName}
+                    </p>
+                    <p className="text-sm text-gray-600">{comment.content}</p>
                   </div>
                 </div>
               ))}
