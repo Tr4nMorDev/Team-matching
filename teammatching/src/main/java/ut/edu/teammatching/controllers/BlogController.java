@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.core.AbstractDestinationResolvingMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,14 +40,17 @@ public class BlogController {
 
     private final BlogRepository blogRepository;
     private final UserRepository userRepository;
+    @Autowired
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Value("${file.upload-dir:uploads/imagespost}")
     private String uploadDir;
 
     @Autowired
-    public BlogController(BlogRepository blogRepository, UserRepository userRepository) {
+    public BlogController(BlogRepository blogRepository, UserRepository userRepository , SimpMessagingTemplate messagingTemplate) {
         this.blogRepository = blogRepository;
         this.userRepository = userRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @GetMapping
@@ -137,6 +142,9 @@ public class BlogController {
         }
 
         Blog savedBlog = blogRepository.save(blog);
+        System.out.println("Sending blog to WebSocket topic...");
+        BlogDTO blogDTO = new BlogDTO(savedBlog); // 👈 Convert sang DTO
+        messagingTemplate.convertAndSend("/topic/blogs", blogDTO);
         return ResponseEntity.ok(savedBlog);
     }
     @Autowired
