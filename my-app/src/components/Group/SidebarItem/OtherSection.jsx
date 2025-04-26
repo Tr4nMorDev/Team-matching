@@ -1,6 +1,6 @@
 import SidebarItem from "./SidebarItem";
 
-const OtherSection = ({ onMemberClick, onRequestClick, onRatingClick }) => {
+const OtherSection = ({ onMemberClick, onRequestClick, onRatingClick, onTaskClick }) => {
   return (
     <div>
       <SidebarItem
@@ -13,6 +13,11 @@ const OtherSection = ({ onMemberClick, onRequestClick, onRatingClick }) => {
         icon={<span className="text-yellow-500">●</span>}
         onClick={onRequestClick}
       />
+        <SidebarItem
+            label="Task"
+            icon={<span className="text-purple-500">●</span>}
+            onClick={onTaskClick}
+        />
       <SidebarItem
         label="Comment"
         icon={<span className="text-yellow-500">●</span>}

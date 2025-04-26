@@ -250,4 +250,13 @@ public class TeamController {
             return ResponseEntity.status(404).body(null);
         }
     }
+
+    @GetMapping("/{teamId}/members/task")
+    public ResponseEntity<List<TeamMemberDTO>> getMembersExcludingLeaderAndLecturer(@PathVariable Long teamId) {
+        Team team = teamService.getTeamById(teamId); // 🔥 Lấy team từ service
+
+        List<TeamMemberDTO> members = teamService.getMembersTask(team);
+
+        return ResponseEntity.ok(members);
+    }
 }

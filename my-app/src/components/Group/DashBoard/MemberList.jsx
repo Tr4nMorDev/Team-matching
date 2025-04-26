@@ -117,8 +117,6 @@ const MemberList = () => {
 
                     const canRemove =
                         (isLeader || isLecturer) && !isBothLeaderAndLecturer;
-                    console.log(members);
-                    console.log(member.profilePicture);
                     return (
                         <motion.li
                             key={member.id}

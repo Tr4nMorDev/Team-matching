@@ -2,7 +2,6 @@ package ut.edu.teammatching.services;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import ut.edu.teammatching.dto.UserDTO;
 import ut.edu.teammatching.dto.team.TeamDTO;
 import ut.edu.teammatching.dto.team.TeamMemberDTO;
 import ut.edu.teammatching.enums.JoinRequestStatus;
@@ -389,4 +388,18 @@ public class TeamService {
 
         return TeamDTO.fromTeam(team);  // Chuyển đổi từ Team sang TeamDTO
     }
+
+    public List<TeamMemberDTO> getMembersTask(Team team) {
+        List<Student> students = team.getStudents();
+
+        if (students == null || students.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return students.stream()
+                .filter(student -> team.getLeader() == null || !student.getId().equals(team.getLeader().getId()))
+                .map(student -> new TeamMemberDTO(student, team))
+                .toList();
+    }
+
 }
