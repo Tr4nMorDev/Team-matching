@@ -2,6 +2,10 @@ package ut.edu.teammatching.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.core.AbstractDestinationResolvingMessagingTemplate;
@@ -54,12 +58,17 @@ public class BlogController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllPosts() {
+    public ResponseEntity<?> getAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
         try {
-            List<Blog> blogs = blogRepository.findAll();
-            List<BlogDTO> blogDTOs = blogs.stream()
-                    .map(BlogDTO::new) // dùng constructor BlogDTO(Blog blog)
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+            Page<Blog> blogPage = blogRepository.findAll(pageable);
+            List<BlogDTO> blogDTOs = blogPage.stream()
+                    .map(BlogDTO::new)
                     .collect(Collectors.toList());
+
             return ResponseEntity.ok(blogDTOs);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error fetching posts: " + e.getMessage());

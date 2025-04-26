@@ -1,10 +1,8 @@
+import { useCallback, useEffect, useState, useRef } from "react";
 import CreateBlog from "./CreatePost";
 import BlogItem from "./BlogItem";
 import { useAuth } from "../../context/useAuth";
 import getBlogs from "../../api/userApi";
-import { data } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
-
 import SockJS from "sockjs-client";
 import { Stomp } from "@stomp/stompjs";
 
@@ -16,54 +14,93 @@ const MainContent = () => {
   const [hasMore, setHasMore] = useState(true);
 
   const stompClientRef = useRef(null);
+
   useEffect(() => {
-    let isMounted = true; // đảm bảo không setState nếu component đã unmount
-    // Gọi API lấy danh sách ban đầu
-    getBlogs()
-      .then((data) => {
+    let isMounted = true;
+
+    const fetchInitialBlogs = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getBlogs(0, 10);
         if (isMounted) {
           setBlogs(data);
+          setPage(1);
+          setHasMore(data.length > 0);
         }
-      })
-      .catch(console.error);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // Kết nối WebSocket
-    const socket = new SockJS("http://localhost:8080/ws"); // đổi đúng endpoint của backend bạn
+    fetchInitialBlogs();
+
+    const socket = new SockJS("http://localhost:8080/ws");
     const stompClient = Stomp.over(socket);
     stompClient.connect({}, () => {
       console.log("Connected to WebSocket");
-      // Sub vào topic blog mới
       stompClient.subscribe("/topic/blogs", (message) => {
         const newBlog = JSON.parse(message.body);
-        setBlogs((prevBlogs) => [newBlog, ...prevBlogs]); // thêm blog mới vào đầu
+        setBlogs((prevBlogs) => [newBlog, ...prevBlogs]);
       });
     });
 
-    // Lưu lại client để ngắt kết nối khi unmount
     stompClientRef.current = stompClient;
 
     return () => {
-      // Cleanup
       if (stompClientRef.current) {
         stompClientRef.current.disconnect(() => {
           console.log("Disconnected from WebSocket");
         });
       }
+      isMounted = false;
     };
   }, []);
+
+  const loadMoreBlogs = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+
+    try {
+      setIsLoading(true);
+      const data = await getBlogs(page, 10);
+      setBlogs((prevBlogs) => [...prevBlogs, ...data]);
+      setPage((prevPage) => prevPage + 1);
+      if (data.length < 10) {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, hasMore, page]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.offsetHeight - 100
+      ) {
+        loadMoreBlogs();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [loadMoreBlogs]);
 
   return (
     <main className="flex justify-center bg-gray-100 min-h-screen py-10">
       <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-4 flex flex-col gap-4 mt-5">
-        {/* Chỉ hiển thị CreatePost nếu đã đăng nhập */}
         {isLoggedIn && <CreateBlog />}
 
-        {/* Danh sách bài viết luôn hiển thị */}
+        {blogs.map((blog, index) => (
+          <BlogItem key={`${blog.id}-${index}`} postId={blog.id} blogs={blog} />
+        ))}
 
-        {blogs.map((blog) => {
-          // console.log(blog); // 👈 check object ở đây
-          return <BlogItem key={blog.id} postId={blog.id} blogs={blog} />;
-        })}
+        {isLoading && <div className="text-center py-4">Đang tải...</div>}
+        {!hasMore && <div className="text-center py-4">Đã hết bài viết.</div>}
       </div>
     </main>
   );

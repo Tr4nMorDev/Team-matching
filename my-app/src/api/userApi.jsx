@@ -32,11 +32,11 @@ export const getUser = async (id) => {
   if (!response.ok) throw new Error("Failed to fetch user");
   return response.json();
 };
-
-async function getBlogs() {
+async function getBlogs(page = 0, pageSize = 10) {
   try {
-    const response = await axios.get(`${API_PROJECT}/api/blogs`);
-    console.log("Blogs:", response.data);
+    const response = await axios.get(`${API_PROJECT}/api/blogs`, {
+      params: { page, size: pageSize },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching posts:", error);
