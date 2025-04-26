@@ -1,53 +1,106 @@
+import { useCallback, useEffect, useState, useRef } from "react";
 import CreateBlog from "./CreatePost";
 import BlogItem from "./BlogItem";
-import { useEffect, useState } from "react";
 import { useAuth } from "../../context/useAuth";
 import getBlogs from "../../api/userApi";
-import { data } from "react-router-dom";
+import SockJS from "sockjs-client";
+import { Stomp } from "@stomp/stompjs";
 
 const MainContent = () => {
   const { isLoggedIn } = useAuth();
   const [blogs, setBlogs] = useState([]);
+  const [page, setPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
+  const stompClientRef = useRef(null);
+
   useEffect(() => {
-    getBlogs()
-      .then((data) => setBlogs(data))
-      .catch(console.error);
+    let isMounted = true;
+
+    const fetchInitialBlogs = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getBlogs(0, 10);
+        if (isMounted) {
+          setBlogs(data);
+          setPage(1);
+          setHasMore(data.length > 0);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInitialBlogs();
+
+    const socket = new SockJS("http://localhost:8080/ws");
+    const stompClient = Stomp.over(socket);
+    stompClient.connect({}, () => {
+      console.log("Connected to WebSocket");
+      stompClient.subscribe("/topic/blogs", (message) => {
+        const newBlog = JSON.parse(message.body);
+        setBlogs((prevBlogs) => [newBlog, ...prevBlogs]);
+      });
+    });
+
+    stompClientRef.current = stompClient;
+
+    return () => {
+      if (stompClientRef.current) {
+        stompClientRef.current.disconnect(() => {
+          console.log("Disconnected from WebSocket");
+        });
+      }
+      isMounted = false;
+    };
   }, []);
 
-  const formatTime = (date) => {
-    const options = {
-      weekday: "short",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+  const loadMoreBlogs = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+
+    try {
+      setIsLoading(true);
+      const data = await getBlogs(page, 10);
+      setBlogs((prevBlogs) => [...prevBlogs, ...data]);
+      setPage((prevPage) => prevPage + 1);
+      if (data.length < 10) {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, hasMore, page]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.offsetHeight - 100
+      ) {
+        loadMoreBlogs();
+      }
     };
-    return new Date(date).toLocaleString("en-US", options); // Thay đổi 'en-US' thành locale bạn muốn
-  };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [loadMoreBlogs]);
 
   return (
     <main className="flex justify-center bg-gray-100 min-h-screen py-10">
       <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-4 flex flex-col gap-4 mt-5">
-        {/* Chỉ hiển thị CreatePost nếu đã đăng nhập */}
         {isLoggedIn && <CreateBlog />}
 
-        {/* Danh sách bài viết luôn hiển thị */}
-
-        {blogs.map((blog) => (
-          <BlogItem
-            key={blog.id}
-            postId={blog.id}
-            name={blog.authorName}
-            avatar={blog.authorAvatar}
-            time={formatTime(blog.createdAt)}
-            images={blog.image}
-            content={blog.content}
-            like={blog.likeCount}
-            comment={blog.comments}
-          />
+        {blogs.map((blog, index) => (
+          <BlogItem key={`${blog.id}-${index}`} postId={blog.id} blogs={blog} />
         ))}
+
+        {isLoading && <div className="text-center py-4">Đang tải...</div>}
+        {!hasMore && <div className="text-center py-4">Đã hết bài viết.</div>}
       </div>
     </main>
   );

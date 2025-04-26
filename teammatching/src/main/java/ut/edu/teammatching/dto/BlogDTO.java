@@ -16,7 +16,7 @@ public class BlogDTO {
     private Long id;
     private String title;
     private String content;
-    private String image;
+    private String images;
     private String authorName;
     private Integer likeCount;
     private String authorAvatar;
@@ -30,7 +30,7 @@ public class BlogDTO {
         this.content = blog.getContent();
         this.authorName = blog.getAuthor().getFullName();
         this.likeCount = blog.getLikeCount();
-        this.image = blog.getImages();
+        this.images = blog.getImages();
         this.authorAvatar = blog.getAuthor().getProfilePicture();
 
         this.createdAt = blog.getCreatedAt();  // Thêm gán createdAt

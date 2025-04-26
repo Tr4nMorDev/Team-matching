@@ -2,8 +2,14 @@ package ut.edu.teammatching.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.core.AbstractDestinationResolvingMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,23 +44,31 @@ public class BlogController {
 
     private final BlogRepository blogRepository;
     private final UserRepository userRepository;
+    @Autowired
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Value("${file.upload-dir:uploads/imagespost}")
     private String uploadDir;
 
     @Autowired
-    public BlogController(BlogRepository blogRepository, UserRepository userRepository) {
+    public BlogController(BlogRepository blogRepository, UserRepository userRepository , SimpMessagingTemplate messagingTemplate) {
         this.blogRepository = blogRepository;
         this.userRepository = userRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllPosts() {
+    public ResponseEntity<?> getAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
         try {
-            List<Blog> blogs = blogRepository.findAll();
-            List<BlogDTO> blogDTOs = blogs.stream()
-                    .map(BlogDTO::new) // dùng constructor BlogDTO(Blog blog)
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+            Page<Blog> blogPage = blogRepository.findAll(pageable);
+            List<BlogDTO> blogDTOs = blogPage.stream()
+                    .map(BlogDTO::new)
                     .collect(Collectors.toList());
+
             return ResponseEntity.ok(blogDTOs);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error fetching posts: " + e.getMessage());
@@ -137,6 +151,9 @@ public class BlogController {
         }
 
         Blog savedBlog = blogRepository.save(blog);
+        System.out.println("Sending blog to WebSocket topic...");
+        BlogDTO blogDTO = new BlogDTO(savedBlog); // 👈 Convert sang DTO
+        messagingTemplate.convertAndSend("/topic/blogs", blogDTO);
         return ResponseEntity.ok(savedBlog);
     }
     @Autowired
