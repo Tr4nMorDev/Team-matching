@@ -14,7 +14,7 @@ const TaskList = () => {
     useEffect(() => {
         (async () => {
             try {
-                const response = await axios.get(`/api/tasks/team/${teamId}`);
+                const response = await axios.get(`http://localhost:8080/api/tasks/team/${teamId}`);
                 setTasks(response.data);
             } catch (err) {
                 setError('Không thể tải danh sách task');
@@ -39,7 +39,7 @@ const TaskList = () => {
             const leaderId = localStorage.getItem("userId"); // Lấy leaderId từ localStorage (hoặc bất kỳ nơi nào bạn lưu trữ)
 
             // Cập nhật trạng thái task thông qua API PUT
-            await axios.put(`/api/tasks/${selectedTask.id}/status?leaderId=${leaderId}`, {
+            await axios.put(`http://localhost:8080/api/tasks/${selectedTask.id}/status?leaderId=${leaderId}`, {
                 newStatus: newStatus // Truyền trạng thái mới trong body của request
             });
 
@@ -47,7 +47,7 @@ const TaskList = () => {
             setShowModal(false);
 
             // Tải lại danh sách task mới
-            const response = await axios.get(`/api/tasks/team/${teamId}`);
+            const response = await axios.get(`http://localhost:8080/api/tasks/team/${teamId}`);
             setTasks(response.data);
         } catch (err) {
             console.error('Error updating task status:', err);
@@ -59,9 +59,9 @@ const TaskList = () => {
         try {
             const userId = localStorage.getItem("userId"); // Lấy userId từ localStorage (hoặc nơi bạn lưu trữ)
 
-            await axios.delete(`/api/tasks/${taskId}?userId=${userId}`);
+            await axios.delete(`http://localhost:8080/api/tasks/${taskId}?userId=${userId}`);
 
-            const response = await axios.get(`/api/tasks/team/${teamId}`);
+            const response = await axios.get(`http://localhost:8080/api/tasks/team/${teamId}`);
             setTasks(response.data);
 
             alert('Task đã được xóa thành công!');

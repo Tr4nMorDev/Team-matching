@@ -18,7 +18,7 @@ const CreateTaskForm = ({ onClose }) => {
         const fetchTeamMembers = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const response = await axios.get(`/api/teams/${teamId}/members/task`, {
+                const response = await axios.get(`http://localhost:8080/api/teams/${teamId}/members/task`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setTeamMembers(response.data);
@@ -38,7 +38,7 @@ const CreateTaskForm = ({ onClose }) => {
             const token = localStorage.getItem("token");
             const leaderId = localStorage.getItem("userId");
 
-            await axios.post(`/api/tasks/${teamId}/create`, formData, {
+            await axios.post(`http://localhost:8080/api/tasks/${teamId}/create`, formData, {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { leaderId },
             });
