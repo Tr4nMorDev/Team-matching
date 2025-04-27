@@ -43,19 +43,28 @@ public class TeamController {
      * ✅ Endpoint cho leader chấp nhận hoặc từ chối yêu cầu tham gia nhóm
      */
     @PostMapping("/{teamId}/join-requests/{studentId}/handle")
-    public ResponseEntity<String> handleJoinRequest(
+    public ResponseEntity<?> handleStudentJoinRequest(
             @PathVariable Long teamId,
             @PathVariable Long studentId,
             @RequestParam boolean accept,
             Authentication authentication
     ) {
-        String leaderUsername = authentication.getName(); // lấy từ JWT token
+        String username = authentication.getName(); // Lấy username từ JWT token
+
+        // Kiểm tra nếu user hợp lệ
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Người dùng không hợp lệ");
+        }
+
+        Long userId = userOpt.get().getId();  // Lấy userId từ User object
 
         try {
-            teamService.handleJoinRequest(teamId, studentId, accept, leaderUsername);
-            return ResponseEntity.ok(accept ? "Đã chấp nhận yêu cầu" : "Đã từ chối yêu cầu");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            teamService.handleJoinRequest(teamId, studentId, accept, userId);
+            String message = accept ? "Đã chấp nhận yêu cầu gia nhập nhóm." : "Đã từ chối yêu cầu gia nhập nhóm.";
+            return ResponseEntity.ok(message);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 
@@ -205,25 +214,13 @@ public class TeamController {
 
     // Lấy danh sách sinh viên đã gửi yêu cầu vào nhóm
     @GetMapping("/{teamId}/join-requests")
-    public ResponseEntity<List<Student>> getJoinRequests(@PathVariable Long teamId) {
-        // Lấy thông tin nhóm từ teamId
-        Team team = teamService.getTeamById(teamId);
-
-        // Kiểm tra xem nhóm có tồn tại không
-        if (team == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<List<TeamMemberDTO>> getJoinRequests(@PathVariable Long teamId) {
+        try {
+            List<TeamMemberDTO> joinRequests = teamService.getJoinRequests(teamId);
+            return ResponseEntity.ok(joinRequests);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Trả về lỗi nếu không tìm thấy nhóm
         }
-
-        // Lấy danh sách sinh viên có yêu cầu gia nhập nhóm
-        Map<Student, JoinRequestStatus> joinRequests = team.getJoinRequests();
-
-        // Chuyển đổi Map thành danh sách sinh viên
-        List<Student> studentsWithRequests = joinRequests.entrySet().stream()
-                .filter(entry -> entry.getValue() == JoinRequestStatus.PENDING) // Chỉ lấy các yêu cầu đang chờ
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(studentsWithRequests);
     }
 
     @GetMapping("/{teamId}/members")
