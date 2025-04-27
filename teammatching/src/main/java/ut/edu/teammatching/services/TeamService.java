@@ -1,11 +1,13 @@
 package ut.edu.teammatching.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ut.edu.teammatching.dto.team.TeamDTO;
 import ut.edu.teammatching.dto.team.TeamMemberDTO;
 import ut.edu.teammatching.enums.JoinRequestStatus;
 import ut.edu.teammatching.enums.TeamType;
+import ut.edu.teammatching.exceptions.AccessDeniedException;
 import ut.edu.teammatching.models.Lecturer;
 import ut.edu.teammatching.models.Student;
 import ut.edu.teammatching.models.Team;
@@ -211,41 +213,67 @@ public class TeamService {
      * Thiết lập leader mới cho team.
      */
     @Transactional
-    public Team setLeader(Long teamId, Long studentId) {
-        // Tìm team theo ID
+    public void changeLeader(Long teamId, Long currentUserId, Long newLeaderId) {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy team."));
 
-        // Tìm student theo ID
-        Student newLeader = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên!"));
+        // Check xem current user có quyền đổi leader không
+        boolean isCurrentLeader = team.getLeader() != null && team.getLeader().getId().equals(currentUserId);
+        boolean isLecturer = team.getLecturer() != null && team.getLecturer().getId().equals(currentUserId);
 
-        // Kiểm tra leader mới có thuộc team không
-        if (!team.getStudents().contains(newLeader)) {
-            throw new IllegalStateException("Leader phải là thành viên của team!");
+        if (!isCurrentLeader && !isLecturer) {
+            throw new SecurityException("Bạn không có quyền thay đổi leader.");
         }
 
-        // Đặt leader mới và lưu vào database
+        // Check xem newLeader có trong team chưa
+        boolean isMember = team.getStudents().stream()
+                .anyMatch(student -> student.getId().equals(newLeaderId));
+
+        if (!isMember) {
+            throw new IllegalArgumentException("Leader mới phải là thành viên của team.");
+        }
+
+        Student newLeader = studentRepository.findById(newLeaderId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sinh viên mới."));
+
         team.setLeader(newLeader);
-        return teamRepository.save(team);
+        teamRepository.save(team);
     }
 
     //Rời team
     @Transactional
-    public void leaveTeam(Long studentId, Long teamId) {
+    public void leaveTeam(Long teamId, Long userId) {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy team!"));
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhóm với ID: " + teamId));
 
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên!"));
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy người dùng với ID: " + userId));
 
-        if (team.getLeader().getId().equals(studentId)) {
-            throw new IllegalStateException("Leader không thể rời khỏi nhóm. Hãy chuyển Leader trước!");
+        if (team.getLeader() != null && team.getLeader().equals(currentUser)) {
+            throw new IllegalStateException("Leader không thể rời nhóm!");
         }
 
-        team.getStudents().remove(student);
+        if (currentUser instanceof Student) {
+            Student student = (Student) currentUser;
+
+            if (!team.getStudents().contains(student)) {
+                throw new IllegalStateException("Sinh viên không phải là thành viên của nhóm!");
+            }
+
+            team.getStudents().remove(student);
+        }
+
+        if (currentUser instanceof Lecturer) {
+            if (team.getTeamType() == TeamType.ACADEMIC && team.getLecturer().equals(currentUser)) {
+                team.setLecturer(null);
+            } else {
+                throw new IllegalStateException("Giảng viên không phải là thành viên của nhóm này!");
+            }
+        }
+
         teamRepository.save(team);
     }
+
 
     /**
      * Xóa một sinh viên khỏi team.

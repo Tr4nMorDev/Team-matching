@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile; // Import cho MultipartFile
 import ut.edu.teammatching.dto.*;
@@ -11,8 +12,7 @@ import ut.edu.teammatching.dto.team.CreateTeamDTO;
 import ut.edu.teammatching.dto.team.JoinRequestResponse;
 import ut.edu.teammatching.dto.team.TeamDTO;
 import ut.edu.teammatching.dto.team.TeamMemberDTO;
-import ut.edu.teammatching.enums.JoinRequestStatus;
-import ut.edu.teammatching.models.Student;
+import ut.edu.teammatching.exceptions.AccessDeniedException;
 import ut.edu.teammatching.models.Team;
 import ut.edu.teammatching.models.User;
 import ut.edu.teammatching.repositories.TeamRepository;
@@ -131,21 +131,28 @@ public class TeamController {
         return ResponseEntity.ok("Team deleted successfully");
     }
 
-    @PostMapping("/{teamId}/leave")
+    @DeleteMapping("/{teamId}/leave")
     public ResponseEntity<String> leaveTeam(@PathVariable Long teamId, @RequestParam Long userId) {
         try {
             teamService.leaveTeam(teamId, userId);
             return ResponseEntity.ok("User has left the team successfully.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to leave team.");
         }
     }
 
-    @PutMapping("/{id}/leader/{studentId}")
-    public ResponseEntity<Team> setLeader(@PathVariable Long id, @PathVariable Long studentId) {
-        return ResponseEntity.ok(teamService.setLeader(id, studentId));
+    @PutMapping("/{teamId}/change-leader")
+    public ResponseEntity<String> changeLeader(
+            @PathVariable Long teamId,
+            @RequestParam Long currentUserId,
+            @RequestParam Long newLeaderId) {
+
+        teamService.changeLeader(teamId, currentUserId, newLeaderId);
+        return ResponseEntity.ok("Đã đổi leader thành công.");
     }
 
     @DeleteMapping("/{teamId}/remove-student")
