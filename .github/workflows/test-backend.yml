@@ -18,6 +18,7 @@ on:
       - fix-time
       - tree-setup-loadpage
       - aaa
+      - master
   pull_request:
     branches:
       - main
