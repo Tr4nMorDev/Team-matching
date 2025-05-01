@@ -1,0 +1,33 @@
+name: Check Docker Compose
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  docker-compose-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Copy .env file (if needed)
+        run: cp .env.example .env || echo ".env exists"
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Compose services
+        run: docker-compose -f docker-compose.yml --env-file .env config
+
+      - name: Build all containers
+        run: docker-compose --env-file .env build
+
+      - name: Run healthcheck (optional)
+        run: docker-compose --env-file .env up -d && sleep 10 && docker-compose ps
+
+      - name: Tear down
+        run: docker-compose down -v

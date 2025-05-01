@@ -49,6 +49,9 @@ services:
     volumes:
       - ./my-app:/app
       - /app/node_modules
+    environment:
+      # Đây là ví dụ nếu bạn muốn explicit truyền biến môi trường từ .env vào container frontend
+      REACT_APP_API_URL: ${VITE_HOST}
 
 volumes:
   teammatching_data:
