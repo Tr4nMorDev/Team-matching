@@ -17,10 +17,6 @@
 - Đăng & đọc blog về tìm đội nhóm hoặc dự án.
 - Chia sẻ kinh nghiệm & mẹo làm việc nhóm.
 
-### 🤖 **AI Gợi ý Thành Viên**
-- Đề xuất bạn cùng nhóm dựa trên kỹ năng & sở thích.
-- Lọc thông tin nhanh chóng, giúp tìm người phù hợp.
-
 ### 💬 **Hệ thống Nhắn tin**
 - Chat nhóm và nhắn tin riêng.
 - Chia sẻ tệp, hình ảnh & tài liệu.
@@ -63,9 +59,8 @@
 
 ---
 ## 🛠️ **Công nghệ sử dụng**
-- **Backend:** Java Spring Boot ☕
-- **Frontend:** React.js ⚛️ + Tailwind CSS 🎨
+- **Backend:** Java Spring Boot ☕ + websocket 
+- **Frontend:** React.js ⚛️ + Tailwind CSS 🎨 
 - **Database:** Docker-mysql 🐘
-- **AI Matching:** Machine Learning 🤖
 
 
