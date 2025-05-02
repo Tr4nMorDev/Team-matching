@@ -42,10 +42,13 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            cd ~/deloy-teammatching || {
-              echo "Folder doesn't exist. Cloning..."
-              git clone https://github.com/Tr4nMorDev/Team-matching.git deloy-teammatching
-              cd deloy-teammatching
+            set -x
+            cd ~/deloy-teammatching/Team-matching || {
+              echo "Cloning repo because folder doesn't exist..."
+              mkdir -p ~/deloy-teammatching
+              cd ~/deloy-teammatching
+              git clone https://github.com/Tr4nMorDev/Team-matching.git
+              cd Team-matching
             }
 
             git pull origin master
