@@ -2,13 +2,9 @@
 
 ** Team Matching** là nền tảng giúp sinh viên FPTU dễ dàng tìm kiếm đội nhóm và cộng tác trong các dự án học thuật hoặc cá nhân.
 
----
+[![Xem video demo](assets/rainy-street-wet-weather-night-town-with-cars-going-along-illuminated-road-with-lampposts-crossroad_107791-4500.jpg)](https://github.com/Tr4nMorDev/Team-matching/assets/demo.mp4)
 
-<video src="assets/demo.mp4" width="600" controls>
-  Trình duyệt của bạn không hỗ trợ phát video.
-  <a href="assets/demo.mp4">Xem video tại đây</a>.
-</video>
----
+> 📽️ _Bấm vào ảnh để xem video demo_
 
 ## 🌟 Tính năng chính
 
@@ -77,4 +73,19 @@
 - **Backend:** Java Spring Boot ☕
 - **Frontend:** React.js ⚛️ + Tailwind CSS 🎨
 - **Database:** Docker-mysql 🐘
-- **AI Matching:** Machine Learning 🤖
+
+---
+
+## 🛠️ **Cách chạy dự án đơn giản khi pull **
+
+```bash
+docker-compose up --build
+```
+
+- Lưu ý : Chưa có `.env` file. Bạn cần sao chép từ `.env.example` trước khi chạy Docker Compose.
+
+```bash
+touch .env  # Tạo file .env (nếu chưa có)
+cp .env.example .env  # Sao chép cấu hình từ .env.example sang .env
+docker-compose up --build  # Xây dựng và chạy dịch vụ
+```
