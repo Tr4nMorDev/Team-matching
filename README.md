@@ -1,12 +1,13 @@
-# 🚀 FPT Team Matching
+# 🚀 Team Matching
 
-## **FPT Team Matching** là nền tảng giúp sinh viên FPTU dễ dàng tìm kiếm đội nhóm và cộng tác trong các dự án học thuật hoặc cá nhân.
+** Team Matching** là nền tảng giúp sinh viên FPTU dễ dàng tìm kiếm đội nhóm và cộng tác trong các dự án học thuật hoặc cá nhân.
+
+---
 
 <video src="assets/demo.mp4" width="600" controls>
   Trình duyệt của bạn không hỗ trợ phát video.
   <a href="assets/demo.mp4">Xem video tại đây</a>.
 </video>
-
 ---
 
 ## 🌟 Tính năng chính
@@ -25,11 +26,6 @@
 
 - Đăng & đọc blog về tìm đội nhóm hoặc dự án.
 - Chia sẻ kinh nghiệm & mẹo làm việc nhóm.
-
-### 🤖 **AI Gợi ý Thành Viên**
-
-- Đề xuất bạn cùng nhóm dựa trên kỹ năng & sở thích.
-- Lọc thông tin nhanh chóng, giúp tìm người phù hợp.
 
 ### 💬 **Hệ thống Nhắn tin**
 
@@ -73,12 +69,6 @@
 
 - Nhắn tin riêng tư & nhóm.
 - Chia sẻ tệp, hình ảnh, tài liệu.
-
-### 🔒 **Yêu cầu phi chức năng**
-
-- **⚡ Hiệu suất cao:** Xử lý nhanh với số lượng lớn sinh viên.
-- **📱 Trải nghiệm mượt mà:** Giao diện thân thiện trên desktop.
-- **🛡️ Bảo mật cao:** Dữ liệu an toàn với xác thực đa lớp.
 
 ---
 
