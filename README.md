@@ -2,7 +2,7 @@
 
 ** Team Matching** là nền tảng giúp sinh viên FPTU dễ dàng tìm kiếm đội nhóm và cộng tác trong các dự án học thuật hoặc cá nhân.
 
-[![Xem video demo](https://github.com/Tr4nMorDev/Team-matching/assets/rainy-street-wet-weather-night-town-with-cars-going-along-illuminated-road-with-lampposts-crossroad_107791-4500.jpg)](https://github.com/Tr4nMorDev/Team-matching/assets/demo.mp4)
+[![Xem video demo](https://bsisystems.com/static/bioshare/img/demo_gray.jpg)](https://drive.google.com/file/d/1miVGYAuATpcYTTTzx8SlwD8nU4CvXayJ/view?usp=drive_link)
 
 > 📽️ _Bấm vào ảnh để xem video demo_
 
